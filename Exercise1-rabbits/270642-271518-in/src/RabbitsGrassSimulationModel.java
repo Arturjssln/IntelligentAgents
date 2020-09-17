@@ -29,7 +29,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 
 		public void begin() {
-			// TODO Auto-generated method stub
 			
 		}
 
@@ -43,7 +42,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 		public String getName() {
 			// TODO Auto-generated method stub
-			return null;
+			return "Rabbits simulation";
 		}
 
 		public Schedule getSchedule() {
@@ -53,6 +52,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 		public void setup() {
 			// TODO Auto-generated method stub
+			System.out.println(this.);
 			
 		}
 }
