@@ -18,12 +18,6 @@ public class RabbitsGrassSimulationSpace {
 				ecosystem.putObjectAt(i, j, 0);
 			}
 		}
-		
-		for(int i = 0; i < size; i++) {
-			for(int j = 0; j < size; j++) {
-				wildlife.putObjectAt(i, j, false);
-			}
-		}
 	}
 	
 	public void initializeGrass(int n) {
@@ -48,7 +42,7 @@ public class RabbitsGrassSimulationSpace {
 	}
 	
 	public boolean isCellOccupied(int x, int y){
-		return (boolean)wildlife.getObjectAt(x, y);
+		return (wildlife.getObjectAt(x, y) != null);
 	}
 	
 	public boolean addRabbit(RabbitsGrassSimulationAgent rabbit){
