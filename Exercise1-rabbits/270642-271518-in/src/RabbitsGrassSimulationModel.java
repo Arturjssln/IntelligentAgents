@@ -1,7 +1,12 @@
+import java.awt.Color;
+import java.util.ArrayList;
+
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
+import uchicago.src.sim.gui.ColorMap;
+import uchicago.src.sim.gui.Value2DDisplay;
 
 /**
  * Class that implements the simulation model for the rabbits grass
@@ -23,10 +28,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private static final int NUMINITGRASS = 100; //TODO!!
 		private static final int GRASSGROWTHRATE = 100; //TODO!!
 		private static final int BIRTHTHRESHOLD = 100; //TODO!!
+		private static final int RABBITINITIALENERGY = 100; //TODO!!
 	
 		// Variables
 		private Schedule schedule;
 		private RabbitsGrassSimulationSpace rgSpace;
+		
+		private ArrayList rabbitsList;
+		
 		private DisplaySurface displayEcosystem;
 		
 		// Attributes
@@ -55,25 +64,31 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		
 		public void setup() {
 			rgSpace = null;
+			rabbitsList = new ArrayList();
 			
 			if (displayEcosystem != null) {
 				displayEcosystem.dispose();
 				displayEcosystem = null;
 		    }
-			displayEcosystem = new DisplaySurface(this, "Carry Drop Model Window 1");
-			registerDisplaySurface("Carry Drop Model Window 1", displayEcosystem);
+			displayEcosystem = new DisplaySurface(this, "Rabbits Grass Model Window 1");
+			registerDisplaySurface("Rabbits Grass Model Window 1", displayEcosystem);
 		}
 
 		public void begin() {
 			buildModel();
 			buildSchedule();
 			buildDisplay();
+			displayEcosystem.display();
 			
 		}
 		
 		public void buildModel() {
 			rgSpace = new RabbitsGrassSimulationSpace(gridSize);
 			rgSpace.initializeGrass(numInitGrass);
+			
+			for(int i=0; i < numInitRabbits; i++) {
+				addNewRabbit();
+			}
 		}
 		
 		public void buildSchedule() {
@@ -81,7 +96,22 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		public void buildDisplay() {
+			ColorMap map = new ColorMap();
 
+		    for(int i = 1; i<16; i++){
+		      map.mapColor(i, new Color((int)(i * 8 + 127), 0, 0));
+		    }
+		    map.mapColor(0, Color.white);
+
+		    Value2DDisplay displayGrass = new Value2DDisplay(rgSpace.getCurrentEcosystem(), map);
+
+		    displayEcosystem.addDisplayable(displayGrass, "Grass");
+		}
+		
+		private void addNewRabbit() {
+			RabbitsGrassSimulationAgent r = new RabbitsGrassSimulationAgent(RABBITINITIALENERGY);
+			rabbitsList.add(r);
+			rgSpace.addRabbit(r);
 		}
 
 		public String[] getInitParam() {
