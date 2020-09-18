@@ -33,14 +33,6 @@ public class RabbitsGrassSimulationSpace {
 	    }
 	}
 	
-	public int getGrassQuantityAt(int x, int y) {
-		return (Integer)ecosystem.getObjectAt(x,y);
-	}
-	
-	public Object2DGrid getCurrentEcosystem(){
-	    return ecosystem;
-	}
-	
 	public boolean isCellOccupied(int x, int y){
 		return (wildlife.getObjectAt(x, y) != null);
 	}
@@ -65,5 +57,16 @@ public class RabbitsGrassSimulationSpace {
 	    return success;
 	  }
 	
+	public int getGrassQuantityAt(int x, int y) {
+		return (Integer)ecosystem.getObjectAt(x,y);
+	}
+	
+	public Object2DGrid getCurrentEcosystem(){
+	    return ecosystem;
+	}
+	
+	public Object2DGrid getCurrentWildlife(){
+		return wildlife;
+	}
 	
 }

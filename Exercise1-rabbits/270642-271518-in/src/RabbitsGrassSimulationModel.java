@@ -7,6 +7,9 @@ import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.ColorMap;
 import uchicago.src.sim.gui.Value2DDisplay;
+import uchicago.src.sim.gui.Object2DDisplay;
+import uchicago.src.sim.util.SimUtilities;
+import uchicago.src.sim.engine.BasicAction;
 
 /**
  * Class that implements the simulation model for the rabbits grass
@@ -65,6 +68,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		public void setup() {
 			rgSpace = null;
 			rabbitsList = new ArrayList();
+			schedule = new Schedule(1);
 			
 			if (displayEcosystem != null) {
 				displayEcosystem.dispose();
@@ -92,6 +96,17 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		public void buildSchedule() {
+			class RabbitsGrassSimulationStep extends BasicAction {
+				public void execute() {
+					SimUtilities.shuffle(rabbitsList);
+					for(int i =0; i < rabbitsList.size(); i++){
+						RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
+						rgsa.step();
+					}
+				}
+		    }
+			
+			schedule.scheduleActionBeginning(0, new RabbitsGrassSimulationStep());
 
 		}
 		
@@ -104,8 +119,13 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		    map.mapColor(0, Color.white);
 
 		    Value2DDisplay displayGrass = new Value2DDisplay(rgSpace.getCurrentEcosystem(), map);
-
+		    
+		    Object2DDisplay displayRabbits = new Object2DDisplay(rgSpace.getCurrentWildlife());
+		    displayRabbits.setObjectList(rabbitsList);
+		    
 		    displayEcosystem.addDisplayable(displayGrass, "Grass");
+		    displayEcosystem.addDisplayable(displayRabbits, "Rabbits");
+		    
 		}
 		
 		private void addNewRabbit() {
