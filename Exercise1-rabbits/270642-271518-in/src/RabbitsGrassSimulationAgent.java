@@ -35,6 +35,10 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 		return y;
 	}
 	
+	public int getEnergy() {
+		return energy;
+	}
+	
 	public void setX(int x_) {
 		x = x_;
 	}
@@ -42,5 +46,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	public void setY(int y_) {
 		y = y_;
 	}
+	
+	
 
 }

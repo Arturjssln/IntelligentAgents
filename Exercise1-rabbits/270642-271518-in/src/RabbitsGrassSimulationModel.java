@@ -107,6 +107,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		    }
 			
 			schedule.scheduleActionBeginning(0, new RabbitsGrassSimulationStep());
+			
+			class RabbitsCountLiving extends BasicAction {
+				public void execute(){
+					countLivingRabbits();
+				}
+			}
+
+			schedule.scheduleActionAtInterval(10, new RabbitsCountLiving());
 
 		}
 		
@@ -133,6 +141,17 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 			rabbitsList.add(r);
 			rgSpace.addRabbit(r);
 		}
+		
+		private int countLivingRabbits(){
+		    int livingRabbits = 0;
+		    for(int i = 0; i < rabbitsList.size(); i++){
+		      RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
+		      if(rgsa.getEnergy() > 0) livingRabbits++;
+		    }
+		    System.out.println("Number of living rabbits is: " + livingRabbits);
+
+		    return livingRabbits;
+		  }
 
 		public String[] getInitParam() {
 			// TODO Auto-generated method stub
@@ -143,12 +162,10 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 
 		public String getName() {
-			// TODO Auto-generated method stub
 			return "Rabbits simulation";
 		}
 		
 		public Schedule getSchedule() {
-			// TODO Auto-generated method stub
 			return schedule;
 		}
 
