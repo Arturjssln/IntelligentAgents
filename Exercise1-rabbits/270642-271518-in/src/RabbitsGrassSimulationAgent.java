@@ -12,10 +12,10 @@ import uchicago.src.sim.space.Object2DGrid;
 
 public class RabbitsGrassSimulationAgent implements Drawable {
 
-	private static final int BIRTHTHRESHOLD = 100; // TODO: remove this variable from Agent
+	//private static final int BIRTHTHRESHOLD = 100; // TODO: remove this variable from Agent
 
 	private int energy;
-	private int birthThreshold = BIRTHTHRESHOLD; // TODO: remove this variable from Agent
+	//private int birthThreshold = BIRTHTHRESHOLD; // TODO: remove this variable from Agent
 	private int x;
 	private int y;
 	private int dx; 
@@ -32,7 +32,8 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 		G.drawFastRoundRect(Color.gray);
 	}
 	
-	public void step(boolean reproduce){
+	public void step(){
+	//public void step(boolean reproduce){
 		
 		// Rabbits on the move
 		int newX = x + dx;
@@ -43,17 +44,18 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	    newY = (newY + grid.getSizeY()) % grid.getSizeY();
 
 	    if(tryMove(newX, newY)){
-	    	energy += rgSpace.eatGrassAt(x,y); 
+	    	energy += rgSpace.eatGrassAt(x,y);
 	    	setRandomDirection();
 	    } else{   	
 	    	setRandomDirection();	      
 	    }
 	    
 	    // Reproduction
-	    if (energy >= birthThreshold) { // TODO: remove this variable from Agent
+	   /* if (energy >= birthThreshold) { // TODO: remove this variable from Agent
 	    	reproduce = true;  
 	    	energy = (int)energy/2; //TODO!!!!!!!!
 	    }
+	    */
 	    
 	    // Aging 
 		energy--;
@@ -90,6 +92,9 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 		}while((dx==0) && (dy==0));
 	}
 	
+	public void setEnergy(int nrj) {
+		energy = nrj; 
+	}
 	public void setRabbitsGrassSimulationSpace(RabbitsGrassSimulationSpace rgs) {
 		rgSpace = rgs; 
 	}

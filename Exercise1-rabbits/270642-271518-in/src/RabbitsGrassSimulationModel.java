@@ -31,13 +31,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 	
 		// Default values
 		private static final int GRIDSIZE = 20;
-		private static final int NUMINITRABBITS = 2; //TODO!!
+		private static final int NUMINITRABBITS = 1; //TODO!!
 		private static final int NUMINITGRASS = 100; //TODO!!
 		private static final int GRASSGROWTHRATE = 100; //TODO!!
 		private static final int RABBITINITIALENERGY = 1000; //TODO!!
 		private static final int MAXGRASS = 16; //TODO!!
 		private static final int MAXKITTENS = 6;
-		private static final int BIRTHTHRESHOLD = 200; //TODO!!
+		private static final int BIRTHTHRESHOLD = 1100; //TODO!!
+		private static final double ENERGYREPRATE = 0.5; //TODO!!
 	
 		// Variables
 		private Schedule schedule;
@@ -55,6 +56,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private int maxGrass = MAXGRASS;
 		private int maxKittens = MAXKITTENS; 
 		private int birthThreshold = BIRTHTHRESHOLD;
+		private double energyRepRate = ENERGYREPRATE;
 		
 		
 	
@@ -108,23 +110,21 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 				public void execute() {
 					SimUtilities.shuffle(rabbitsList);
 					for(int i =0; i < rabbitsList.size(); i++){
-						boolean reproduce = false;
+						//boolean reproduce = false;
 						RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
 						
-						rgsa.step(reproduce);
-						
-						// Reproduction
-						if (reproduce) {
-							reproduction(); 
-						}
-						
+						//rgsa.step(reproduce);
+						rgsa.step();					
 					}
 					
-					// Update display 
+					// Update Display 
 					displayEcosystem.updateDisplay(); 
 					
-					// Killing Rabbits
+					// Kill Rabbits
 			        reapDeadRabbits();
+			        
+					// Reproduction
+					reproduction(); 
 			        
 				}
 		    }
@@ -161,13 +161,21 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		    
 		}
 		
-		private void reproduction() {
-			int nbKittens = (int)(Math.random()*maxKittens);
-			for (int i=0; i<nbKittens; i++) {
-				addNewRabbit(); 
+		private void reproduction() { 
+			for(int i = (rabbitsList.size() - 1); i >= 0 ; i--){
+				RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
+				if(rgsa.getEnergy() >= birthThreshold) {
+					int nbKittens = (int)(Math.random()*maxKittens);
+					for (int j=0; i<nbKittens; j++) {
+				    	System.out.println("before");
+				    	countLivingRabbits();
+						addNewRabbit();
+				    	System.out.println("after");
+				    	countLivingRabbits();
+					}
+					rgsa.setEnergy((int)(rgsa.getEnergy()*energyRepRate)); 
+				}
 			}
-			
-			
 		}
 		
 		private void addNewRabbit() {
@@ -179,7 +187,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private void reapDeadRabbits(){
 			for(int i = (rabbitsList.size() - 1); i >= 0 ; i--){
 		    	RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
-		        if(rgsa.getEnergy() < 1){
+		        if(rgsa.getEnergy() < 1) {
 		        	rgSpace.removeRabbitAt(rgsa.getX(), rgsa.getY());
 		        	rabbitsList.remove(i);
 		        }
