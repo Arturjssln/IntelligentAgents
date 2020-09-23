@@ -37,6 +37,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private static final int RABBITINITIALENERGY = 1000; //TODO!!
 		private static final int MAXGRASS = 16; //TODO!!
 		private static final int MAXKITTENS = 6;
+		private static final int BIRTHTHRESHOLD = 200; //TODO!!
 	
 		// Variables
 		private Schedule schedule;
@@ -53,6 +54,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private int grassGrowthRate = GRASSGROWTHRATE;
 		private int maxGrass = MAXGRASS;
 		private int maxKittens = MAXKITTENS; 
+		private int birthThreshold = BIRTHTHRESHOLD;
 		
 		
 	

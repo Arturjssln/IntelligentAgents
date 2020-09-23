@@ -12,10 +12,10 @@ import uchicago.src.sim.space.Object2DGrid;
 
 public class RabbitsGrassSimulationAgent implements Drawable {
 
-	private static final int BIRTHTHRESHOLD = 100; //TODO!!
+	private static final int BIRTHTHRESHOLD = 100; // TODO: remove this variable from Agent
 
 	private int energy;
-	private int birthThreshold = BIRTHTHRESHOLD;
+	private int birthThreshold = BIRTHTHRESHOLD; // TODO: remove this variable from Agent
 	private int x;
 	private int y;
 	private int dx; 
@@ -44,14 +44,15 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 
 	    if(tryMove(newX, newY)){
 	    	energy += rgSpace.eatGrassAt(x,y); 
+	    	setRandomDirection();
 	    } else{   	
 	    	setRandomDirection();	      
 	    }
 	    
 	    // Reproduction
-	    if (energy >= birthThreshold) {
+	    if (energy >= birthThreshold) { // TODO: remove this variable from Agent
 	    	reproduce = true;  
-	    	energy = energy; //TODO!!!!!!!!
+	    	energy = (int)energy/2; //TODO!!!!!!!!
 	    }
 	    
 	    // Aging 
@@ -84,8 +85,8 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	
 	private void setRandomDirection() {
 		do {
-		      dx = (int)Math.floor(Math.random() * 3) - 1;
-		      dy = (int)Math.floor(Math.random() * 3) - 1;
+			dx = (int)Math.floor(Math.random() * 3) - 1;
+		    dy = (int)Math.floor(Math.random() * 3) - 1;
 		}while((dx==0) && (dy==0));
 	}
 	
