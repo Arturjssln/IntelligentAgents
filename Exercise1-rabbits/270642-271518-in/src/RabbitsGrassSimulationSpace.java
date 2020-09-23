@@ -6,6 +6,8 @@ import uchicago.src.sim.space.Object2DGrid;
  */
 
 public class RabbitsGrassSimulationSpace {
+	
+	// Attributes
 	private Object2DGrid ecosystem;
 	private Object2DGrid wildlife;
 	
@@ -34,7 +36,7 @@ public class RabbitsGrassSimulationSpace {
 	}
 	
 	public boolean isCellOccupied(int x, int y){
-		return (wildlife.getObjectAt(x, y) != null);
+		return (wildlife.getObjectAt(x,y) != null);
 	}
 	
 	public boolean addRabbit(RabbitsGrassSimulationAgent rabbit){
@@ -50,6 +52,7 @@ public class RabbitsGrassSimulationSpace {
 		    	wildlife.putObjectAt(x, y, rabbit);
 		    	rabbit.setX(x);
 		    	rabbit.setY(y);
+		    	rabbit.setRabbitsGrassSimulationSpace(this);
 		    	success = true;
 		    }
 		    count++;
@@ -57,8 +60,31 @@ public class RabbitsGrassSimulationSpace {
 	    return success;
 	  }
 	
+	public void removeRabbitAt(int x, int y) {
+		wildlife.putObjectAt(x, y, null);
+	}
+	
+	public int eatGrassAt(int x, int y) {
+		// Return eaten quantity of grass
+		int energy = getGrassQuantityAt(x, y); 
+		ecosystem.putObjectAt(x, y, 0); //TODO!! eat a small part of the grass only 
+		return energy;	
+	}
+	
+	public boolean moveRabbitAt(int x, int y, int x_, int y_){
+	    if(!isCellOccupied(x_, y_)){
+	    	RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)wildlife.getObjectAt(x, y);
+	    	removeRabbitAt(x,y);
+	    	rgsa.setX(x_);
+	    	rgsa.setY(y_);
+	    	wildlife.putObjectAt(x_, y_, rgsa);
+	    	return true;
+	    }
+	    return false;
+	}
+
 	public int getGrassQuantityAt(int x, int y) {
-		return (Integer)ecosystem.getObjectAt(x,y);
+		return (Integer)ecosystem.getObjectAt(x, y);
 	}
 	
 	public Object2DGrid getCurrentEcosystem(){

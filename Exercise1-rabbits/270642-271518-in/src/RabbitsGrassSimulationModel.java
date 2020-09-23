@@ -22,16 +22,21 @@ import uchicago.src.sim.engine.BasicAction;
  * - Artur Jesslen - 270642
  */
 
-
 public class RabbitsGrassSimulationModel extends SimModelImpl {		
 		
+		//Colors
+		public static final Color MUD_COLOR = new Color(102,51,0);
+		public static final Color GRASS_COLOR = new Color(0,102,0);
+		
+	
 		// Default values
 		private static final int GRIDSIZE = 20;
-		private static final int NUMINITRABBITS = 100; //TODO!!
+		private static final int NUMINITRABBITS = 2; //TODO!!
 		private static final int NUMINITGRASS = 100; //TODO!!
 		private static final int GRASSGROWTHRATE = 100; //TODO!!
-		private static final int BIRTHTHRESHOLD = 100; //TODO!!
-		private static final int RABBITINITIALENERGY = 100; //TODO!!
+		private static final int RABBITINITIALENERGY = 1000; //TODO!!
+		private static final int MAXGRASS = 16; //TODO!!
+		private static final int MAXKITTENS = 6;
 	
 		// Variables
 		private Schedule schedule;
@@ -46,7 +51,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private int numInitRabbits = NUMINITRABBITS;
 		private int numInitGrass = NUMINITGRASS;
 		private int grassGrowthRate = GRASSGROWTHRATE;
-		private int birthThreshold = BIRTHTHRESHOLD;
+		private int maxGrass = MAXGRASS;
+		private int maxKittens = MAXKITTENS; 
 		
 		
 	
@@ -100,9 +106,24 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 				public void execute() {
 					SimUtilities.shuffle(rabbitsList);
 					for(int i =0; i < rabbitsList.size(); i++){
+						boolean reproduce = false;
 						RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
-						rgsa.step();
+						
+						rgsa.step(reproduce);
+						
+						// Reproduction
+						if (reproduce) {
+							reproduction(); 
+						}
+						
 					}
+					
+					// Update display 
+					displayEcosystem.updateDisplay(); 
+					
+					// Killing Rabbits
+			        reapDeadRabbits();
+			        
 				}
 		    }
 			
@@ -119,12 +140,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		public void buildDisplay() {
+			
+			// Create color map for display 
 			ColorMap map = new ColorMap();
-
-		    for(int i = 1; i<16; i++){
-		      map.mapColor(i, new Color((int)(i * 8 + 127), 0, 0));
+			
+		    for(int i = 1; i<maxGrass ; i++){
+		    	map.mapColor(i, GRASS_COLOR);
 		    }
-		    map.mapColor(0, Color.white);
+		    map.mapColor(0, MUD_COLOR);
 
 		    Value2DDisplay displayGrass = new Value2DDisplay(rgSpace.getCurrentEcosystem(), map);
 		    
@@ -136,11 +159,30 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		    
 		}
 		
+		private void reproduction() {
+			int nbKittens = (int)(Math.random()*maxKittens);
+			for (int i=0; i<nbKittens; i++) {
+				addNewRabbit(); 
+			}
+			
+			
+		}
+		
 		private void addNewRabbit() {
 			RabbitsGrassSimulationAgent r = new RabbitsGrassSimulationAgent(RABBITINITIALENERGY);
 			rabbitsList.add(r);
 			rgSpace.addRabbit(r);
 		}
+		
+		private void reapDeadRabbits(){
+			for(int i = (rabbitsList.size() - 1); i >= 0 ; i--){
+		    	RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
+		        if(rgsa.getEnergy() < 1){
+		        	rgSpace.removeRabbitAt(rgsa.getX(), rgsa.getY());
+		        	rabbitsList.remove(i);
+		        }
+			}
+		  }
 		
 		private int countLivingRabbits(){
 		    int livingRabbits = 0;
