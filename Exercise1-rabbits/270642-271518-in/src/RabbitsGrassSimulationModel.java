@@ -18,7 +18,7 @@ import uchicago.src.sim.engine.BasicAction;
  * environment and the simulation.
  *
  * @author 
- * - Célia Benquet - 271518
+ * - Celia Benquet - 271518
  * - Artur Jesslen - 270642
  */
 
