@@ -89,7 +89,7 @@ public class RabbitsGrassSimulationSpace {
 	public int eatGrassAt(int x, int y) {
 		// Return eaten quantity of grass
 		int energy = getGrassQuantityAt(x, y); 
-		ecosystem.putObjectAt(x, y, 0); //TODO!! eat a small part of the grass only 
+		ecosystem.putObjectAt(x, y, 0);
 		return energy;	
 	}
 	

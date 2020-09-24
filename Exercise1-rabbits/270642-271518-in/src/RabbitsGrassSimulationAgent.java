@@ -93,7 +93,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 		do {
 			dx = (int)Math.floor(Math.random() * 3) - 1;
 		    dy = (int)Math.floor(Math.random() * 3) - 1;
-		}while((dx==0) && (dy==0));
+		} while(((dx==0) && (dy==0)) || (dx * dy != 0));
 	}
 	
 	public void setEnergy(int nrj) {

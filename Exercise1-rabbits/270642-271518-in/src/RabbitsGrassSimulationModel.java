@@ -37,14 +37,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private static final Color GRASS_COLOR = new Color(0,102,0);
 		// Default values
 		private static final int GRIDSIZE = 20;
-		private static final int NUMINITRABBITS = 1; //TODO!!
-		private static final int NUMINITGRASS = 100; //TODO!!
-		private static final int GRASSGROWTHRATE = 100; //TODO!!
-		private static final int RABBITINITIALENERGY = 1000; //TODO!!
-		private static final int MAXGRASS = 16; //TODO!!
+		private static final int NUMINITRABBITS = 2;
+		private static final int NUMINITGRASS = 100;
+		private static final int GRASSGROWTHRATE = 10;
+		private static final int RABBITINITIALENERGY = 500;
+		private static final int MAXGRASS = 20;
 		private static final int MAXKITTENS = 6;
-		private static final int BIRTHTHRESHOLD = 1100; //TODO!!
-		private static final double MAXENERGYREPRATE = 0.5; //TODO!!
+		private static final int BIRTHTHRESHOLD = 750;
+		private static final double MAXENERGYREPRATE = 0.5;
 	
 		// Variables
 		private Schedule schedule;
@@ -84,7 +84,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 			model.fileName = "log/stats-"+instant.toString()+".csv";
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(model.fileName, true));
-				writer.write("Rabbits, Grass\n");
+				writer.write("Rabbits,Grass\n");
 				writer.close();
 			} catch (IOException e) {
 				System.out.println("Error while writing header on log file");
