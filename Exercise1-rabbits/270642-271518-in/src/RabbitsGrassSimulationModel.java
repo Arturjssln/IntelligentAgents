@@ -81,7 +81,14 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 			// Prepare log file
 			Clock clock = Clock.systemDefaultZone();
 			Instant instant = clock.instant();
-			model.fileName = "Exercise1-rabbits/270642-271518-in/log/stats-"+instant.toString()+".txt";
+			model.fileName = "log/stats-"+instant.toString()+".csv";
+			try {
+				BufferedWriter writer = new BufferedWriter(new FileWriter(model.fileName, true));
+				writer.write("Rabbits, Grass\n");
+				writer.close();
+			} catch (IOException e) {
+				System.out.println("Error while writing header on log file");
+			}
 		}
 		
 		public void setup() {
