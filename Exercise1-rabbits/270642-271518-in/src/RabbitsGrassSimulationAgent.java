@@ -1,5 +1,7 @@
 import uchicago.src.sim.gui.Drawable;
-import java.awt.Color;
+
+import javax.swing.ImageIcon;
+
 import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
 
@@ -7,20 +9,26 @@ import uchicago.src.sim.space.Object2DGrid;
 /**
  * Class that implements the simulation agent for the rabbits grass simulation.
 
- * @author
+ * @author 
+ * - Celia Benquet - 271518
+ * - Artur Jesslen - 270642
  */
 
 public class RabbitsGrassSimulationAgent implements Drawable {
 
-	//private static final int BIRTHTHRESHOLD = 100; // TODO: remove this variable from Agent
+	// CONSTANTS
+	public static final double PROBACHANGEDIRECTION = 0.1;
 
+	// Variables
 	private int energy;
-	//private int birthThreshold = BIRTHTHRESHOLD; // TODO: remove this variable from Agent
 	private int x;
 	private int y;
 	private int dx; 
 	private int dy; 
 	private RabbitsGrassSimulationSpace rgSpace; 
+
+	// Attributes
+	private final double probaChangeDirection = PROBACHANGEDIRECTION;
 	
 	
 	public RabbitsGrassSimulationAgent(int nrj) {
@@ -29,11 +37,11 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	}
 	
 	public void draw(SimGraphics G) {
-		G.drawFastRoundRect(Color.gray);
+		// Draw rabbits
+		G.drawImageToFit((new ImageIcon("Exercise1-rabbits/270642-271518-in/img/rabbit.png")).getImage());
 	}
 	
 	public void step(){
-	//public void step(boolean reproduce){
 		
 		// Rabbits on the move
 		int newX = x + dx;
@@ -44,19 +52,15 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	    newY = (newY + grid.getSizeY()) % grid.getSizeY();
 
 	    if(tryMove(newX, newY)){
-	    	energy += rgSpace.eatGrassAt(x,y);
-	    	setRandomDirection();
+			energy += rgSpace.eatGrassAt(x,y);
+			// Probability to change direction of no obstacle encountered
+			if (Math.random() < probaChangeDirection) {
+				setRandomDirection();
+			}
 	    } else{   	
 	    	setRandomDirection();	      
-	    }
-	    
-	    // Reproduction
-	   /* if (energy >= birthThreshold) { // TODO: remove this variable from Agent
-	    	reproduce = true;  
-	    	energy = (int)energy/2; //TODO!!!!!!!!
-	    }
-	    */
-	    
+		}
+		
 	    // Aging 
 		energy--;
 	}

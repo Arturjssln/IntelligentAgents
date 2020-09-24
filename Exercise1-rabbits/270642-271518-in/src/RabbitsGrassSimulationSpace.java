@@ -2,7 +2,10 @@ import uchicago.src.sim.space.Object2DGrid;
 
 /**
  * Class that implements the simulation space of the rabbits grass simulation.
+ * 
  * @author 
+ * - Celia Benquet - 271518
+ * - Artur Jesslen - 270642
  */
 
 public class RabbitsGrassSimulationSpace {
@@ -33,6 +36,25 @@ public class RabbitsGrassSimulationSpace {
 	    	// Fill the empty cell with a grass object
 	    	ecosystem.putObjectAt(x, y, 1);
 	    }
+	}
+
+	public void addGrass() {
+		// Look for a random cell
+		int x = (int)(Math.random()*(ecosystem.getSizeX()));
+		int y = (int)(Math.random()*(ecosystem.getSizeY()));
+		int grassValue = (Integer)ecosystem.getObjectAt(x,y);
+		// Add one to this cell
+		ecosystem.putObjectAt(x, y, grassValue+1);
+	}
+
+	public int countGrass() {
+		int grassQuantity = 0;
+		for (int i=0; i < ecosystem.getSizeX(); i++) {
+			for (int j=0; j < ecosystem.getSizeY(); j++) {
+				grassQuantity += (Integer)ecosystem.getObjectAt(i,j);
+			}
+		}
+		return grassQuantity;
 	}
 	
 	public boolean isCellOccupied(int x, int y){
