@@ -13,8 +13,6 @@ import uchicago.src.sim.util.SimUtilities;
 import uchicago.src.sim.engine.BasicAction;
 
 // Log info
-import java.time.Clock;
-import java.time.Instant;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 /**
@@ -70,34 +68,19 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		// Methods 
 		public static void main(String[] args) {
 			// Create & Run the simulation
-			
 			System.out.println("Rabbit skeleton");
 
 			SimInit init = new SimInit();
 			RabbitsGrassSimulationModel model = new RabbitsGrassSimulationModel();
 			
-			// Do "not" modify the following lines of parsing arguments
 			if (args.length == 0) // by default, you don't use parameter file nor batch mode 
 				init.loadModel(model, "", false);
 			else
 				init.loadModel(model, args[0], Boolean.parseBoolean(args[1]));
 
-			// Prepare log file
-			Clock clock = Clock.systemDefaultZone();
-			Instant instant = clock.instant();
-			model.fileName = "log/stats-"+instant.toString()+".csv";
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(model.fileName, true));
-				writer.write("Rabbits,Grass\n");
-				writer.close();
-			} catch (IOException e) {
-				System.out.println("Error while writing header on log file");
-			}
 		}
 		
 		public void setup() {
-			// Reset the simulation
-			
 			rgSpace = null;
 			rabbitsList = new ArrayList<RabbitsGrassSimulationAgent>();
 			schedule = new Schedule(1);
@@ -112,8 +95,16 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 
 		public void begin() {
+			// Prepare log file
+			fileName = String.format("Exercise1-rabbits/270642-271518-in/log/test-stats-BT_%d-GGR_%d-GS_%d-MK_%d-NIG_%d-NIR_%d.csv", birthThreshold, grassGrowthRate, gridSize, maxKittens, numInitGrass, numInitRabbits);
+			try {
+				BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+				writer.write("Rabbits,Grass\n");
+				writer.close();
+			} catch (IOException e) {
+				System.out.println("Error while writing header on log file");
+			}
 			// Initialise the simulation 
-			
 			buildModel();
 			buildSchedule();
 			buildDisplay();
@@ -122,8 +113,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		public void buildModel() {
-			// Initialise the environment, Create grid, Place rabbits and grass
-			
+			// Initialize environment
 			rgSpace = new RabbitsGrassSimulationSpace(gridSize);
 			rgSpace.initializeGrass(numInitGrass);
 			
@@ -182,9 +172,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		public void buildDisplay() {
-			// Display wildlife and ecosystem in the grid 
-
-			// Create color map for display 
+			// Create color map to display grass
 			ColorMap map = new ColorMap();
 		    for(int i = 1; i<maxGrass ; i++){
 		    	map.mapColor(i, GRASS_COLOR);
@@ -199,40 +187,33 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		    
 		}
 		
+		// Reproduction process for wildlife
 		private void reproduction() { 
-			// Reproduction process for wildlife
-			
-			//TODO! t'avais une explication mais je pense pas que ce soit ca c'est
-			//peut etre une histoire d'acces a un array quand t'en enleve dans la mort ??
-			
-			
-			
+			// from end of the table so newly created rabbits are not taken into account
 			for (int i=rabbitsList.size()-1; i >= 0 ; i--) {
 				RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
 				// If rabbit has enough energy and is old enough 
 				if((rgsa.getEnergy()>=birthThreshold) && (rgsa.getAge()>puberty)) {
 					// Random number of kittens in the litter
-					int nbKittens = (int)(Math.random()*maxKittens);
+					int nbKittens = (int)(Math.random()*maxKittens+0.5);
 					for (int j=0; j<nbKittens; j++) {
 						addNewRabbit();
 					}
-					// Looses energy, depending on litter size
+					// Looses energy (depending on litter size)
 					rgsa.setEnergy((int)(rgsa.getEnergy()*(1 - maxEnergyRepRate*nbKittens/maxKittens))); 
 				}
 			}
 		}
 
+		// Grass growth process
 		private void grassSpreading() {
-			// Grass growth process
-			
 			for (int i=0; i < grassGrowthRate; i++) {
-				rgSpace.addGrass();
+				rgSpace.addGrass(maxGrass);
 			}
 		}
 		
+		// Add new rabbit randomly in the grid
 		private void addNewRabbit() {
-			// Add new rabbit randomly in the grid
-			
 			RabbitsGrassSimulationAgent r = new RabbitsGrassSimulationAgent(RABBITINITIALENERGY);
 			// If empty spot available 
 			if (rgSpace.addRabbit(r)) {
@@ -240,34 +221,28 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 				rabbitsList.add(r);
 			}
 		}
-		
+
+		// Rabbit Death process 
 		private void reapDeadRabbits(){
-			// Rabbit Death process 
-			
 			for(int i = (rabbitsList.size() - 1); i >= 0 ; i--){
 		    	RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
-		        // If energy too low, the rabbit dies 
-		    	if(rgsa.getEnergy() < 1) {
-		    		// Remove it from the grid 
+		        // If energy too low, the rabbit dies
+		    	if(rgsa.getEnergy() <= 0) {
 		        	rgSpace.removeRabbitAt(rgsa.getX(), rgsa.getY());
-		        	// Remove it from the rabbit list
 		        	rabbitsList.remove(i);
 		        }
 			}
 		  }
 		
+		// Count number of living rabbits 
 		private int countLivingRabbits(){
-			// Count number of living rabbits 
-			
 		    int livingRabbits = 0;
 		    for(int i = 0; i < rabbitsList.size(); i++){
 		      RabbitsGrassSimulationAgent rgsa = (RabbitsGrassSimulationAgent)rabbitsList.get(i);
-		      // If rabbit still has energy, add it to the count
 		      if(rgsa.getEnergy() > 0) {
 		    	  livingRabbits++;
 		      }
 		    }
-				
 		    return livingRabbits;
 		  }
 
@@ -278,7 +253,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 
 		// GETTERS 
-		
 		public String getName() {
 			return "Rabbits simulation";
 		}
@@ -312,7 +286,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 		
 		// SETTERS
-		
 		public void setGridSize(int n) {
 			gridSize = n;
 		}
@@ -338,13 +311,10 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 			maxKittens = n;
 		}
 		
+		// Write rabbit count in a file to analyse 
 		private void logStats() {
-			// Write rabbit count in a file to analyse 
-
 			int livingRabbits = countLivingRabbits(); 
-			
 			String content = livingRabbits +"," + rgSpace.countGrass() + '\n';
-			
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
 				writer.write(content);

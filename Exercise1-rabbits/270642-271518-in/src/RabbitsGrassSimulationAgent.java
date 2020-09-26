@@ -31,59 +31,51 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	// Attributes
 	private final double probaChangeDirection = PROBACHANGEDIRECTION;
 	
-	
+	// Constructor 
 	public RabbitsGrassSimulationAgent(int nrj) {
-		// Constructor 
-		
 		energy = nrj;
 		age = 0; 
 		setRandomDirection(); 
 	}
 	
 	public void draw(SimGraphics G) {
-		// Draw rabbits as an image
-		G.drawImageToFit((new ImageIcon("img/rabbit.png")).getImage());
+		G.drawImageToFit((new ImageIcon("Exercise1-rabbits/270642-271518-in/img/rabbit.png")).getImage());
 	}
-	
+
+	// Step of time of the simulation for the agent 
 	public void step(){
-		// Step of time of the simulation for the agent 
-		
 		// Rabbits on the move
 		int newX = x + dx;
 	    int newY = y + dy;
 
 	    Object2DGrid grid = rgSpace.getCurrentWildlife();
-	    // Get new direction
-	    newX = (newX + grid.getSizeX()) % grid.getSizeX();
+		// Torus-shaped world
+		newX = (newX + grid.getSizeX()) % grid.getSizeX();
 	    newY = (newY + grid.getSizeY()) % grid.getSizeY();
 
 
-	    // If new cell available 
+	    // Check if new cell is available
 	    if(tryMove(newX, newY)){
-	    	// Eat the grass in the cell 
 			energy += rgSpace.eatGrassAt(x,y);
 			
-			// Probability to change direction of no obstacle encountered
+			// Probability to change direction if no obstacle encountered
 			if (Math.random() < probaChangeDirection) {
 				setRandomDirection();
 			}
-				
 		} else{   	
 	    	setRandomDirection();	      
 		}
 			
-	    // Aging 
+	    // Aging
 		energy--;
 		age++; 
 	}
 	
 	private boolean tryMove(int x_, int y_) {
-		// Test if new cell available
-		return rgSpace.moveRabbitAt(x,y,x_,y_); 
+		return rgSpace.moveRabbitAt(x,y,x_,y_); // return false if not free
 	}
 	
 	// GETTERS
-	
 	public int getX() {
 		return x;
 	}
@@ -101,10 +93,8 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	}
 	
 	// SETTERS 
-	
 	private void setRandomDirection() {
-		// Set random direction in one of the 4 available dof 
-		
+		// Set random direction in one of the 4 available directions 
 		do {
 			dx = (int)Math.floor(Math.random() * 3) - 1;
 		    dy = (int)Math.floor(Math.random() * 3) - 1;
