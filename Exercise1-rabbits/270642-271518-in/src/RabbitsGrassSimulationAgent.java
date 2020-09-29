@@ -39,7 +39,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 	}
 	
 	public void draw(SimGraphics G) {
-		G.drawImageToFit((new ImageIcon("Exercise1-rabbits/270642-271518-in/img/rabbit.png")).getImage());
+		G.drawImageToFit((new ImageIcon("img/rabbit.png")).getImage());
 	}
 
 	// Step of time of the simulation for the agent 

@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import uchicago.src.sim.engine.Schedule;
@@ -12,9 +11,6 @@ import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.util.SimUtilities;
 import uchicago.src.sim.engine.BasicAction;
 
-// Log info
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 /**
  * Class that implements the simulation model for the rabbits grass
  * simulation.  This is the first class which needs to be setup in
@@ -25,9 +21,7 @@ import java.io.FileWriter;
  * - Celia Benquet - 271518
  * - Artur Jesslen - 270642
  */
-
 public class RabbitsGrassSimulationModel extends SimModelImpl {		
-		
 	
 		// CONSTANTS
 		// Colors
@@ -61,7 +55,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		private int birthThreshold = BIRTHTHRESHOLD;
 		private double maxEnergyRepRate = MAXENERGYREPRATE;
 		private int puberty = PUBERTY; 
-		private String fileName;
 		
 		
 	
@@ -95,16 +88,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 		}
 
 		public void begin() {
-			// Prepare log file
-			fileName = String.format("Exercise1-rabbits/270642-271518-in/log/test-stats-BT_%d-GGR_%d-GS_%d-MK_%d-NIG_%d-NIR_%d.csv", birthThreshold, grassGrowthRate, gridSize, maxKittens, numInitGrass, numInitRabbits);
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
-				writer.write("Rabbits,Grass\n");
-				writer.close();
-			} catch (IOException e) {
-				System.out.println("Error while writing header on log file");
-			}
-			// Initialise the simulation 
+			// Initialize the simulation 
 			buildModel();
 			buildSchedule();
 			buildDisplay();
@@ -146,8 +130,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 					reapDeadRabbits();
 					
 					// Display updated
-					displayEcosystem.updateDisplay(); 
-			        
+					displayEcosystem.updateDisplay(); 		        
 				}
 		    }
 			
@@ -160,15 +143,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 				}
 			}
 			schedule.scheduleActionAtInterval(10, new RabbitsCountLiving());
-
-			class LogStats extends BasicAction {
-				// Count living rabbits to get population plot
-				public void execute(){
-					logStats();
-				}
-			}
-			schedule.scheduleActionAtInterval(1, new LogStats());
-
 		}
 		
 		public void buildDisplay() {
@@ -309,18 +283,5 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 		public void setMaxKittens(int n) {
 			maxKittens = n;
-		}
-		
-		// Write rabbit count in a file to analyse 
-		private void logStats() {
-			int livingRabbits = countLivingRabbits(); 
-			String content = livingRabbits +"," + rgSpace.countGrass() + '\n';
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
-				writer.write(content);
-				writer.close();
-			} catch (IOException e) {
-				System.out.println("Error while writing log file");
-			}
 		}
 }
