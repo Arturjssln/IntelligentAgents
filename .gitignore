@@ -55,8 +55,6 @@ Exercise1-rabbits/.project
 .metadata/.mylyn/.taskListIndex/segments_1
 .metadata/.mylyn/.taskListIndex/write.lock
 .metadata/version.ini
-Exercise1-rabbits/270642-271518-in/.classpath
-Exercise1-rabbits/270642-271518-in/.classpath
-Exercise1-rabbits/270642-271518-in/.classpath
-Exercise1-rabbits/270642-271518-in/.classpath
+*/*/.classpath
+*/*/*/.classpath
 lib/
