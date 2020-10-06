@@ -18,7 +18,8 @@ import logist.topology.Topology.City;
 
 public class ReactiveAgent implements ReactiveBehavior {
 
-	static private final double EPSILON = 10e-4;
+	static private final double EPSILON = 1e-6;
+	static private final double REWARD_RATE = 0.1;
 
 	private Random random;
 	private double pPickup;
@@ -163,7 +164,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 		City cityFrom = state.getFromCity();
 		Vehicle vehicle = myAgent.vehicles().get(0);
 		double cost = vehicle.costPerKm() * cityFrom.distanceTo(action);
-		double reward = (state.getToCity() != null && state.getToCity().equals(action)) ? td.reward(cityFrom, action)*0.1 : 0.0;
+		double reward = (state.getToCity() != null && state.getToCity().equals(action)) ? REWARD_RATE*td.reward(cityFrom, action) : 0.0;
 		System.out.println(reward - cost);
 		return reward - cost;
 	} 
