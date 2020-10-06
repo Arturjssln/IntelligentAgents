@@ -14,6 +14,7 @@ import logist.task.Task;
 import logist.task.TaskDistribution;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
+import template.State;
 
 public class ReactiveAgent implements ReactiveBehavior {
 
@@ -23,11 +24,11 @@ public class ReactiveAgent implements ReactiveBehavior {
 	private double pPickup;
 	private int numActions;
 	private Agent myAgent;
-	private double[] values;
+	private State currentState;
 	
 
-	private HashMap<City, Double> bestValueInState = new HashMap<City, Double>();
-	private HashMap<City, City> bestStateInState = new HashMap<City, City>();
+	private HashMap<State, Double> bestValueInState = new HashMap<State, Double>();
+	private HashMap<State, State> bestStateInState = new HashMap<State, State>();
 
 
 	@Override
@@ -42,6 +43,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 		this.pPickup = discount;
 		this.numActions = 0;
 		this.myAgent = agent;
+		this.currentState = new State(agent.getCurrentCity(), null, false);
 		
 		learnValue(topology, td);
 
@@ -50,18 +52,19 @@ public class ReactiveAgent implements ReactiveBehavior {
 	@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
 		Action action;
-		
-		City currentCity = vehicle.getCurrentCity();
-		if (availableTask == null) { //If there's no available task
-			action = new Move(currentCity.randomNeighbor(random));
 
-		} else { //If there is an (or more) available task(s)
+		if (availableTask != null) { //If there is an available task
+			currentState = new State(currentState.getCurrentCity(), availableTask.deliveryCity, availableTask=true)
+			state = bestStateInState()
+			action = new Move()
+
+		} else { //If there's no available task
 			if (true) {
 				System.out.println(vehicle.name() + " picks up a task from " + availableTask.pickupCity + " to " + availableTask.deliveryCity);
 				action = new Pickup(availableTask);
 
 			} else {
-				City newCity = currentCity.randomNeighbor(random);
+				City newCity = currentState.getCurrentCity().randomNeighbor(random);
 				action = new Move(newCity);
 				System.out.println(vehicle.name() + " refused to pick up a task from " + availableTask.pickupCity + " to " + availableTask.deliveryCity + ", new destination is " + newCity);
 			}
