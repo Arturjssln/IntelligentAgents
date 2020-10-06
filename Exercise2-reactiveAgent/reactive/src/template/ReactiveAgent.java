@@ -77,9 +77,8 @@ public class ReactiveAgent implements ReactiveBehavior {
 	public Action act(Vehicle vehicle, Task availableTask) {
 		Action action;
 		
-
+		City currentCity = vehicle.getCurrentCity();
 		if (availableTask == null) { //If there's no available task
-			City currentCity = vehicle.getCurrentCity();
 			action = new Move(currentCity.randomNeighbor(random));
 
 		} else { //If there is an (or more) available task(s)
