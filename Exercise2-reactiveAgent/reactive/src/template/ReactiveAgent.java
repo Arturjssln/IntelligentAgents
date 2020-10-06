@@ -2,7 +2,6 @@ package template;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -14,9 +13,8 @@ import logist.plan.Action.Move;
 import logist.plan.Action.Pickup;
 import logist.task.Task;
 import logist.task.TaskDistribution;
-import logist.cityTopology.Topology;
-import logist.cityTopology.Topology.City;
-import template.State;
+import logist.topology.Topology;
+import logist.topology.Topology.City;
 
 public class ReactiveAgent implements ReactiveBehavior {
 
@@ -26,7 +24,6 @@ public class ReactiveAgent implements ReactiveBehavior {
 	private double pPickup;
 	private int numActions;
 	private Agent myAgent;
-	private double[] values;
 	private State currentState;
 	
 	private ArrayList<State> myStates = new ArrayList<State>();
@@ -91,6 +88,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 		} catch (Exception e) {
 			System.exit(1);
 		}
+		return null;
 	}
 
 	
@@ -98,7 +96,9 @@ public class ReactiveAgent implements ReactiveBehavior {
 		double maxDiff = Double.MIN_VALUE;
 		// Compute all possible states
 		computeStates(cityTopology);
-
+		//Initialize HashMap
+		initializeValues();
+		long iteration = 0;
 		// Learning algorithm (Value iteration)
 		do {
 			for (State state : myStates) {
@@ -106,7 +106,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 
 				List<City> actions = (state.getToCity() != null) ? cityTopology.cities() : state.getFromCity().neighbors();
 				for (City action : actions) {
-					double qValue = computeReward(td) + this.pPickup * computeTransitionProba(action, td);
+					double qValue = computeReward(state, action, td) + this.pPickup * computeTransitionProba(action, td);
 					qValueForAction.put(action, qValue);
 				}
 
@@ -125,6 +125,8 @@ public class ReactiveAgent implements ReactiveBehavior {
 				bestValueForState.put(state, maxQValue);
 				bestStateForState.put(state, new State(state.getFromCity(), bestAction));
 			}
+		iteration++;
+		System.out.println("The cityTotal profit after "+numActions+" actions is "+myAgent.getTotalProfit()+" (average profit: "+(myAgent.getTotalProfit() / (double)numActions)+")");
 		} while(maxDiff > EPSILON);
 	}
 
@@ -142,6 +144,12 @@ public class ReactiveAgent implements ReactiveBehavior {
 		}
 	}
 
+	private void initializeValues() {
+		for(State state : myStates) {
+			bestValueForState.put(state, random.nextDouble());
+		}
+	}
+
 	private double computeTransitionProba(City action, TaskDistribution td) {
 		double T = 0.0;
 		for (State state_ : myStates) {
@@ -154,11 +162,10 @@ public class ReactiveAgent implements ReactiveBehavior {
 		return T;
 	}
 
-	private double computeReward(TaskDistribution td) {
-		City cityFrom = currentState.getFromCity();
-		City cityTo = currentState.getToCity();
+	private double computeReward(State state, City action, TaskDistribution td) {
+		City cityFrom = state.getFromCity();
 		Vehicle vehicle = myAgent.vehicles().get(0);
-		double cost = vehicle.costPerKm() * cityFrom.distanceTo(cityTo);
-		return td.reward(cityFrom, cityTo) - cost;
+		double cost = vehicle.costPerKm() * cityFrom.distanceTo(action);
+		return td.reward(cityFrom, action) - cost;
 	} 
 }
