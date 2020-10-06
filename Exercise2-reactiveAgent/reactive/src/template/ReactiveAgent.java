@@ -16,7 +16,7 @@ import logist.task.TaskDistribution;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
 
-public class ReactiveTemplate implements ReactiveBehavior {
+public class ReactiveAgent implements ReactiveBehavior {
 
 	static private final double EPSILON = 10e-4;
 
@@ -48,15 +48,50 @@ public class ReactiveTemplate implements ReactiveBehavior {
 
 	}
 
+	/*Action action;
+		City currentCity = vehicle.getCurrentCity();
+		
+		if(availableTask != null && currentCity == availableTask.pickupCity){ //search if a task is available in the current city
+			State nowState = new State(true, currentCity, availableTask.deliveryCity);
+			AgentAction agentAction =  bestActionInState.get(nowState);
+			
+			if(agentAction.isDelivering()){
+				System.out.println(vehicle.name() + " picks up a task from "+ availableTask.pickupCity + " to " + availableTask.deliveryCity + ".");
+				action = new Pickup(availableTask);
+			} else{
+				System.out.println(vehicle.name() + " refuses a task from "+ availableTask.pickupCity + " to "+  availableTask.deliveryCity + ". It moves to " + agentAction.getDestination() + ".");
+				action = new Move(agentAction.getDestination());
+			}
+			
+		} else{	
+			State nowState = new State(false, currentCity);
+			AgentAction agentAction =  bestActionInState.get(nowState);
+			action = new Move(agentAction.getDestination());
+			System.out.println(vehicle.name() + " has no available task. It just moves from " + vehicle.getCurrentCity() + " to " + agentAction.getDestination() + ".");
+
+		}
+		return action;
+		*/
+
 	@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
 		Action action;
 		
-		if (availableTask == null || random.nextDouble() > pPickup) {
+
+		if (availableTask == null) { //If there's no available task
 			City currentCity = vehicle.getCurrentCity();
 			action = new Move(currentCity.randomNeighbor(random));
-		} else {
-			action = new Pickup(availableTask);
+
+		} else { //If there is an (or more) available task(s)
+			if (true) {
+				System.out.println(vehicle.name() + " picks up a task from " + availableTask.pickupCity + " to " + availableTask.deliveryCity);
+				action = new Pickup(availableTask);
+
+			} else {
+				City newCity = currentCity.randomNeighbor(random);
+				action = new Move(newCity);
+				System.out.println(vehicle.name() + " refused to pick up a task from " + availableTask.pickupCity + " to " + availableTask.deliveryCity + ", new destination is " + newCity);
+			}
 		}
 		
 		if (numActions >= 1) {
