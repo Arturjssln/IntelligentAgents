@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
-import apple.laf.JRSUIState.ValueState;
 import logist.simulation.Vehicle;
 import logist.agent.Agent;
 import logist.behavior.ReactiveBehavior;
@@ -48,31 +47,6 @@ public class ReactiveAgent implements ReactiveBehavior {
 
 	}
 
-	/*Action action;
-		City currentCity = vehicle.getCurrentCity();
-		
-		if(availableTask != null && currentCity == availableTask.pickupCity){ //search if a task is available in the current city
-			State nowState = new State(true, currentCity, availableTask.deliveryCity);
-			AgentAction agentAction =  bestActionInState.get(nowState);
-			
-			if(agentAction.isDelivering()){
-				System.out.println(vehicle.name() + " picks up a task from "+ availableTask.pickupCity + " to " + availableTask.deliveryCity + ".");
-				action = new Pickup(availableTask);
-			} else{
-				System.out.println(vehicle.name() + " refuses a task from "+ availableTask.pickupCity + " to "+  availableTask.deliveryCity + ". It moves to " + agentAction.getDestination() + ".");
-				action = new Move(agentAction.getDestination());
-			}
-			
-		} else{	
-			State nowState = new State(false, currentCity);
-			AgentAction agentAction =  bestActionInState.get(nowState);
-			action = new Move(agentAction.getDestination());
-			System.out.println(vehicle.name() + " has no available task. It just moves from " + vehicle.getCurrentCity() + " to " + agentAction.getDestination() + ".");
-
-		}
-		return action;
-		*/
-
 	@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
 		Action action;
@@ -108,9 +82,8 @@ public class ReactiveAgent implements ReactiveBehavior {
 		int nbCities = topology.size();
 		double[] oldValues = new double[nbCities];
 		double[] qValue = new double[nbCities];
-		double[] values = new double[nbCities];
-		for (double val : values) {
-			val = (new Random()).nextInt(10);
+		for (int i=0; i<values.length;i++) {
+			values[i] = (new Random()).nextInt(10);
 		}
 		do {
 			maxDiff = Double.MIN_VALUE;
