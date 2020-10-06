@@ -3,7 +3,7 @@ package template;
 import logist.topology.Topology.City;
 
 public class State {
-    private City fromCity;	
+    public City fromCity;	
     private City toCity; //nullable if no task available
     
     public State(City fromCity, City toCity) {
@@ -20,11 +20,11 @@ public class State {
     }
 
     public void setFromCity(City city) {
-        this.fromCity = fromCity;
+        this.fromCity = city;
     }
 
     public void setToCity(City city) {
-        this.toCity = toCity;
+        this.toCity = city;
     }
 
     @Override
@@ -38,17 +38,15 @@ public class State {
 			return false;
 		State other = (State) obj;
 		if (fromCity == null) {
-			if (other.getFromCity() != null)
+			if (other.fromCity != null)
 				return false;
-		} else if (!fromCity.equals(other.getFromCity()))
+		} else if (!fromCity.equals(other.fromCity))
 			return false;
 		if (toCity == null) {
-			if (other.getToCity() != null)
+			if (other.toCity != null)
 				return false;
-		} else if (!toCity.equals(other.getToCity()))
+		} else if (!toCity.equals(other.toCity))
 			return false;
 		return true;
 	} 
-
-
 }
