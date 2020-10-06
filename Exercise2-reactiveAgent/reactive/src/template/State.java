@@ -3,14 +3,18 @@ package template;
 import logist.topology.Topology.City;
 
 public class State {
-    public City fromCity;	
-    public City toCity; //nullable if no task available
+
+    // Attributes
+    private City fromCity;	
+    private City toCity; //nullable if no task available
     
+    // Constructor
     public State(City fromCity, City toCity) {
         this.fromCity = fromCity;
         this.toCity = toCity;
     }
 
+    // Getters
     public City getFromCity() {
         return this.fromCity;
     }
@@ -19,6 +23,8 @@ public class State {
         return this.toCity;
     }
 
+
+    // Setters
     public void setFromCity(City city) {
         this.fromCity = city;
     }
@@ -27,7 +33,9 @@ public class State {
         this.toCity = city;
     }
 
+
     @Override
+    // Redefine the equals method
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -37,19 +45,20 @@ public class State {
 			return false;
 		State other = (State) obj;
 		if (fromCity == null) {
-			if (other.fromCity != null)
+			if (other.getFromCity() != null)
 				return false;
-		} else if (!(fromCity.id == other.fromCity.id))
+		} else if (!(fromCity.id == other.getFromCity().id))
 			return false;
 		if (toCity == null) {
-			if (other.toCity != null)
+			if (other.getToCity() != null)
 				return false;
-		} else if (!(toCity.id == other.toCity.id))
+		} else if (!(toCity.id == other.getToCity().id))
 			return false;
 		return true;
     } 
     
     @Override
+    // Redefine the hashCode method
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
