@@ -70,6 +70,8 @@ public class ReactiveAgent implements ReactiveBehavior {
 			}
 		} else { //If there's no available task
 			currentState = new State(vehicle.getCurrentCity(), null);
+			System.out.println(currentState.getFromCity());
+			System.out.println(currentState.getToCity());
 			System.out.println(bestStateForState.containsKey(currentState));
 			currentState = bestStateForState.get(currentState);
 			action = new Move(currentState.getToCity());
