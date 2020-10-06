@@ -4,7 +4,7 @@ import logist.topology.Topology.City;
 
 public class State {
     public City fromCity;	
-    private City toCity; //nullable if no task available
+    public City toCity; //nullable if no task available
     
     public State(City fromCity, City toCity) {
         this.fromCity = fromCity;
@@ -47,5 +47,14 @@ public class State {
 		} else if (!(toCity.id == other.toCity.id))
 			return false;
 		return true;
-	} 
+    } 
+    
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result += prime * result + ((fromCity == null) ? 0 : fromCity.hashCode());
+		result += prime * result + ((toCity == null) ? 0 : toCity.hashCode());
+		return result;
+	}
 }

@@ -37,7 +37,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 		// Reads the discount faccityTor cityFrom the agents.xml file.
 		// If the property is not present it defaults cityTo 0.95
 		Double discount = agent.readProperty("discount-faccityTor", Double.class,
-				0.95);
+				0.1);
 
 		this.random = new Random();
 		this.pPickup = discount;
@@ -46,6 +46,7 @@ public class ReactiveAgent implements ReactiveBehavior {
 		this.currentState = new State(null, null);
 		
 		learnValue(cityTopology, td);
+
 
 	}
 
@@ -56,27 +57,24 @@ public class ReactiveAgent implements ReactiveBehavior {
 		currentState.setFromCity(vehicle.getCurrentCity());
 		if (availableTask != null) { //If there is an available task
 			currentState = new State(vehicle.getCurrentCity(), availableTask.deliveryCity);
-			// TODO: check is equals is the right condition
+			
 			boolean takeTask = currentState.equals(bestStateForState.get(currentState));
 			if (takeTask) {
-				System.out.println(vehicle.name() + " picked up a task cityFrom " + availableTask.pickupCity + " cityTo " + availableTask.deliveryCity);
+				System.out.println(vehicle.name() + " picked up a task cityFrom " + String.valueOf(availableTask.pickupCity.id) + " cityTo " + String.valueOf(availableTask.deliveryCity.id));
 				action = new Pickup(availableTask);
 			} else {
 				//TODO: merge this with next condition
 				currentState.setToCity(null);
 				currentState = bestStateForState.get(currentState);
 				action = new Move(currentState.getToCity());
-				System.out.println(vehicle.name() + " refused cityTo pick up a task cityFrom " + availableTask.pickupCity + " cityTo " + availableTask.deliveryCity + ", new destination is " + currentState.getToCity());
+				System.out.println(vehicle.name() + " refused to pick up a task cityFrom " + String.valueOf(availableTask.pickupCity.id) + " cityTo " + String.valueOf(availableTask.deliveryCity.id) + ", new destination is " + String.valueOf(currentState.getToCity().id));
 			}
 		} else { //If there's no available task
 			currentState = new State(vehicle.getCurrentCity(), null);
-			System.out.println(currentState.getFromCity());
-			System.out.println(currentState.getToCity());
-			System.out.println(bestStateForState.containsKey(currentState));
 			currentState = bestStateForState.get(currentState);
+			System.out.println(currentState.getToCity());
 			action = new Move(currentState.getToCity());
-			System.out.println(vehicle.name() + " found no task cityFrom " + availableTask.pickupCity + " cityTo " + availableTask.deliveryCity + ", new destination is " + currentState.getToCity());
-
+			System.out.println(vehicle.name() + " found no task cityFrom " + String.valueOf(vehicle.getCurrentCity().id) + ", new destination is " + String.valueOf(currentState.getToCity().id));
 		}
 		if (numActions >= 1) {
 			System.out.println("The cityTotal profit after "+numActions+" actions is "+myAgent.getTotalProfit()+" (average profit: "+(myAgent.getTotalProfit() / (double)numActions)+")");
@@ -103,18 +101,19 @@ public class ReactiveAgent implements ReactiveBehavior {
 			maxDiff = -1e5;
 			for (State state : myStates) {
 				HashMap<City, Double> qValueForAction = new HashMap<City, Double>();
-
-				List<City> actions = (state.getToCity() != null) ? cityTopology.cities() : state.getFromCity().neighbors();
-				for (City action : actions) {
+				
+				List<City> availableActions = computeAvailableActions(state);
+				System.out.println(availableActions.size());
+				for (City action : availableActions) {
 					double qValue = computeReward(state, action, td) + this.pPickup * computeTransitionProba(action, td);
 					qValueForAction.put(action, qValue);
 				}
-				double maxQValue = Double.MIN_VALUE;
+				double maxQValue = -1e5;
 				City bestAction = null;
 				for (City action : qValueForAction.keySet()) {
 					double qValue_ = qValueForAction.get(action);
-					maxQValue = qValue_ > maxQValue ? qValue_ : maxQValue;
 					bestAction = qValue_ > maxQValue ? action : bestAction;
+					maxQValue = qValue_ > maxQValue ? qValue_ : maxQValue;
 				}
 				// Check convergence
 				double diff = Math.abs(bestValueForState.get(state) - maxQValue);
@@ -164,7 +163,17 @@ public class ReactiveAgent implements ReactiveBehavior {
 		City cityFrom = state.getFromCity();
 		Vehicle vehicle = myAgent.vehicles().get(0);
 		double cost = vehicle.costPerKm() * cityFrom.distanceTo(action);
-		double reward = (state.getToCity() != null) ? td.reward(cityFrom, action) : 0.0;
+		double reward = (state.getToCity() != null && state.getToCity().equals(action)) ? td.reward(cityFrom, action)*0.1 : 0.0;
+		System.out.println(reward - cost);
 		return reward - cost;
 	} 
+
+	private List<City> computeAvailableActions(State state) {
+		City toCity = state.getToCity();
+		ArrayList<City> availableActions = new ArrayList<City>();
+		availableActions.addAll(state.getFromCity().neighbors());
+		if ((toCity != null) && !(availableActions.contains(toCity)))
+			availableActions.add(toCity);
+		return availableActions;
+	}
 }
