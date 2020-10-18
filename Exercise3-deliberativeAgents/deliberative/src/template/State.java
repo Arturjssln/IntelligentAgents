@@ -1,35 +1,68 @@
 package template;
 
 import logist.topology.Topology.City;
+import logist.task.TaskSet;
+import logist.task.Task;
+import logist.plan.Plan;
 
 public class State {
 
-
     // Attributes
     private City currentCity;	
-    private TaskSet pickedUpTasks; // delivered tasks 
-    private TaskSet freeTasks; // task to be delivered or going to be pick up in the state
+    public TaskSet pickedUpTasks;
+	public TaskSet freeTasks;
+	public Plan plan;
     
     // Constructor
-    public State(City currentCity) {
-        this.currentCity = currentCity;
-        this.currentTasks = new List<TaskStatut>(); 
+    public State(City initialCity) {
+		this.currentCity = initialCity;
+		this.pickedUpTasks = new TaskSet(); 
+		this.awaitingDeliveryTasks = new TaskSet(); 
+		this.plan = new Plan(initialCity)
     }
 
     // Getters
     public City getCurrentCity() {
         return this.currentCity;
-    }
+	}
 
-    public List<TaskStatut> getcurrentTasks(){
-        return currentTasks; 
-    }
+	public TaskSet getpickedUpTasks() {
+        return this.pickedUpTasks;
+	}
 
+	public TaskSet getAwaitingDeliveryTasks() {
+        return this.awaitingDeliveryTasks;
+	}
+	
+	public Plan getPlan() {
+        return this.plan;
+    }
 
     // Setters
     public void setCurrentCity(City city) {
         this.currentCity = city;
+	}
+
+	public void setpickedUpTasks(TaskSet tasks;) {
+        this.pickedUpTasks = tasks;
     }
+
+	public void setAwaitingDeliveryTasks(TaskSet tasks;) {
+        this.awaitingDeliveryTasks = tasks;
+	}
+	
+	public void setPlan(Plan plan) {
+		this.plan = plan;
+	}
+
+	public Boolean isLastTask() {
+		return (this.pickedUpTasks.isEmpty() && this.awaitingDeliveryTasks.isEmpty());
+	}
+
+	public State createSuccessor(Task taskToAdd) {
+
+	}
+
 
 
     @Override

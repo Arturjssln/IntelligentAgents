@@ -11,13 +11,16 @@ import logist.task.TaskSet;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
 
+import template.AStarAlgo;
+import template.BFSAlgo;
+
 /**
  * An optimal planner for one vehicle.
  */
 @SuppressWarnings("unused")
-public class DeliberativeTemplate implements DeliberativeBehavior {
+public class DeliberativeAgent implements DeliberativeBehavior {
 
-	enum Algorithm { BFS, ASTAR }
+	enum Algorithm { BFS, ASTAR, NAIVE}
 	
 	/* Environment */
 	Topology topology;
@@ -29,7 +32,7 @@ public class DeliberativeTemplate implements DeliberativeBehavior {
 
 	/* the planning class */
 	Algorithm algorithm;
-	//Heuristic heuristic;  // TODO implement
+	Heuristic heuristic;  // TODO implement
 	
 	@Override
 	public void setup(Topology topology, TaskDistribution td, Agent agent) {
@@ -48,7 +51,7 @@ public class DeliberativeTemplate implements DeliberativeBehavior {
 		//heuristic = Heuristic.valueOf(heuristicName.toUpperCase()); 
 
 
-		this.currentState = new State(null, null);
+		this.currentState = new State(null);
 		// ...
 	}
 	
@@ -60,11 +63,14 @@ public class DeliberativeTemplate implements DeliberativeBehavior {
 		// Compute the plan with the selected algorithm.
 		switch (algorithm) {
 		case ASTAR:
-			// ...
-			plan = naivePlan(vehicle, tasks);
+			AStarAlgo aStar = new AStarAlgo();
+			plan = aStar.computePlan(vehicle, tasks);
 			break;
 		case BFS:
-			// ...
+			BFSAlgo bfs = new BFSAlgo();
+			plan = bfs.computePlan(vehicle, tasks);
+			break;
+		case NAIVE:
 			plan = naivePlan(vehicle, tasks);
 			break;
 		default:
@@ -94,60 +100,6 @@ public class DeliberativeTemplate implements DeliberativeBehavior {
 			current = task.deliveryCity;
 		}
 		return plan;
-	}
-
-	private Plan BFSPlan(Vehicle vehicle, TaskSet tasks) {
-		City currentCity = vehicle.getCurrentCity();
-		Plan plan = new Plan(current);
-
-		State currentState = new State(currentCity, null); 
-		 
-		// List type that allows removing at the beggining 
-		LinkedList<State> statesToCheck = new LinkedList<State>(); 
-		statesToCheck.add(currentState)
-
-		do{
-			if (statesToCheck.isEmpty()) {break;}
-            State currentNode = statesToCheck.getFirst(); 
-            QTable = statesToCheck.removeFirst(); 
-            // We check if node is the last task to effectuate 
-            if (node = last node) {
-				return node; 
-			}
-			else {
-				// TODO a faire 
-				successorState = computeSuccessors(node)
-				statesToCheck.add(successorState)
-
-			}
-        }while{true} // TODO change the stop condition
-		throw new IndexOutOfBoundsException('Q-Table is empty') 
-		
-	}
-
-	private List<City> computeSuccessors(State state, Vehicle vehicle, TaskSet tasks) {
-        // Create a list of the possible actions for the given state
-        // Successors can be 'move to another city', 'pickup task'
-		City currentCity = state.getCurrentCity(); 
-		List<TaskStatut> currentTasks = state.getCurrentTasks();
-        TaskSet currentTasks = tasks; 
-		List<City> citiesTo = new List<City>();
- 
-			// For all tasks 
-			for (Task task : tasks) {
-                
-                // Can go to the cities where task to deliver
-				for (City cityTo : current.pathTo(task.pickupCity)) {
-					// Save the cities where agent can go to get a task 
-					citiesTo.add(cityTo);
-				}				
-			}
-		}
-	}
-
-	
-	private Plan ASTARPlan(Vehicle vehicle, TaskSet tasks) {
-		// TODO
 	}
 
 	@Override
