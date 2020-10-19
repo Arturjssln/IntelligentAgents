@@ -14,13 +14,15 @@ import logist.topology.Topology.City;
 import template.AStarAlgo;
 import template.BFSAlgo;
 
+
 /**
  * An optimal planner for one vehicle.
  */
 @SuppressWarnings("unused")
 public class DeliberativeAgent implements DeliberativeBehavior {
 
-	enum Algorithm { BFS, ASTAR, NAIVE}
+	enum Algorithm { BFS, ASTAR, NAIVE};
+	enum Heuristic { SHORTEST}; // TODO
 	
 	/* Environment */
 	Topology topology;
@@ -32,7 +34,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 
 	/* the planning class */
 	Algorithm algorithm;
-	Heuristic heuristic;  // TODO implement
+	Heuristic heuristic;
 	
 	@Override
 	public void setup(Topology topology, TaskDistribution td, Agent agent) {
@@ -43,16 +45,13 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 		// initialize the planner
 		int capacity = agent.vehicles().get(0).capacity();
 		String algorithmName = agent.readProperty("algorithm", String.class, "ASTAR");
+		String heuristicName = agent.readProperty("heuristic", String.class, "SHORTEST");
 		
 		// Throws IllegalArgumentException if algorithm is unknown
-		algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
+		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
 		
 		// Throws IllegalArgumentException if heuristic is unknown
-		//heuristic = Heuristic.valueOf(heuristicName.toUpperCase()); 
-
-
-		this.currentState = new State(null);
-		// ...
+		this.heuristic = Heuristic.valueOf(heuristicName.toUpperCase()); 
 	}
 	
 	@Override
@@ -63,7 +62,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 		// Compute the plan with the selected algorithm.
 		switch (algorithm) {
 		case ASTAR:
-			AStarAlgo aStar = new AStarAlgo();
+			AStarAlgo aStar = new AStarAlgo(this.heuristic);
 			plan = aStar.computePlan(vehicle, tasks);
 			break;
 		case BFS:
