@@ -33,16 +33,15 @@ public class AStarAlgo extends Algo {
 	@Override
 	public Plan computePlan(Vehicle vehicle, TaskSet tasks) {
 
-        State currentState = new State(vehicle.getCurrentCity()); 
-		currentState.setPickedUpTasks(vehicle.getCurrentTasks()); 
-
-
-        // Add the tasks that were not picked up yet to the 'waiting'
-        for (Task task : currentState.getPickedUpTasks()) {
-           if (!(tasks.contains(task))) {
-               currentState.awaitingDeliveryTasks.add(task);
-           }
-        }
+       // Add the tasks that were not picked up yet to the awaiting delivery list
+	   TaskSet awaitingDeliveryTasks = tasks;
+	   for (Task task : vehicle.getCurrentTasks()) {
+		   if (!(tasks.contains(task))) {
+			   awaitingDeliveryTasks.add(task);
+		   }
+	   }
+	   State currentState = new State(vehicle.getCurrentCity(), vehicle.getCurrentTasks(), awaitingDeliveryTasks); 
+	   
   
         LinkedList<State> statesToCheck = new LinkedList<State>();
         statesToCheck.add(currentState); 
@@ -68,7 +67,7 @@ public class AStarAlgo extends Algo {
 				//statesToCheck = sortByCost(statesToCheck); //TODO: check if needed
             }
         } while (true);
-		throw new IndexOutOfBoundsException("StatesToCheck is empty"); 
+		throw new IndexOutOfBoundsException("AStar StatesToCheck is empty"); 
 		
 	}
 
@@ -93,8 +92,8 @@ public class AStarAlgo extends Algo {
 		return sortedStates; 
 	}
 
-
-	private LinkedList<State> computeSuccessors(State state) {
+    @Override
+	protected LinkedList<State> computeSuccessors(State state) {
         // Compute a list of all possible states given the current state
         TaskSet awaitingDeliveryTasks = state.getAwaitingDeliveryTasks();
         TaskSet pickedUpTasks = state.getPickedUpTasks();
@@ -105,8 +104,7 @@ public class AStarAlgo extends Algo {
         for (Task task : awaitingDeliveryTasks) {
             State nextState = new State(state);
 
-            
-            for (Task taskToPickup : getTasksFromCity(state)) {
+            for (Task taskToPickup : getTasksToPickup(state)) {
                 if (nextState.getPickedUpTasks().weightSum() + task.weight + taskToPickup.weight < vehicleCapacity && task != taskToPickup) {
                     nextState.plan.appendPickup(taskToPickup);
                     nextState.pickedUpTasks.add(taskToPickup);
@@ -116,14 +114,14 @@ public class AStarAlgo extends Algo {
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.pickupCity)) {
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                for (Task taskToPickup : getTasksFromCity(nextState)) {
+                for (Task taskToPickup : getTasksToPickup(nextState)) {
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToCity(nextState)) {
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
@@ -138,7 +136,6 @@ public class AStarAlgo extends Algo {
             }
         }
 
-
         // Deliver picked up tasks
         for (Task task : pickedUpTasks) {
             State nextState = new State(state);
@@ -147,18 +144,17 @@ public class AStarAlgo extends Algo {
 				nextState.setCurrentCity(cityOnTheWay);
 				nextState.plan.appendMove(cityOnTheWay);
                 
-                for (Task taskToPickup : getTasksFromCity(nextState)) {
+                for (Task taskToPickup : getTasksToPickup(nextState)) {
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight < vehicleCapacity) {
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToCity(nextState)) {
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
-                  
 			} 
 			nextState.computeCost(costPerKm);
 			nextState.computeHeuristic(heuristic); //TODO: other parameters ? 
@@ -166,28 +162,4 @@ public class AStarAlgo extends Algo {
         }
         return nextStates;
     }
-	
-	private ArrayList<Task> getTasksFromCity(State state) {
-    	ArrayList<Task> tasksFromCity = new ArrayList<Task>();
-        for(Task task : state.getAwaitingDeliveryTasks()) {
-            if (state.getCurrentCity() == task.pickupCity) {
-                tasksFromCity.add(task);
-            }
-        }
-        return tasksFromCity;
-    }
-
-    private ArrayList<Task> getTasksToCity(State state) {
-    	ArrayList<Task> tasksToCity = new ArrayList<Task>();
-        for(Task task : state.getAwaitingDeliveryTasks()) {
-            if (state.getCurrentCity() == task.deliveryCity) {
-                tasksToCity.add(task);
-            }
-        }
-        return tasksToCity;
-    }
-
-
-
-
 }

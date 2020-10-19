@@ -22,7 +22,7 @@ import template.BFSAlgo;
 public class DeliberativeAgent implements DeliberativeBehavior {
 
 	enum Algorithm { BFS, ASTAR, NAIVE};
-	enum Heuristic { NONE}; // TODO
+	enum Heuristic { NONE, SHORTEST }; // TODO
 	
 	/* Environment */
 	Topology topology;
@@ -45,7 +45,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 		// initialize the planner
 		int capacity = agent.vehicles().get(0).capacity();
 		String algorithmName = agent.readProperty("algorithm", String.class, "ASTAR");
-		String heuristicName = agent.readProperty("heuristic", String.class, "SHORTEST");
+		String heuristicName = agent.readProperty("heuristic", String.class, "NONE");
 		
 		// Throws IllegalArgumentException if algorithm is unknown
 		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
@@ -72,7 +72,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 			break;
 		case BFS:
 			start = System.currentTimeMillis();
-			BFSAlgo bfs = new BFSAlgo();
+			BFSAlgo bfs = new BFSAlgo(vehicle);
 			plan = bfs.computePlan(vehicle, tasks);
 			end = System.currentTimeMillis();
 			break;

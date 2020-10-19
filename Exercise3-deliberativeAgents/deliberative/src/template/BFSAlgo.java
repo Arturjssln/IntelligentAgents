@@ -12,22 +12,30 @@ import logist.topology.Topology.City;
 
 import template.Algo;
 import template.State;
+import template.DeliberativeAgent.Heuristic;
 
 public class BFSAlgo extends Algo {
+	
+	int costPerKm;
+	int vehicleCapacity;
 
-
+	// Constructor
+	public BFSAlgo(Vehicle vehicle) {
+		this.vehicleCapacity = vehicle.capacity(); 
+		this.costPerKm = vehicle.costPerKm(); 
+	}
+	
     @Override
     public Plan computePlan(Vehicle vehicle, TaskSet tasks) {
-
-        State currentState = new State(vehicle.getCurrentCity()); 
-        currentState.setPickedUpTasks(vehicle.getCurrentTasks()); 
-        // Add the tasks that were not picked up yet to the 'waiting'
-        for (Task task : currentState.getPickedUpTasks()) {
-           if (!(tasks.contains(task))) {
-               currentState.awaitingDeliveryTasks.add(task);
-           }
+        // Add the tasks that were not picked up yet to the awaiting delivery list
+        TaskSet awaitingDeliveryTasks = tasks;
+        for (Task task : vehicle.getCurrentTasks()) {
+            if (!(tasks.contains(task))) {
+                awaitingDeliveryTasks.add(task);
+            }
         }
-  
+        State currentState = new State(vehicle.getCurrentCity(), vehicle.getCurrentTasks(),awaitingDeliveryTasks ); 
+        
         LinkedList<State> statesToCheck = new LinkedList<State>();
         statesToCheck.add(currentState); 
         ArrayList<State> statesChecked = new ArrayList<State>(); 
@@ -36,107 +44,104 @@ public class BFSAlgo extends Algo {
             if (statesToCheck.isEmpty()) break; 
             
             State stateToCheck = statesToCheck.removeFirst(); 
-
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
 				return stateToCheck.getPlan(); 
             }
             if (!statesChecked.contains(stateToCheck)) { 
                 statesChecked.add(stateToCheck);
-                LinkedList<State> successorStates = computeSuccessors(stateToCheck, vehicle.capacity()); // si il crie c'est la
+                LinkedList<State> successorStates = computeSuccessors(stateToCheck);
                 statesToCheck.addAll(successorStates);
             }
         } while (true);
-		throw new IndexOutOfBoundsException("StatesToCheck is empty");
-		
+		throw new IndexOutOfBoundsException("BFS StatesToCheck is empty");
     }
 
-    private LinkedList<State> computeSuccessors(State state, int vehicleCapacity) {
+    @Override
+    protected LinkedList<State> computeSuccessors(State state) {
         // Compute a list of all possible states given the current state
         TaskSet awaitingDeliveryTasks = state.getAwaitingDeliveryTasks();
         TaskSet pickedUpTasks = state.getPickedUpTasks();
         
         LinkedList<State> nextStates = new LinkedList<State>();
 
-        // Browse all available task 
+        // Browse all available awaiting tasks
         for (Task task : awaitingDeliveryTasks) {
             State nextState = new State(state);
 
-            
-            for (Task taskToPickup : getTasksFromCity(state)) {
+            // If there are awaiting tasks in the currentCity 
+            for (Task taskToPickup : getTasksToPickup(state)) {
+                // If vehicle has enough capacity to pick up the task 
                 if (nextState.getPickedUpTasks().weightSum() + task.weight + taskToPickup.weight < vehicleCapacity && task != taskToPickup) {
+                    // Pick up the task by Setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
                     nextState.plan.appendPickup(taskToPickup);
                     nextState.pickedUpTasks.add(taskToPickup);
                     nextState.awaitingDeliveryTasks.remove(taskToPickup);
                 }
             }
+            // If tasks to deliver or pickup on the way to task.deliveryCity
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.pickupCity)) {
+                // for each city on the way, move to from city to city is added
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                for (Task taskToPickup : getTasksFromCity(nextState)) {
+                // For all the awaiting tasks in the cityOnTheWay
+                for (Task taskToPickup : getTasksToPickup(nextState)) {
+                    // If the vehicle has enough capacity to pick up the task
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
+                        // Pick up the task by Setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
                         nextState.plan.appendPickup(taskToPickup);
-                        nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
+                        nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToCity(nextState)) {
+                // For all the picked up tasks to be delivered in the cityOnTheWay
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
+                    // Deliver the task and remove it from the picked up tasks
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
             }
+            // If the vehicle has enough capacity to pick up the task
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
+                // Pick up the initial task 'task' by setting the plan, removing the task from awaiting and adding it to picked up
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
                 nextState.pickedUpTasks.add(task); 
+                // Save the corresponding state 
                 nextStates.add(nextState);
             }
         }
 
 
-        // Deliver picked up tasks
+        // Browse all picked up tasks
         for (Task task : pickedUpTasks) {
             State nextState = new State(state);
-            
+            // Check all cities on the path 
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.deliveryCity)) {
+                // Add going to the city to the plan 
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                
-                for (Task taskToPickup : getTasksFromCity(nextState)) {
+                // For all tasks to be pickup
+                for (Task taskToPickup : getTasksToPickup(nextState)) {
+                    // If vehicle has enough capacity to pick up the task 
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight < vehicleCapacity) {
+                        // Pick up by adding the action to the plan, and update the TaskSets
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToCity(nextState)) {
+                // For all taks to deliver
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
+                    // Deliver the task by adding the action to the plan and removing it from the picked up task
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
                   
             } 
+            // Save the corresponding state 
             nextStates.add(nextState);
         }
         return nextStates;
-    }
-
-    private ArrayList<Task> getTasksFromCity(State state) {
-    	ArrayList<Task> tasksFromCity = new ArrayList<Task>();
-        for(Task task : state.getAwaitingDeliveryTasks()) {
-            if (state.getCurrentCity() == task.pickupCity) {
-                tasksFromCity.add(task);
-            }
-        }
-        return tasksFromCity;
-    }
-
-    private ArrayList<Task> getTasksToCity(State state) {
-    	ArrayList<Task> tasksToCity = new ArrayList<Task>();
-        for(Task task : state.getAwaitingDeliveryTasks()) {
-            if (state.getCurrentCity() == task.deliveryCity) {
-                tasksToCity.add(task);
-            }
-        }
-        return tasksToCity;
     }
 }

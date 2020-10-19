@@ -8,7 +8,7 @@
 		<set class-path="bin/"/>
 		<set class-name="template.DeliberativeAgent"/>
 		<set algorithm="BFS"/>
-		<set heuristic="SHORTEST"/>
+		<set heuristic="NONE"/>
 	</agent>
 	
 </agents>
