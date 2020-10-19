@@ -132,7 +132,8 @@ public class AStarAlgo extends Algo {
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
 				nextState.pickedUpTasks.add(task);
-				nextState.setCost(computeCost(nextState)); 
+				nextState.computeCost(costPerKm);
+				nextState.computeHeuristic(heuristic); //TODO: other parameters ? 
                 nextStates.add(nextState);
             }
         }
