@@ -12,6 +12,7 @@ public class State {
 	public TaskSet awaitingDeliveryTasks;
 	public Plan plan;
 	private double cost; 
+	private double heuristic;
     
     // Constructor
     public State(City initialCity) {
@@ -44,11 +45,16 @@ public class State {
 	
 	public Plan getPlan() {
         return this.plan;
-    }
-
-	public double getCost() {
-		return this.cost; 
 	}
+	
+	public double getTotalCost() {
+		return cost + heuristic;
+	}
+
+	//TODO: remove
+	/*public double getCost() {
+		return this.cost; 
+	}*/
 
     // Setters
     public void setCurrentCity(City city) {
@@ -67,8 +73,30 @@ public class State {
 		this.plan = plan;
 	}
 
-	public void setCost(double cost) {
+	//TODO: remove
+	/*public void setCost(double cost) {
 		this.cost = cost; 
+	}*/
+
+	//TODO: remove
+	/*public void addCost(double extraCost) {
+		this.cost += extraCost; 
+	}*/
+
+	public void computeCost(double costPerKm) {
+		this.cost = plan.totalDistance() * costPerKm; 
+	}
+
+	public void computeHeuristic() {
+		switch (this.heuristic) {
+			case SHORTEST:
+				this.heuristic = 0;
+				break;
+			
+			default:
+				break;
+		}
+
 	}
 
 	public Boolean isLastTask() {
