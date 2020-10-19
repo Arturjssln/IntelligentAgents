@@ -1,6 +1,7 @@
 package template;
 
 import logist.topology.Topology.City;
+import template.DeliberativeAgent.Heuristic;
 import logist.task.TaskSet;
 import logist.plan.Plan;
 
@@ -87,9 +88,9 @@ public class State {
 		this.cost = plan.totalDistance() * costPerKm; 
 	}
 
-	public void computeHeuristic() {
-		switch (this.heuristic) {
-			case SHORTEST:
+	public void computeHeuristic(Heuristic heuristic) {
+		switch (heuristic) {
+			case NONE:
 				this.heuristic = 0;
 				break;
 			
