@@ -29,12 +29,12 @@ public class BFSAlgo extends Algo {
     public Plan computePlan(Vehicle vehicle, TaskSet tasks) {
         // Add the tasks that were not picked up yet to the awaiting delivery list
         TaskSet awaitingDeliveryTasks = tasks;
-        for (Task task : vehicle.getCurrentTasks()) {
-            if (!(tasks.contains(task))) {
-                awaitingDeliveryTasks.add(task);
+        for (Task task : awaitingDeliveryTasks) {
+            if (vehicle.getCurrentTasks().contains(task)) {
+                awaitingDeliveryTasks.remove(task);
             }
         }
-        State currentState = new State(vehicle.getCurrentCity(), vehicle.getCurrentTasks(),awaitingDeliveryTasks ); 
+        State currentState = new State(vehicle.getCurrentCity(), vehicle.getCurrentTasks(), awaitingDeliveryTasks); 
         
         LinkedList<State> statesToCheck = new LinkedList<State>();
         statesToCheck.add(currentState); 

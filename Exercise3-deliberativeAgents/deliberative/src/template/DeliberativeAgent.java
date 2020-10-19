@@ -22,7 +22,7 @@ import template.BFSAlgo;
 public class DeliberativeAgent implements DeliberativeBehavior {
 
 	enum Algorithm { BFS, ASTAR, NAIVE};
-	enum Heuristic { NONE, SHORTEST }; // TODO
+	enum Heuristic { NONE, SHORTEST };
 	
 	/* Environment */
 	Topology topology;
@@ -56,6 +56,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 	
 	@Override
 	public Plan plan(Vehicle vehicle, TaskSet tasks) {
+		
 		City currentCity = vehicle.getCurrentCity();
 		Plan plan = new Plan(currentCity);
 
@@ -91,6 +92,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 	private Plan naivePlan(Vehicle vehicle, TaskSet tasks) {
 		City current = vehicle.getCurrentCity();
 		Plan plan = new Plan(current);
+
 
 		for (Task task : tasks) {
 			// move: current city => pickup location
