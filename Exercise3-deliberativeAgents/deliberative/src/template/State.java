@@ -9,6 +9,15 @@ import logist.plan.Plan;
 
 public class State {
 
+	/* The class is defined by 6 attributes
+	currentCity: the city in which the agent is
+	pickedUpTasks: the tasks that the agent has in its vehicle, waiting to be delivered
+	awaitingDeliveryTasks: the tasks in the environnment, waiting to be picked up
+	plan: list of actions needed to get from initial city to the currentCity
+	cost: cost to pay to get from initial city to the currentCity 
+	heuristic: value of the heuristic at the stage of the state
+	*/
+
     // Attributes
     private City currentCity;	
     public TaskSet pickedUpTasks;
@@ -30,11 +39,55 @@ public class State {
         this.currentCity = state.getCurrentCity(); 
         this.pickedUpTasks = state.pickedUpTasks.clone();
 		this.awaitingDeliveryTasks = state.awaitingDeliveryTasks.clone();
+		// Deep copy 
 		this.plan = new Plan(this.currentCity);
 		for (Action action : state.plan) {
 			this.plan.append(action);
 		}
-    } 
+	} 
+	
+	// Methods
+
+	public void computeCost(double costPerKm) {
+		// Compute the cost from the total distance travelled and the cost per km
+		this.cost = plan.totalDistance() * costPerKm; 
+	}
+
+	public void computeHeuristic(Heuristic heuristic, double costPerKm) {
+		// Compute the wanted heuristic 
+		switch (heuristic) {
+			case NONE:
+				this.heuristic = 0.0;
+				break;
+			case LONGESTTASK: 
+				this.heuristic = computeHeuristicLongestTask() * costPerKm;
+			default:
+				break;
+		}
+	}
+
+	private double computeHeuristicLongestTask() {
+		/* Compute the longest travelled distance to pickup and deliver 
+		(or only deliver if already picked up) a task */
+		double heuristic = 0.0; 
+
+		// Browse distances to travel to pick up and deliver awaiting tasks
+		for (Task awaitingDeliveryTask : awaitingDeliveryTasks) {
+			heuristic = Math.max(heuristic, (this.currentCity.distanceTo(awaitingDeliveryTask.pickupCity)
+							+ awaitingDeliveryTask.pickupCity.distanceTo(awaitingDeliveryTask.deliveryCity)));
+		}
+		// Browse distances to travel to deliver picked up tasks
+		for (Task pickedUpTask : pickedUpTasks) {
+			heuristic = Math.max(heuristic, this.currentCity.distanceTo(pickedUpTask.deliveryCity));
+		}
+
+		return heuristic;
+	}
+
+	public Boolean isGoalState() {
+		// Check if all the tasks have been picked up and delivered: goal state 
+		return (this.pickedUpTasks.isEmpty() && this.awaitingDeliveryTasks.isEmpty());
+	}
 
     // Getters
     public City getCurrentCity() {
@@ -80,39 +133,6 @@ public class State {
 	
 	public void setPlan(Plan plan) {
 		this.plan = plan;
-	}
-
-	public void computeCost(double costPerKm) {
-		this.cost = plan.totalDistance() * costPerKm; 
-	}
-
-	public void computeHeuristic(Heuristic heuristic, double costPerKm) {
-		switch (heuristic) {
-			case NONE:
-				this.heuristic = 0.0;
-				break;
-			case SHORTEST: 
-				this.heuristic = computeHeuristicShortest() * costPerKm;
-			default:
-				break;
-		}
-	}
-
-	private double computeHeuristicShortest() {
-		double heuristic = 0.0; 
-
-		for (Task awaitingDeliveryTask : awaitingDeliveryTasks) {
-			heuristic = Math.max(heuristic, (this.currentCity.distanceTo(awaitingDeliveryTask.pickupCity)
-							+ awaitingDeliveryTask.pickupCity.distanceTo(awaitingDeliveryTask.deliveryCity)));
-		}
-		for (Task pickedUpTask : pickedUpTasks) {
-			heuristic = Math.max(heuristic, this.currentCity.distanceTo(pickedUpTask.deliveryCity));
-		}
-		return heuristic;
-	}
-
-	public Boolean isLastTask() {
-		return (this.pickedUpTasks.isEmpty() && this.awaitingDeliveryTasks.isEmpty());
 	}
 
     @Override

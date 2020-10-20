@@ -24,7 +24,7 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 	// Different algorithms implemented 
 	enum Algorithm { BFS, ASTAR, NAIVE};
 	// Different heuristic implemented 
-	enum Heuristic { NONE, SHORTEST };
+	enum Heuristic { NONE, LONGESTTASK };
 	
 	/* Environment */
 	Topology topology;
