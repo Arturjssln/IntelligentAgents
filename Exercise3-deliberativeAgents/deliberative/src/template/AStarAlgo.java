@@ -58,7 +58,8 @@ public class AStarAlgo extends Algo {
 
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
-            	System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total cost of plan: " + stateToCheck.getCost());
 				return stateToCheck.getPlan(); 
             }
 			if ((!statesChecked.contains(stateToCheck)) || 
