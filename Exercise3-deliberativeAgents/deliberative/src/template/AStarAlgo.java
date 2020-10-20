@@ -1,6 +1,7 @@
 package template;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -48,12 +49,16 @@ public class AStarAlgo extends Algo {
         LinkedList<State> statesChecked = new LinkedList<State>(); 
 
 		do {
+			if (statesChecked.size()%10000 == 0) {
+				System.out.println("States checked: " + statesChecked.size() + " States to check: " + statesToCheck.size());
+			}
             if (statesToCheck.isEmpty()) break; 
             
             State stateToCheck = statesToCheck.removeFirst(); 
 
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
+            	System.out.println("Total states checked: " + statesChecked.size());
 				return stateToCheck.getPlan(); 
             }
 			if ((!statesChecked.contains(stateToCheck)) || 
@@ -84,7 +89,8 @@ public class AStarAlgo extends Algo {
 	private LinkedList<State> sortByCost(LinkedList<State> states) {
 		int[] sortedIndices = IntStream.range(0, states.size())
 			.boxed().sorted((i, j) -> Double.valueOf(states.get(i).getTotalCost()).compareTo(Double.valueOf(states.get(j).getTotalCost())))
-			.mapToInt(ele -> ele).toArray();
+            .mapToInt(ele -> ele).toArray();
+        System.out.println(Arrays.toString(sortedIndices));
 		LinkedList<State> sortedStates = new LinkedList<State>();
 		for (int index : sortedIndices) {
 			sortedStates.add(states.get(index));
@@ -114,6 +120,10 @@ public class AStarAlgo extends Algo {
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.pickupCity)) {
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
+                    nextState.plan.appendDelivery(taskToDeliver);
+                    nextState.pickedUpTasks.remove(taskToDeliver); 
+                }
                 for (Task taskToPickup : getTasksToPickup(nextState)) {
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
                         nextState.plan.appendPickup(taskToPickup);
@@ -121,17 +131,13 @@ public class AStarAlgo extends Algo {
                         nextState.pickedUpTasks.add(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
-                    nextState.plan.appendDelivery(taskToDeliver);
-                    nextState.pickedUpTasks.remove(taskToDeliver); 
-                }
             }
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
 				nextState.pickedUpTasks.add(task);
 				nextState.computeCost(costPerKm);
-				nextState.computeHeuristic(heuristic); //TODO: other parameters ? 
+				nextState.computeHeuristic(heuristic, costPerKm);
                 nextStates.add(nextState);
             }
         }
@@ -157,7 +163,7 @@ public class AStarAlgo extends Algo {
                 }
 			} 
 			nextState.computeCost(costPerKm);
-			nextState.computeHeuristic(heuristic); //TODO: other parameters ? 
+			nextState.computeHeuristic(heuristic, costPerKm);
             nextStates.add(nextState);
         }
         return nextStates;

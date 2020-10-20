@@ -41,11 +41,15 @@ public class BFSAlgo extends Algo {
         ArrayList<State> statesChecked = new ArrayList<State>(); 
 
 		do {
+			if (statesChecked.size()%10000 == 0) {
+				System.out.println("States checked: " + statesChecked.size() + " States to check: " + statesToCheck.size());
+			}
             if (statesToCheck.isEmpty()) break; 
             
             State stateToCheck = statesToCheck.removeFirst(); 
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
+            	System.out.println("Total states checked: " + statesChecked.size());
 				return stateToCheck.getPlan(); 
             }
             if (!statesChecked.contains(stateToCheck)) { 
@@ -84,23 +88,24 @@ public class BFSAlgo extends Algo {
                 // for each city on the way, move to from city to city is added
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                // For all the awaiting tasks in the cityOnTheWay
-                for (Task taskToPickup : getTasksToPickup(nextState)) {
-                    // If the vehicle has enough capacity to pick up the task
-                    if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
-                        // Pick up the task by Setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
-                        nextState.plan.appendPickup(taskToPickup);
-                        nextState.pickedUpTasks.add(taskToPickup); 
-                        nextState.awaitingDeliveryTasks.remove(taskToPickup); 
-                    }
-                }
                 // For all the picked up tasks to be delivered in the cityOnTheWay
                 for (Task taskToDeliver : getTasksToDeliver(nextState)) {
                     // Deliver the task and remove it from the picked up tasks
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
+                // For all the awaiting tasks in the cityOnTheWay
+                for (Task taskToPickup : getTasksToPickup(nextState)) {
+                    // If the vehicle has enough capacity to pick up the task
+                    if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
+                        // Pick up the task by setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
+                        nextState.plan.appendPickup(taskToPickup);
+                        nextState.pickedUpTasks.add(taskToPickup); 
+                        nextState.awaitingDeliveryTasks.remove(taskToPickup); 
+                    }
+                }
             }
+            
             // If the vehicle has enough capacity to pick up the task
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
                 // Pick up the initial task 'task' by setting the plan, removing the task from awaiting and adding it to picked up

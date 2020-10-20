@@ -4,11 +4,32 @@
 	<!-- A list of agents and their behavior classes -->
 	
 	<!-- #### DELIBERATIVE AGENTS ### -->
-	<agent name="deliberative-random">
+	<agent name="deliberative-naive">
+		<set class-path="bin/"/>
+		<set class-name="template.DeliberativeAgent"/>
+		<set algorithm="NAIVE"/>
+		<set heuristic="NONE"/>
+	</agent>
+
+	<agent name="deliberative-bfs">
 		<set class-path="bin/"/>
 		<set class-name="template.DeliberativeAgent"/>
 		<set algorithm="BFS"/>
 		<set heuristic="NONE"/>
+	</agent>
+
+	<agent name="deliberative-astar">
+		<set class-path="bin/"/>
+		<set class-name="template.DeliberativeAgent"/>
+		<set algorithm="ASTAR"/>
+		<set heuristic="NONE"/>
+	</agent>
+
+	<agent name="deliberative-astar-h">
+		<set class-path="bin/"/>
+		<set class-name="template.DeliberativeAgent"/>
+		<set algorithm="ASTAR"/>
+		<set heuristic="SHORTEST"/>
 	</agent>
 	
 </agents>

@@ -86,13 +86,13 @@ public class State {
 		this.cost = plan.totalDistance() * costPerKm; 
 	}
 
-	public void computeHeuristic(Heuristic heuristic) {
+	public void computeHeuristic(Heuristic heuristic, double costPerKm) {
 		switch (heuristic) {
 			case NONE:
 				this.heuristic = 0.0;
 				break;
 			case SHORTEST: 
-				this.heuristic = computeHeuristicShortest();
+				this.heuristic = computeHeuristicShortest() * costPerKm;
 			default:
 				break;
 		}
@@ -100,12 +100,13 @@ public class State {
 
 	private double computeHeuristicShortest() {
 		double heuristic = 0.0; 
-		for (Task pickedUpTask : pickedUpTasks) {
-			heuristic += this.currentCity.distanceTo(pickedUpTask.pickupCity)
-							+ pickedUpTask.pickupCity.distanceTo(pickedUpTask.deliveryCity);
+
+		for (Task awaitingDeliveryTask : awaitingDeliveryTasks) {
+			heuristic = Math.max(heuristic, (this.currentCity.distanceTo(awaitingDeliveryTask.pickupCity)
+							+ awaitingDeliveryTask.pickupCity.distanceTo(awaitingDeliveryTask.deliveryCity)));
 		}
-		for (Task awaitingTask : awaitingDeliveryTasks) {
-			heuristic += this.currentCity.distanceTo(awaitingTask.deliveryCity);
+		for (Task pickedUpTask : pickedUpTasks) {
+			heuristic = Math.max(heuristic, this.currentCity.distanceTo(pickedUpTask.deliveryCity));
 		}
 		return heuristic;
 	}
