@@ -88,9 +88,8 @@ public class AStarAlgo extends Algo {
 
 	private LinkedList<State> sortByCost(LinkedList<State> states) {
 		int[] sortedIndices = IntStream.range(0, states.size())
-			.boxed().sorted((i, j) -> Double.valueOf(states.get(i).getTotalCost()).compareTo(Double.valueOf(states.get(j).getTotalCost())))
+			.boxed().sorted((i, j) -> Double.valueOf(states.get(j).getTotalCost()).compareTo(Double.valueOf(states.get(i).getTotalCost())))
             .mapToInt(ele -> ele).toArray();
-        System.out.println(Arrays.toString(sortedIndices));
 		LinkedList<State> sortedStates = new LinkedList<State>();
 		for (int index : sortedIndices) {
 			sortedStates.add(states.get(index));
