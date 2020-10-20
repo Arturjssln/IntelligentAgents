@@ -49,7 +49,8 @@ public class BFSAlgo extends Algo {
             State stateToCheck = statesToCheck.removeFirst(); 
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
-            	System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total cost of plan: " + stateToCheck.getCost());
 				return stateToCheck.getPlan(); 
             }
             if (!statesChecked.contains(stateToCheck)) { 
@@ -105,13 +106,14 @@ public class BFSAlgo extends Algo {
                     }
                 }
             }
-            
+
             // If the vehicle has enough capacity to pick up the task
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
                 // Pick up the initial task 'task' by setting the plan, removing the task from awaiting and adding it to picked up
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
                 nextState.pickedUpTasks.add(task); 
+                nextState.computeCost(costPerKm);
                 // Save the corresponding state 
                 nextStates.add(nextState);
             }
@@ -144,6 +146,7 @@ public class BFSAlgo extends Algo {
                 }
                   
             } 
+            nextState.computeCost(costPerKm);
             // Save the corresponding state 
             nextStates.add(nextState);
         }

@@ -58,7 +58,8 @@ public class AStarAlgo extends Algo {
 
             // We check if node is the last task to perform 
             if (stateToCheck.isLastTask()) {
-            	System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total states checked: " + statesChecked.size());
+                System.out.println("Total cost of plan: " + stateToCheck.getCost());
 				return stateToCheck.getPlan(); 
             }
 			if ((!statesChecked.contains(stateToCheck)) || 
@@ -88,9 +89,8 @@ public class AStarAlgo extends Algo {
 
 	private LinkedList<State> sortByCost(LinkedList<State> states) {
 		int[] sortedIndices = IntStream.range(0, states.size())
-			.boxed().sorted((i, j) -> Double.valueOf(states.get(i).getTotalCost()).compareTo(Double.valueOf(states.get(j).getTotalCost())))
+			.boxed().sorted((i, j) -> Double.valueOf(states.get(j).getTotalCost()).compareTo(Double.valueOf(states.get(i).getTotalCost())))
             .mapToInt(ele -> ele).toArray();
-        System.out.println(Arrays.toString(sortedIndices));
 		LinkedList<State> sortedStates = new LinkedList<State>();
 		for (int index : sortedIndices) {
 			sortedStates.add(states.get(index));
