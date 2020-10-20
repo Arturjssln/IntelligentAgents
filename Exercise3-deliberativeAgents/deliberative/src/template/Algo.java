@@ -12,9 +12,11 @@ import template.Algo;
 
 public abstract class Algo {
 
+    // Abstract methods overrided in the subclasses
     public abstract Plan computePlan(Vehicle vehicle, TaskSet tasks);
     protected abstract LinkedList<State> computeSuccessors(State state);
     
+    // Utility methods 
     protected ArrayList<Task> getTasksToPickup(State state) {
         // Return the tasks awaiting to be picked up in state
     	ArrayList<Task> tasksFromCity = new ArrayList<Task>();
