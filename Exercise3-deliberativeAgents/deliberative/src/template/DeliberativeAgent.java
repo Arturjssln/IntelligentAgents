@@ -21,7 +21,9 @@ import template.BFSAlgo;
 @SuppressWarnings("unused")
 public class DeliberativeAgent implements DeliberativeBehavior {
 
+	// Different algorithms implemented 
 	enum Algorithm { BFS, ASTAR, NAIVE};
+	// Different heuristic implemented 
 	enum Heuristic { NONE, SHORTEST };
 	
 	/* Environment */
@@ -66,18 +68,21 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 		// Compute the plan with the selected algorithm.
 		switch (algorithm) {
 		case ASTAR:
+			// Agent plans its path through the A* algo
 			AStarAlgo aStar = new AStarAlgo(this.heuristic, vehicle);
 			start = System.currentTimeMillis();
 			plan = aStar.computePlan(vehicle, tasks);
 			end = System.currentTimeMillis();
 			break;
 		case BFS:
+			// Agent plans its path through the BFS algo
 			start = System.currentTimeMillis();
 			BFSAlgo bfs = new BFSAlgo(vehicle);
 			plan = bfs.computePlan(vehicle, tasks);
 			end = System.currentTimeMillis();
 			break;
 		case NAIVE:
+			// Agent plans its path through a naive approach
 			start = System.currentTimeMillis();
 			plan = naivePlan(vehicle, tasks);
 			end = System.currentTimeMillis();
@@ -85,6 +90,8 @@ public class DeliberativeAgent implements DeliberativeBehavior {
 		default:
 			throw new AssertionError("Should not happen.");
 		}
+
+		// Keep track of the time to compute the plan 
 		System.out.println("Algorithm " + algorithm.toString()  + " took " + (end - start)/1000.0 + " seconds");	
 		return plan;
 	}
