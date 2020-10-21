@@ -1,9 +1,6 @@
 package template;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.IntStream;
 
 import logist.plan.Plan;
@@ -43,9 +40,10 @@ public class AStarAlgo extends Algo {
         }
 	   State currentState = new State(vehicle.getCurrentCity(), vehicle.getCurrentTasks(), awaitingDeliveryTasks); 
 	   
-  
+        // Contains states that need to be checked
         LinkedList<State> statesToCheck = new LinkedList<State>();
         statesToCheck.add(currentState); 
+        // Contains states that has been checked
         LinkedList<State> statesChecked = new LinkedList<State>(); 
 
 		do {
@@ -57,7 +55,7 @@ public class AStarAlgo extends Algo {
             State stateToCheck = statesToCheck.removeFirst(); 
 
             // We check if node is the last task to perform 
-            if (stateToCheck.isLastTask()) {
+            if (stateToCheck.isGoalState()) {
                 System.out.println("Total states checked: " + statesChecked.size());
                 System.out.println("Total cost of plan: " + stateToCheck.getCost());
 				return stateToCheck.getPlan(); 
@@ -69,8 +67,8 @@ public class AStarAlgo extends Algo {
 			
                 LinkedList<State> successorStates = computeSuccessors(stateToCheck);
 				LinkedList<State> sortedSuccessorStates = sortByCost(successorStates);
-				statesToCheck.addAll(sortedSuccessorStates);
-				//statesToCheck = sortByCost(statesToCheck); //TODO: check if needed
+                // Add all successors to the states that need to be checked later
+                statesToCheck.addAll(sortedSuccessorStates);
             }
         } while (true);
 		throw new IndexOutOfBoundsException("AStar StatesToCheck is empty"); 
@@ -79,19 +77,24 @@ public class AStarAlgo extends Algo {
 
 	private boolean isCostLowerThanExistingCopy(State stateToCheck, LinkedList<State> states) {
 		for (State state : states) {
-			if (state.getCurrentCity() == stateToCheck.getCurrentCity()) {
-				states.remove(state);
-				return (stateToCheck.getTotalCost() < state.getTotalCost()); 
+            if ((state.getCurrentCity() == stateToCheck.getCurrentCity()) && 
+                (stateToCheck.getTotalCost() < state.getTotalCost())) {
+                states.remove(state);
+                return true; 
 			}
 		}
 		return false; 
 	}
 
+    // Sort LinkedList of states by increasing order
 	private LinkedList<State> sortByCost(LinkedList<State> states) {
-		int[] sortedIndices = IntStream.range(0, states.size())
+        // Get indices of the sorted List 
+        int[] sortedIndices = IntStream.range(0, states.size())
 			.boxed().sorted((i, j) -> Double.valueOf(states.get(j).getTotalCost()).compareTo(Double.valueOf(states.get(i).getTotalCost())))
             .mapToInt(ele -> ele).toArray();
-		LinkedList<State> sortedStates = new LinkedList<State>();
+        
+        //Reorder list
+        LinkedList<State> sortedStates = new LinkedList<State>();
 		for (int index : sortedIndices) {
 			sortedStates.add(states.get(index));
 		}
@@ -106,25 +109,33 @@ public class AStarAlgo extends Algo {
         
         LinkedList<State> nextStates = new LinkedList<State>();
 
-        // Browse all available task 
+        // Browse all available awaiting tasks
         for (Task task : awaitingDeliveryTasks) {
             State nextState = new State(state);
-
+            
+            // If there are awaiting tasks in the currentCity , pickup them
             for (Task taskToPickup : getTasksToPickup(state)) {
+                // Check vehicle capacity
                 if (nextState.getPickedUpTasks().weightSum() + task.weight + taskToPickup.weight < vehicleCapacity && task != taskToPickup) {
                     nextState.plan.appendPickup(taskToPickup);
                     nextState.pickedUpTasks.add(taskToPickup);
                     nextState.awaitingDeliveryTasks.remove(taskToPickup);
                 }
             }
+            
+            // For all city on the way to the pickup city
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.pickupCity)) {
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
+
+                // Check if there are task to deliver in the current city
                 for (Task taskToDeliver : getTasksToDeliver(nextState)) {
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
+                // Check if there are task to pickup in the current city
                 for (Task taskToPickup : getTasksToPickup(nextState)) {
+                    // Check vehicle capacity
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
@@ -132,38 +143,49 @@ public class AStarAlgo extends Algo {
                     }
                 }
             }
+
+            // Check vehicle capacity
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
 				nextState.pickedUpTasks.add(task);
-				nextState.computeCost(costPerKm);
-				nextState.computeHeuristic(heuristic, costPerKm);
+				nextState.computeCost(costPerKm); // update cost in state
+				nextState.computeHeuristic(heuristic, costPerKm); // update heuristic in state
+                
+                // Save the corresponding state 
                 nextStates.add(nextState);
             }
         }
 
-        // Deliver picked up tasks
+        // Browse all picked up tasks
         for (Task task : pickedUpTasks) {
             State nextState = new State(state);
             
+            // For all city on the way to the delivery city
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.deliveryCity)) { 
 				nextState.setCurrentCity(cityOnTheWay);
 				nextState.plan.appendMove(cityOnTheWay);
                 
+                // Check if there are task to deliver in the current city
+                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
+                    nextState.plan.appendDelivery(taskToDeliver);
+                    nextState.pickedUpTasks.remove(taskToDeliver); 
+                }
+
+                // Check if there are task to pickup in the current city
                 for (Task taskToPickup : getTasksToPickup(nextState)) {
+                    // Check vehicle capacity
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight < vehicleCapacity) {
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
                     }
                 }
-                for (Task taskToDeliver : getTasksToDeliver(nextState)) {
-                    nextState.plan.appendDelivery(taskToDeliver);
-                    nextState.pickedUpTasks.remove(taskToDeliver); 
-                }
 			} 
-			nextState.computeCost(costPerKm);
-			nextState.computeHeuristic(heuristic, costPerKm);
+			nextState.computeCost(costPerKm); // update cost in state
+			nextState.computeHeuristic(heuristic, costPerKm); // update heuristic in state
+            
+            // Save the corresponding state 
             nextStates.add(nextState);
         }
         return nextStates;

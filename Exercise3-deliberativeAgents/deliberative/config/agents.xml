@@ -25,11 +25,12 @@
 		<set heuristic="NONE"/>
 	</agent>
 
-	<agent name="deliberative-astar-h">
+	<agent name="deliberative-main">
 		<set class-path="bin/"/>
 		<set class-name="template.DeliberativeAgent"/>
 		<set algorithm="ASTAR"/>
-		<set heuristic="SHORTEST"/>
+		<set heuristic="LONGESTTASK"/>
 	</agent>
+
 	
 </agents>

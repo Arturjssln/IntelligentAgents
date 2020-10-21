@@ -2,7 +2,6 @@ package template;
 
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.List;
 
 import logist.plan.Plan;
 import logist.simulation.Vehicle;
@@ -48,7 +47,7 @@ public class BFSAlgo extends Algo {
             
             State stateToCheck = statesToCheck.removeFirst(); 
             // We check if node is the last task to perform 
-            if (stateToCheck.isLastTask()) {
+            if (stateToCheck.isGoalState()) {
                 System.out.println("Total states checked: " + statesChecked.size());
                 System.out.println("Total cost of plan: " + stateToCheck.getCost());
 				return stateToCheck.getPlan(); 
@@ -74,32 +73,31 @@ public class BFSAlgo extends Algo {
         for (Task task : awaitingDeliveryTasks) {
             State nextState = new State(state);
 
-            // If there are awaiting tasks in the currentCity 
+            // If there are awaiting tasks in the currentCity , pickup them
             for (Task taskToPickup : getTasksToPickup(state)) {
-                // If vehicle has enough capacity to pick up the task 
+                // Check vehicle capacity
                 if (nextState.getPickedUpTasks().weightSum() + task.weight + taskToPickup.weight < vehicleCapacity && task != taskToPickup) {
-                    // Pick up the task by Setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
                     nextState.plan.appendPickup(taskToPickup);
                     nextState.pickedUpTasks.add(taskToPickup);
                     nextState.awaitingDeliveryTasks.remove(taskToPickup);
                 }
             }
-            // If tasks to deliver or pickup on the way to task.deliveryCity
+
+            // If tasks to deliver or pickup on the way to task.pickupCity
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.pickupCity)) {
-                // for each city on the way, move to from city to city is added
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                // For all the picked up tasks to be delivered in the cityOnTheWay
+
+                // Check if there are task to deliver in the current city
                 for (Task taskToDeliver : getTasksToDeliver(nextState)) {
-                    // Deliver the task and remove it from the picked up tasks
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
-                // For all the awaiting tasks in the cityOnTheWay
+
+                // Check if there are task to pickup in the current city
                 for (Task taskToPickup : getTasksToPickup(nextState)) {
-                    // If the vehicle has enough capacity to pick up the task
+                    // Check vehicle capacity
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight + task.weight < vehicleCapacity && task != taskToPickup) {
-                        // Pick up the task by setting nextState extra plan step, pickup task and remove the picked up task from awaiting tasks
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.pickedUpTasks.add(taskToPickup); 
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
@@ -109,11 +107,11 @@ public class BFSAlgo extends Algo {
 
             // If the vehicle has enough capacity to pick up the task
             if (nextState.getPickedUpTasks().weightSum() + task.weight < vehicleCapacity) {
-                // Pick up the initial task 'task' by setting the plan, removing the task from awaiting and adding it to picked up
                 nextState.plan.appendPickup(task);
                 nextState.awaitingDeliveryTasks.remove(task); 
                 nextState.pickedUpTasks.add(task); 
-                nextState.computeCost(costPerKm);
+                nextState.computeCost(costPerKm); // update cost in state
+                
                 // Save the corresponding state 
                 nextStates.add(nextState);
             }
@@ -123,16 +121,16 @@ public class BFSAlgo extends Algo {
         // Browse all picked up tasks
         for (Task task : pickedUpTasks) {
             State nextState = new State(state);
-            // Check all cities on the path 
+            
+            // For all city on the way to the delivery city
             for (City cityOnTheWay : state.getCurrentCity().pathTo(task.deliveryCity)) {
-                // Add going to the city to the plan 
                 nextState.setCurrentCity(cityOnTheWay);
                 nextState.plan.appendMove(cityOnTheWay);
-                // For all tasks to be pickup
+
+                // Check if there are task to pickup in the current city
                 for (Task taskToPickup : getTasksToPickup(nextState)) {
-                    // If vehicle has enough capacity to pick up the task 
+                    // Check vehicle capacity
                     if (nextState.getPickedUpTasks().weightSum() + taskToPickup.weight < vehicleCapacity) {
-                        // Pick up by adding the action to the plan, and update the TaskSets
                         nextState.plan.appendPickup(taskToPickup);
                         nextState.awaitingDeliveryTasks.remove(taskToPickup); 
                         nextState.pickedUpTasks.add(taskToPickup); 
@@ -140,7 +138,6 @@ public class BFSAlgo extends Algo {
                 }
                 // For all taks to deliver
                 for (Task taskToDeliver : getTasksToDeliver(nextState)) {
-                    // Deliver the task by adding the action to the plan and removing it from the picked up task
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
