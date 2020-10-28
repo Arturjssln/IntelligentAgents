@@ -18,16 +18,18 @@ public class State {
 	heuristic: value of the heuristic at the stage of the state
 	*/
 
-    // Attributes
+	// Attributes
+	public City initialCity;
     private City currentCity;	
     public TaskSet pickedUpTasks;
 	public TaskSet awaitingDeliveryTasks;
 	public Plan plan;
-	private double cost; 
+	private double cost;
 	private double heuristic;
     
     // Constructor
     public State(City initialCity, TaskSet pickedUpTasks, TaskSet awaitingDeliveryTasks) {
+		this.initialCity = initialCity;
 		this.currentCity = initialCity;
 		this.pickedUpTasks = pickedUpTasks;
 		this.awaitingDeliveryTasks = awaitingDeliveryTasks;
@@ -36,11 +38,12 @@ public class State {
 	
 	// Copy constructor
     public State(State state) { 
+		this.initialCity = state.initialCity; 
         this.currentCity = state.getCurrentCity(); 
         this.pickedUpTasks = state.pickedUpTasks.clone();
 		this.awaitingDeliveryTasks = state.awaitingDeliveryTasks.clone();
 		// Deep copy 
-		this.plan = new Plan(this.currentCity);
+		this.plan = new Plan(this.initialCity);
 		for (Action action : state.plan) {
 			this.plan.append(action);
 		}

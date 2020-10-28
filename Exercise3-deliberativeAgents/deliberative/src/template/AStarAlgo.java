@@ -75,32 +75,6 @@ public class AStarAlgo extends Algo {
 		
 	}
 
-	private boolean isCostLowerThanExistingCopy(State stateToCheck, LinkedList<State> states) {
-		for (State state : states) {
-            if ((state.getCurrentCity() == stateToCheck.getCurrentCity()) && 
-                (stateToCheck.getTotalCost() < state.getTotalCost())) {
-                states.remove(state);
-                return true; 
-			}
-		}
-		return false; 
-	}
-
-    // Sort LinkedList of states by increasing order
-	private LinkedList<State> sortByCost(LinkedList<State> states) {
-        // Get indices of the sorted List 
-        int[] sortedIndices = IntStream.range(0, states.size())
-			.boxed().sorted((i, j) -> Double.valueOf(states.get(j).getTotalCost()).compareTo(Double.valueOf(states.get(i).getTotalCost())))
-            .mapToInt(ele -> ele).toArray();
-        
-        //Reorder list
-        LinkedList<State> sortedStates = new LinkedList<State>();
-		for (int index : sortedIndices) {
-			sortedStates.add(states.get(index));
-		}
-		return sortedStates; 
-	}
-
     @Override
 	protected LinkedList<State> computeSuccessors(State state) {
         // Compute a list of all possible states given the current state
@@ -190,4 +164,30 @@ public class AStarAlgo extends Algo {
         }
         return nextStates;
     }
+
+    private boolean isCostLowerThanExistingCopy(State stateToCheck, LinkedList<State> states) {
+		for (State state : states) {
+            if ((state.getCurrentCity() == stateToCheck.getCurrentCity()) && 
+                (stateToCheck.getTotalCost() < state.getTotalCost())) {
+                states.remove(state);
+                return true; 
+			}
+		}
+		return false; 
+	}
+
+    // Sort LinkedList of states by increasing order
+	private LinkedList<State> sortByCost(LinkedList<State> states) {
+        // Get indices of the sorted List 
+        int[] sortedIndices = IntStream.range(0, states.size())
+			.boxed().sorted((i, j) -> Double.valueOf(states.get(j).getTotalCost()).compareTo(Double.valueOf(states.get(i).getTotalCost())))
+            .mapToInt(ele -> ele).toArray();
+        
+        //Reorder list
+        LinkedList<State> sortedStates = new LinkedList<State>();
+		for (int index : sortedIndices) {
+			sortedStates.add(states.get(index));
+		}
+		return sortedStates; 
+	}
 }

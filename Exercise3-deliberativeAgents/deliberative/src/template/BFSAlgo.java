@@ -141,7 +141,7 @@ public class BFSAlgo extends Algo {
                     nextState.plan.appendDelivery(taskToDeliver);
                     nextState.pickedUpTasks.remove(taskToDeliver); 
                 }
-                  
+
             } 
             nextState.computeCost(costPerKm);
             // Save the corresponding state 
