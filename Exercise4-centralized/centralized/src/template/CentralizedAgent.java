@@ -1,11 +1,11 @@
 package template;
 
-//the list of imports
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import logist.LogistSettings;
 
+import logist.LogistSettings;
 import logist.Measures;
 import logist.behavior.AuctionBehavior;
 import logist.behavior.CentralizedBehavior;
@@ -19,23 +19,29 @@ import logist.task.TaskSet;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
 
+import template.SLSAlgo;
+
 /**
  * A very simple auction agent that assigns all tasks to its first vehicle and
  * handles them sequentially.
  *
  */
 @SuppressWarnings("unused")
-public class CentralizedTemplate implements CentralizedBehavior {
+public class CentralizedAgent implements CentralizedBehavior {
+
+	// Different algorithms implemented 
+	enum Algorithm { SLS, NAIVE};
 
     private Topology topology;
     private TaskDistribution distribution;
     private Agent agent;
-    private long timeout_setup;
+    private long timeout_setup; // TODO: a quoi ça sert ça ?????
     private long timeout_plan;
+
+    private Algorithm algorithm;
     
     @Override
-    public void setup(Topology topology, TaskDistribution distribution,
-            Agent agent) {
+    public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
         
         // this code is used to get the timeouts
         LogistSettings ls = null;
@@ -45,6 +51,11 @@ public class CentralizedTemplate implements CentralizedBehavior {
         catch (Exception exc) {
             System.out.println("There was a problem loading the configuration file.");
         }
+
+        String algorithmName = agent.readProperty("algorithm", String.class, "SLS");
+
+        // Throws IllegalArgumentException if algorithm is unknown
+		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
         
         // the setup method cannot last more than timeout_setup milliseconds
         timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
@@ -59,8 +70,28 @@ public class CentralizedTemplate implements CentralizedBehavior {
     @Override
     public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
         long time_start = System.currentTimeMillis();
+        // Compute the plans for each vehicle with the selected algorithm.
+        List<Plan> plans = new ArrayList<Plan>();
+		switch (algorithm) {
+            case NAIVE:
+                plans = computeNaivePlans(vehicles, tasks);
+                break;
+            case SLS:
+                SLSAlgo sls = new SLSAlgo(vehicles);
+                plans = sls.computePlans(tasks, this.timeout_plan, time_start);
+                break;
+            default: 
+                throw new AssertionError("Should not happen.");
+        }        
+        long time_end = System.currentTimeMillis();
+        long duration = (time_end - time_start) / 1000.0;
+        System.out.println("The plan was generated in " + duration + " seconds using " + algorithm.toString() + " alogirthm.");
         
-//		System.out.println("Agent " + agent.id() + " has tasks " + tasks);
+        return plans;
+    }
+
+    private List<Plan> computeNaivePlans(List<Vehicle> vehicles, TaskSet tasks) {
+        // First vehicle get all the tasks, other vehicles can rest
         Plan planVehicle1 = naivePlan(vehicles.get(0), tasks);
 
         List<Plan> plans = new ArrayList<Plan>();
@@ -68,12 +99,7 @@ public class CentralizedTemplate implements CentralizedBehavior {
         while (plans.size() < vehicles.size()) {
             plans.add(Plan.EMPTY);
         }
-        
-        long time_end = System.currentTimeMillis();
-        long duration = time_end - time_start;
-        System.out.println("The plan was generated in " + duration + " milliseconds.");
-        
-        return plans;
+        return plans
     }
 
     private Plan naivePlan(Vehicle vehicle, TaskSet tasks) {
