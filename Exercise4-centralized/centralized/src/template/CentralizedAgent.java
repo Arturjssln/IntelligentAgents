@@ -1,5 +1,6 @@
 package template;
 
+import java.io.File;
 //the list of imports
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ import logist.topology.Topology.City;
  *
  */
 @SuppressWarnings("unused")
-public class CentralizedTemplate implements CentralizedBehavior {
+public class CentralizedAgent implements CentralizedBehavior {
 
     private Topology topology;
     private TaskDistribution distribution;
