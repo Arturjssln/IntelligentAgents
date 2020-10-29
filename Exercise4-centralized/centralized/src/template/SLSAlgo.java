@@ -13,10 +13,10 @@ public class SLSAlgo {
 
     // To solve discrete constraint optimization problem (COP)
 
-    // List<Solution> PotentialSolutions; // TODO: faudrait l'initialiser  
+    // List<Solution> PotentialSolutions; // TODO: faudrait l'initialiser
     List<Vehicle> vehicles;
 
-    final int MAX_ITERATION = 10000; 
+    final int MAX_ITERATION = 10000;
 
 	// Constructor
 	public SLSAlgo(List<Vehicle> vehicles) {
@@ -25,20 +25,20 @@ public class SLSAlgo {
 
 
     public List<Plan> computePlans(TaskSet tasks, long time_out, long start_time) {
-        List<Plan> plans = new ArrayList<Plan> (); 
-        Solution optimalSolution = new Solution(); 
+        List<Plan> plans = new ArrayList<Plan> ();
+        Solution optimalSolution = new Solution();
 
         optimalSolution = selectInitialSolution();
-        List<Solution> potentialSolutions = new ArrayList<Solution> (); 
+        List<Solution> potentialSolutions = new ArrayList<Solution> ();
 
-        int iteration = 0; 
+        int iteration = 0;
         do {
-            potentialSolutions = generateNeighbours(optimalSolution); 
-            optimalSolution = localChoice(potentialSolutions); 
-            ++iteration; 
-        } while(iteration<MAX_ITERATION); 
-        
-        plans = optimalSolution.generatePlans(); 
+            potentialSolutions = generateNeighbours(optimalSolution);
+            optimalSolution = localChoice(potentialSolutions);
+            ++iteration;
+        } while(iteration<MAX_ITERATION);
+
+        plans = optimalSolution.generatePlans();
 
         // TODO: verify that (current_time < start_time + time_out) in loop
         long current_time = System.currentTimeMillis();
@@ -50,28 +50,28 @@ public class SLSAlgo {
 
 
     private Solution selectInitialSolution() {
-        // return a plan that is valid 
-        // udpate the lists 
+        // return a plan that is valid
+        // udpate the lists
 
-        return new Solution(); 
+        return new Solution();
     }
 
     private List<Solution> generateNeighbours(Solution solution) {
         // changing vehicle for the task
-        // changing task order 
+        // changing task order
         // others ? ...
-    	
-    	return new ArrayList<Solution>(); 
+
+    	return new ArrayList<Solution>();
     }
 
 
     private Solution localChoice(List<Solution> potentialSolutions) {
-        double probability = 0.3; 
+        double probability = 0.3;
 
-        return new Solution(); 
+        return new Solution();
     }
     private void updateTime(Solution solution) {
 
     }
- 
+
 }

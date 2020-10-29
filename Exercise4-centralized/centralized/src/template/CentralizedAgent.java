@@ -1,6 +1,7 @@
 package template;
 
 import java.io.File;
+//the list of imports
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +30,7 @@ import template.SLSAlgo;
 @SuppressWarnings("unused")
 public class CentralizedAgent implements CentralizedBehavior {
 
-	// Different algorithms implemented 
+	// Different algorithms implemented
 	enum Algorithm { SLS, NAIVE};
 
     private Topology topology;
@@ -39,10 +40,10 @@ public class CentralizedAgent implements CentralizedBehavior {
     private long timeout_plan;
 
     private Algorithm algorithm;
-    
+
     @Override
     public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
-        
+
         // this code is used to get the timeouts
         LogistSettings ls = null;
         try {
@@ -56,12 +57,12 @@ public class CentralizedAgent implements CentralizedBehavior {
 
         // Throws IllegalArgumentException if algorithm is unknown
 		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
-        
+
         // the setup method cannot last more than timeout_setup milliseconds
         timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
         // the plan method cannot execute more than timeout_plan milliseconds
         timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
-        
+
         this.topology = topology;
         this.distribution = distribution;
         this.agent = agent;
@@ -80,13 +81,13 @@ public class CentralizedAgent implements CentralizedBehavior {
                 SLSAlgo sls = new SLSAlgo(vehicles);
                 plans = sls.computePlans(tasks, this.timeout_plan, time_start);
                 break;
-            default: 
+            default:
                 throw new AssertionError("Should not happen.");
-        }        
+        }
         long time_end = System.currentTimeMillis();
         long duration = (time_end - time_start) / 1000.0;
         System.out.println("The plan was generated in " + duration + " seconds using " + algorithm.toString() + " alogirthm.");
-        
+
         return plans;
     }
 
