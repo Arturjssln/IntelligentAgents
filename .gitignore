@@ -9,6 +9,8 @@
 *.zip
 *.class
 
+*/logist
+
 
 
 ## METADATA 
@@ -59,3 +61,4 @@
 .metadata/.mylyn/.taskListIndex/segments_1
 .metadata/.mylyn/.taskListIndex/write.lock
 .metadata/version.ini
+/.metadata/
