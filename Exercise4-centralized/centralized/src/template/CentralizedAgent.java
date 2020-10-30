@@ -78,14 +78,14 @@ public class CentralizedAgent implements CentralizedBehavior {
                 plans = computeNaivePlans(vehicles, tasks);
                 break;
             case SLS:
-                SLSAlgo sls = new SLSAlgo(vehicles);
-                plans = sls.computePlans(tasks, this.timeout_plan, time_start);
+                SLSAlgo sls = new SLSAlgo(vehicles, tasks);
+                plans = sls.computePlans(tasks, time_start+this.timeout_plan);
                 break;
             default:
                 throw new AssertionError("Should not happen.");
         }
         long time_end = System.currentTimeMillis();
-        long duration = (time_end - time_start) / 1000.0;
+        double duration = (time_end - time_start) / 1000.0;
         System.out.println("The plan was generated in " + duration + " seconds using " + algorithm.toString() + " alogirthm.");
 
         return plans;
@@ -100,7 +100,7 @@ public class CentralizedAgent implements CentralizedBehavior {
         while (plans.size() < vehicles.size()) {
             plans.add(Plan.EMPTY);
         }
-        return plans
+        return plans;
     }
 
     private Plan naivePlan(Vehicle vehicle, TaskSet tasks) {
