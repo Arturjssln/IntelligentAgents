@@ -50,8 +50,6 @@ public class SLSAlgo {
         plans = currentSolution.generatePlans(this.vehicles);
 
         // need to be of size #vehicles
-
-
         return plans;
     }
 
@@ -108,8 +106,7 @@ public class SLSAlgo {
         return new Solution();
     }
 
-    //TODO: Verify this function
-    // Sort List of states by increasing order
+    // Sort List of Vehicles by increasing order of capacity
 	private List<Vehicle> sortByCapacity(List<Vehicle> vehicles) {
         // Get indices of the sorted List 
         int[] sortedIndices = IntStream.range(0, vehicles.size())
@@ -124,31 +121,95 @@ public class SLSAlgo {
 		return sortedVehicles; 
     }
     
-    //TODO: Verify this function
-    // Sort LinkedList of states by increasing order
+    // Sort List of costs by increasing order and return index if sorted list
 	private int[] sortByCost(List<Double> costsForSolution) {
         // Get indices of the sorted List 
         int[] sortedIndices = IntStream.range(0, costsForSolution.size())
 			.boxed().sorted((i, j) -> Double.valueOf(costsForSolution.get(j)).compareTo(Double.valueOf(costsForSolution.get(i))))
             .mapToInt(ele -> ele).toArray();
-        
 		return sortedIndices; 
 	}
 
     private List<Solution> generateNeighbours(Solution solution) {
-        // changing vehicle for the task
-        // changing task order
-        // others ? ...
+        List<Solution> neighours = new ArrayList<Solution>();
+        Vehicle vehicleI; 
+        do {
+            Random rand = new Random(); 
+            vehicleI = vehicles.get(rand.nextInt(vehicles.size()));
+        } while (solution.nextTaskForVehicle.get(vehicleI) == null); // TODO: check here if null is returned
 
-    	return new ArrayList<Solution>();
+        Task task = solution.nextTaskForVehicle.get(vehicleI);
+        for (Vehicle vehicleJ : vehicles) {
+            if (!vehicleJ.equals(vehicleI)) {
+                if (task.weight < vehicleJ.capacity()) { //TODO!: check this condition
+                    neighours.add(changingVehicle(solution, vehicleI, vehicleJ));
+                }
+            }
+        }
+        int length = 0;
+        do {
+            task = solution.nextTaskForTask.get(task);
+            length++;
+        } while(task == null);
+
+        if (length > 2) {
+            for (int tIdx1=0; tIdx1<length-1; tIdx1++) {
+                for (int tIdx2=tIdx1+1; tIdx2<length; tIdx2++) {
+                    neighours.add(changingTaskOrder(solution, vehicleI, tIdx1, tIdx2));
+                }
+            }
+        }
+    	return neighours;
     }
 
-    private void changingVehicle(Solution solution, Vehicle vehicle) {
-        // TODO: copy of solution !!
-        Solution newSolution = new Solution(solution); //TODO: change 
-        Task firstTask = solution.getNextTaskForVehicle().get(vehicle); 
+    private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2) {
+        Solution newSolution = new Solution(solution);
+        Task firstTask = newSolution.nextTaskForVehicle.get(v1); 
+
+        newSolution.nextTaskForVehicle.put(v1.id(), newSolution.nextTaskForTask.get(firstTask));
+        newSolution.nextTaskForVehicle.put(v2.id(), firstTask);
+        newSolution.nextTaskForTask.put(firstTask, newSolution.nextTaskForVehicle.get(v2));
+
+        updateTime(newSolution, v1);
+
+        newSolution.vehicles.put(firstTask, v2.id());
+
+        return newSolution;
     }
 
+    private Solution changingTaskOrder(Solution solution, Vehicle vehicle, int tIdx1, int tIdx2) {
+        Solution newSolution = new Solution(solution);
+        Task prevTask1 = newSolution.nextTaskForVehicle.get(vehicle);
+        Task task1 = newSolution.nextTaskForTask.get(prevTask1);
+        int count = 1;
+        while (count < tIdx1) {
+            prevTask1 = task1;
+            task1 = newSolution.nextTaskForTask.get(prevTask1);
+            count++;
+        }
+        Task postTask1 = newSolution.nextTaskForTask.get(task1);
+        Task prevTask2 = task1;
+        Task task2 = newSolution.nextTaskForTask.get(prevTask2);
+        count++;
+        while (count < tIdx2) {
+            prevTask2 = task2;
+            task2 = newSolution.nextTaskForTask.get(prevTask2);
+            count++;
+        }
+        Task postTask2 = newSolution.nextTaskForTask.get(task2);
+        if (postTask1.equals(task2)) {
+            newSolution.nextTaskForTask.put(prevTask1, task2);
+            newSolution.nextTaskForTask.put(task2, task1);
+            newSolution.nextTaskForTask.put(task1, postTask2);
+        } else {
+            newSolution.nextTaskForTask.put(prevTask1, task2);
+            newSolution.nextTaskForTask.put(task2, postTask1);
+            newSolution.nextTaskForTask.put(prevTask2, task1);
+            newSolution.nextTaskForTask.put(task1, postTask2);
+        }
+        updateTime(newSolution, vehicle);
+        return newSolution;
+    }
 
     private Solution localChoice(List<Solution> potentialSolutions) {
         
@@ -166,8 +227,6 @@ public class SLSAlgo {
         return currentSolution; 
     }
 
-
-
     private double computeCost(List<Plan> plansForSolution) {
         double costSum = 0.0; 
         for (int i=0; i<plansForSolution.size(); i++) {
@@ -175,10 +234,20 @@ public class SLSAlgo {
         }
         return costSum; 
     }
-
     
-    private void updateTime(Solution solution) {
-
+    private void updateTime(Solution solution, Vehicle vehicle) {
+        //TODO! : Adapt this code for multiple task
+        Task taskI = solution.nextTaskForVehicle.get(vehicle);
+        Task taskJ = null;
+        if (taskI != null) {
+            solution.pickupTimes.put(taskI, 0);
+            do {
+                taskJ = solution.nextTaskForTask.get(taskI);
+                if (taskJ != null) {
+                    solution.deliveryTimes.put(taskJ, solution.deliveryTimes.get(taskI)+1);
+                    taskI = taskJ;
+                } 
+            } while (taskJ != null);
+        }
     }
-
 }
