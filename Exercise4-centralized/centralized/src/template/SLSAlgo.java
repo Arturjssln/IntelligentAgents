@@ -136,7 +136,7 @@ public class SLSAlgo {
             Random rand = new Random(); 
             vehicleI = vehicles.get(rand.nextInt(vehicles.size()));
         } while (solution.nextTaskForVehicle.get(vehicleI.id()) == null); 
-        
+
         Task task = solution.nextTaskForVehicle.get(vehicleI.id());
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
@@ -223,32 +223,8 @@ public class SLSAlgo {
         return newSolution;
     }
 
-    private List<Task> 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private List<Solution> changingTaskOrder(Solution solution, Vehicle vehicle, int tIdx1, int tIdx2) {
-        List<Solution> newSolutions = new  List<Solution>();
+        List<Solution> newSolutions = new  ArrayList<Solution>();
         Solution newSolution = new Solution(solution);
         Task prevTask1 = newSolution.nextTaskForVehicle.get(vehicle.id());
         Task task1 = newSolution.nextTaskForTask.get(prevTask1);
@@ -278,35 +254,37 @@ public class SLSAlgo {
             newSolution.nextTaskForTask.put(prevTask2, task1);
             newSolution.nextTaskForTask.put(task1, postTask2);
         }
+
         int task1PickupTime = newSolution.pickupTimes.get(task1);
         int task1DeliveryTime = newSolution.deliveryTimes.get(task1);
         int task2PickupTime = newSolution.pickupTimes.get(task2);
         int task2DeliveryTime = newSolution.deliveryTimes.get(task2);
+        
         // Create new solution by switching delivery time
-        newSolution.pickupTimes.put(task2, task1PickupTime);
         if (task2PickupTime < task1DeliveryTime) {
-            newSolution.pickupTimes.put(task1, task2PickupTime);
-            newSolutions.add(new Solution(newSolution));
-        } else {
-            newSolution.deliveryTimes.put(task2, task1DeliveryTime);
-            newSolution.pickupTimes.put(task1, task2PickupTime);
-            newSolution.deliveryTimes.put(task1, task2DeliveryTime);
-            newSolutions.add(new Solution(newSolution));
+            Solution newSolutionTemp =  new Solution(newSolution);
+            newSolutionTemp.pickupTimes.put(task2, task1PickupTime);
+            newSolutionTemp.pickupTimes.put(task1, task2PickupTime);
+            newSolutions.add(newSolutionTemp);
         }
+        Solution newSolutionTemp =  new Solution(newSolution);
+        newSolutionTemp.pickupTimes.put(task2, task1PickupTime);
+        newSolutionTemp.deliveryTimes.put(task2, task1DeliveryTime);
+        newSolutionTemp.pickupTimes.put(task1, task2PickupTime);
+        newSolutionTemp.deliveryTimes.put(task1, task2DeliveryTime);
+        newSolutions.add(newSolutionTemp);
+
         // Create new solution by switching 
         Random random = new Random();
         int maxTime = Math.max(task1DeliveryTime, task2DeliveryTime);
         int randomTask1DeliveryTime = random.nextInt(maxTime - task1PickupTime) + task1PickupTime;
         int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime;
-        if (task2PickupTime < randomTask1DeliveryTime) {
-            newSolution.pickupTimes.put(task1, task2PickupTime);
-            newSolutions.add(new Solution(newSolution));
-        } else {
-            newSolution.deliveryTimes.put(task2, task1DeliveryTime);
-            newSolution.pickupTimes.put(task1, task2PickupTime);
-            newSolution.deliveryTimes.put(task1, task2DeliveryTime);
-            newSolutions.add(new Solution(newSolution));
-        }
+
+        newSolution.pickupTimes.put(task2, task1PickupTime);
+        newSolution.deliveryTimes.put(task2, randomTask1DeliveryTime);
+        newSolution.pickupTimes.put(task1, task2PickupTime);
+        newSolution.deliveryTimes.put(task1, randomTask2DeliveryTime);
+        newSolutions.add(newSolution);
         return newSolutions;
     }
 
