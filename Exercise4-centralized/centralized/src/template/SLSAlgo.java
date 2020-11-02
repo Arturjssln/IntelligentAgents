@@ -11,7 +11,6 @@ import logist.plan.Plan;
 import logist.simulation.Vehicle;
 import logist.task.Task;
 import logist.task.TaskSet;
-import logist.topology.Topology.City;
 
 import template.Solution;
 
@@ -136,13 +135,13 @@ public class SLSAlgo {
         do {
             Random rand = new Random(); 
             vehicleI = vehicles.get(rand.nextInt(vehicles.size()));
-        } while (solution.nextTaskForVehicle.get(vehicleI) == null); // TODO: check here if null is returned
-
-        Task task = solution.nextTaskForVehicle.get(vehicleI);
+        } while (solution.nextTaskForVehicle.get(vehicleI.id()) == null); 
+        
+        Task task = solution.nextTaskForVehicle.get(vehicleI.id());
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
-                if (task.weight < vehicleJ.capacity()) { //TODO!: check this condition
-                    neighours.add(changingVehicle(solution, vehicleI, vehicleJ));
+                if (task.weight < vehicleJ.capacity()) { //TODO: pas la bonne capacité: doit prendre la capacité restante
+                    neighours.addAll(changingVehicle(solution, vehicleI, vehicleJ));
                 }
             }
         }
@@ -155,7 +154,8 @@ public class SLSAlgo {
         if (length > 2) {
             for (int tIdx1=0; tIdx1<length-1; tIdx1++) {
                 for (int tIdx2=tIdx1+1; tIdx2<length; tIdx2++) {
-                    neighours.add(changingTaskOrder(solution, vehicleI, tIdx1, tIdx2));
+                    //TODO: check capacité: doit prendre la capacité restante
+                    neighours.addAll(changingTaskOrder(solution, vehicleI, tIdx1, tIdx2));
                 }
             }
         }
@@ -163,23 +163,94 @@ public class SLSAlgo {
     }
 
     private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2) {
+        
         Solution newSolution = new Solution(solution);
-        Task firstTask = newSolution.nextTaskForVehicle.get(v1); 
+        Task firstTask = newSolution.nextTaskForVehicle.get(v1.id()); 
+
+        firstTaskDeliveryTime = newSolution.deliveryTimes.get(firstTask); 
 
         newSolution.nextTaskForVehicle.put(v1.id(), newSolution.nextTaskForTask.get(firstTask));
         newSolution.nextTaskForVehicle.put(v2.id(), firstTask);
-        newSolution.nextTaskForTask.put(firstTask, newSolution.nextTaskForVehicle.get(v2));
+        newSolution.nextTaskForTask.put(firstTask, newSolution.nextTaskForVehicle.get(v2.id()));
 
-        updateTime(newSolution, v1);
+        newSolution.pickupTimes.remove(firstTask); 
+        newSolution.deliveryTimes.remove(firstTask); 
+        newSolution.pickupTimes.put(newSolution.nextTaskForVehicle.get(v1.id()), 0);
+        newSolution.pickupTimes.put(newSolution.nextTaskForVehicle.get(v2.id()), 0);
 
+        // Solution where deliveryTime stays the same for both tasks 
+        newSolution.deliveryTimes.put(firstTaks, firstTaskDeliveryTime); 
+        for (Map.Entry<Task, Integer> entry: deliveryTimes.getEntries()) {
+            if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
+                if (entry.getValue() < firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()-1); 
+                }
+                else if (entry.getValue() >= firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()-2); 
+                }
+            }
+            if (newSolution.vehicles.get(entry.getKey()) == v2.id()) {
+                if (entry.getValue() < firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()+1); 
+                }
+                else if (entry.getValue() >= firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()+2); 
+                }              
+            }
+        }
+
+        for (Map.Entry<Task, Integer> entry: pickupTimes.getEntries()) {
+            if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
+                if (entry.getValue() < firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()-1); 
+                }
+                else if (entry.getValue() >= firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()-2); 
+                }
+            }
+            if (newSolution.vehicles.get(entry.getKey()) == v2.id()) {
+                if (entry.getValue() < firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()+1); 
+                }
+                else if (entry.getValue() >= firstTaskDeliveryTime) {
+                    newSolution.deliveryTimes.put(getKey(), getValue()+2); 
+                }              
+            }
+        }
+        
         newSolution.vehicles.put(firstTask, v2.id());
 
         return newSolution;
     }
 
-    private Solution changingTaskOrder(Solution solution, Vehicle vehicle, int tIdx1, int tIdx2) {
+    private List<Task> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private List<Solution> changingTaskOrder(Solution solution, Vehicle vehicle, int tIdx1, int tIdx2) {
+        List<Solution> newSolutions = new  List<Solution>();
         Solution newSolution = new Solution(solution);
-        Task prevTask1 = newSolution.nextTaskForVehicle.get(vehicle);
+        Task prevTask1 = newSolution.nextTaskForVehicle.get(vehicle.id());
         Task task1 = newSolution.nextTaskForTask.get(prevTask1);
         int count = 1;
         while (count < tIdx1) {
@@ -207,8 +278,36 @@ public class SLSAlgo {
             newSolution.nextTaskForTask.put(prevTask2, task1);
             newSolution.nextTaskForTask.put(task1, postTask2);
         }
-        updateTime(newSolution, vehicle);
-        return newSolution;
+        int task1PickupTime = newSolution.pickupTimes.get(task1);
+        int task1DeliveryTime = newSolution.deliveryTimes.get(task1);
+        int task2PickupTime = newSolution.pickupTimes.get(task2);
+        int task2DeliveryTime = newSolution.deliveryTimes.get(task2);
+        // Create new solution by switching delivery time
+        newSolution.pickupTimes.put(task2, task1PickupTime);
+        if (task2PickupTime < task1DeliveryTime) {
+            newSolution.pickupTimes.put(task1, task2PickupTime);
+            newSolutions.add(new Solution(newSolution));
+        } else {
+            newSolution.deliveryTimes.put(task2, task1DeliveryTime);
+            newSolution.pickupTimes.put(task1, task2PickupTime);
+            newSolution.deliveryTimes.put(task1, task2DeliveryTime);
+            newSolutions.add(new Solution(newSolution));
+        }
+        // Create new solution by switching 
+        Random random = new Random();
+        int maxTime = Math.max(task1DeliveryTime, task2DeliveryTime);
+        int randomTask1DeliveryTime = random.nextInt(maxTime - task1PickupTime) + task1PickupTime;
+        int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime;
+        if (task2PickupTime < randomTask1DeliveryTime) {
+            newSolution.pickupTimes.put(task1, task2PickupTime);
+            newSolutions.add(new Solution(newSolution));
+        } else {
+            newSolution.deliveryTimes.put(task2, task1DeliveryTime);
+            newSolution.pickupTimes.put(task1, task2PickupTime);
+            newSolution.deliveryTimes.put(task1, task2DeliveryTime);
+            newSolutions.add(new Solution(newSolution));
+        }
+        return newSolutions;
     }
 
     private Solution localChoice(List<Solution> potentialSolutions) {
@@ -234,10 +333,10 @@ public class SLSAlgo {
         }
         return costSum; 
     }
-    
+    /*
     private void updateTime(Solution solution, Vehicle vehicle) {
         //TODO! : Adapt this code for multiple task
-        Task taskI = solution.nextTaskForVehicle.get(vehicle);
+        Task taskI = solution.nextTaskForVehicle.get(vehicle.id());
         Task taskJ = null;
         if (taskI != null) {
             solution.pickupTimes.put(taskI, 0);
@@ -250,4 +349,5 @@ public class SLSAlgo {
             } while (taskJ != null);
         }
     }
+    */
 }

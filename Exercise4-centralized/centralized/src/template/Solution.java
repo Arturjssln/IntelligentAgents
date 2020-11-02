@@ -1,23 +1,15 @@
 package template;
 
-import logist.behavior.AuctionBehavior;
-import logist.behavior.CentralizedBehavior;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import logist.agent.Agent;
-import logist.config.Parsers;
 import logist.simulation.Vehicle;
 import logist.plan.Plan;
 import logist.task.Task;
-import logist.task.TaskDistribution;
 import logist.task.TaskSet;
-import logist.topology.Topology;
 import logist.topology.Topology.City;
 
 public class Solution {
@@ -136,7 +128,6 @@ public class Solution {
 
     
     public boolean isValid(TaskSet tasks, List<Vehicle> vehicles) {
-    	//TODO : faire ça
         // Respects the constraints 
     
     	
@@ -176,18 +167,19 @@ public class Solution {
         int timeStep = 1;
         Double[] pickedUpTasksWeight = new Double[vehicles.size()]; 
         Arrays.fill(pickedUpTasksWeight, 0.0);
-
         while(updateTasksAtTimeStepForVehicles(timeStep, vehicles)) {
             for (int i=0; i<vehicles.size(); i++) {
                 List<Task> tasksAtTimeStep = tasksAtTimeStepForVehicles.get(i);
                 if (tasksAtTimeStep.size() > 1) { return false;}
-                Task task = tasksAtTimeStep.get(0);
-                if (pickupTimes.get(task) == timeStep) {
-                	pickedUpTasksWeight[i] += task.weight;
-                } else {
-                	pickedUpTasksWeight[i] -= task.weight;
+                if (tasksAtTimeStep.size() == 1) {
+                    Task task = tasksAtTimeStep.get(0);
+                    if (pickupTimes.get(task) == timeStep) {
+                        pickedUpTasksWeight[i] += task.weight;
+                    } else {
+                        pickedUpTasksWeight[i] -= task.weight;
+                    }
+                    if (pickedUpTasksWeight[i] > vehicles.get(i).capacity()) { return false;}
                 }
-                if (pickedUpTasksWeight[i] > vehicles.get(i).capacity()) { return false;}
             }
             timeStep++;
         }
@@ -207,7 +199,6 @@ public class Solution {
         return (!tasksAtTime.isEmpty()); 
     }
 
-    // TODO: check pour tutur
     private boolean attributeSizeValid(TaskSet tasks, List<Vehicle> vehicles) {
         return ((vehicles.size() == nextTaskForVehicle.size()) && 
                 (tasks.size() == nextTaskForTask.size()) && 
