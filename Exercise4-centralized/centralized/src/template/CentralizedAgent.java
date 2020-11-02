@@ -66,7 +66,6 @@ public class CentralizedAgent implements CentralizedBehavior {
         this.topology = topology;
         this.distribution = distribution;
         this.agent = agent;
-        System.out.println("timeOut"+ timeout_plan); 
         
     }
 
