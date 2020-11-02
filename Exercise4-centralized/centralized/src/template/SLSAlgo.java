@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -141,7 +142,7 @@ public class SLSAlgo {
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
                 if (task.weight < vehicleJ.capacity()) { //TODO: pas la bonne capacité: doit prendre la capacité restante
-                    neighours.addAll(changingVehicle(solution, vehicleI, vehicleJ));
+                    neighours.add(changingVehicle(solution, vehicleI, vehicleJ));
                 }
             }
         }
@@ -167,7 +168,7 @@ public class SLSAlgo {
         Solution newSolution = new Solution(solution);
         Task firstTask = newSolution.nextTaskForVehicle.get(v1.id()); 
 
-        firstTaskDeliveryTime = newSolution.deliveryTimes.get(firstTask); 
+        Integer firstTaskDeliveryTime = newSolution.deliveryTimes.get(firstTask); 
 
         newSolution.nextTaskForVehicle.put(v1.id(), newSolution.nextTaskForTask.get(firstTask));
         newSolution.nextTaskForVehicle.put(v2.id(), firstTask);
@@ -179,41 +180,41 @@ public class SLSAlgo {
         newSolution.pickupTimes.put(newSolution.nextTaskForVehicle.get(v2.id()), 0);
 
         // Solution where deliveryTime stays the same for both tasks 
-        newSolution.deliveryTimes.put(firstTaks, firstTaskDeliveryTime); 
-        for (Map.Entry<Task, Integer> entry: deliveryTimes.getEntries()) {
+        newSolution.deliveryTimes.put(firstTask, firstTaskDeliveryTime); 
+        for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()-1); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()-2); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-2); 
                 }
             }
             if (newSolution.vehicles.get(entry.getKey()) == v2.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()+1); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()+2); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+2); 
                 }              
             }
         }
 
-        for (Map.Entry<Task, Integer> entry: pickupTimes.getEntries()) {
+        for (Entry<Task, Integer> entry: newSolution.pickupTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()-1); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()-2); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-2); 
                 }
             }
             if (newSolution.vehicles.get(entry.getKey()) == v2.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()+1); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(getKey(), getValue()+2); 
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+2); 
                 }              
             }
         }
