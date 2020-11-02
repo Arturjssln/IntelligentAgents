@@ -180,6 +180,8 @@ public class SLSAlgo {
         newSolution.pickupTimes.put(newSolution.nextTaskForVehicle.get(v2.id()), 0);
 
         // Solution where deliveryTime stays the same for both tasks 
+
+        // TODO: faire une fonction 
         newSolution.deliveryTimes.put(firstTask, firstTaskDeliveryTime); 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
@@ -203,18 +205,18 @@ public class SLSAlgo {
         for (Entry<Task, Integer> entry: newSolution.pickupTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-2); 
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-2); 
                 }
             }
             if (newSolution.vehicles.get(entry.getKey()) == v2.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
                 }
                 else if (entry.getValue() >= firstTaskDeliveryTime) {
-                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+2); 
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+2); 
                 }              
             }
         }
@@ -274,7 +276,7 @@ public class SLSAlgo {
         newSolutionTemp.pickupTimes.put(task1, task2PickupTime);
         newSolutionTemp.deliveryTimes.put(task1, task2DeliveryTime);
         newSolutions.add(newSolutionTemp);
-
+        /*
         // Create new solution by switching 
         Random random = new Random();
         int maxTime = Math.max(task1DeliveryTime, task2DeliveryTime);
@@ -282,9 +284,52 @@ public class SLSAlgo {
         int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime;
 
         newSolution.pickupTimes.put(task2, task1PickupTime);
-        newSolution.deliveryTimes.put(task2, randomTask1DeliveryTime);
         newSolution.pickupTimes.put(task1, task2PickupTime);
+
+        for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
+                if (randomTask1DeliveryTime < task1DeliveryTime && 
+                    entry.getValue() >= randomTask1DeliveryTime &&
+                    entry.getValue() < task1DeliveryTime) {
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                } else if (randomTask1DeliveryTime > task1DeliveryTime && 
+                    entry.getValue() <= randomTask1DeliveryTime &&
+                    entry.getValue() > task1DeliveryTime)) {
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
+                }
+            }
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
+                if (randomTask2DeliveryTime < task2DeliveryTime && 
+                    entry.getValue() >= randomTask2DeliveryTime &&
+                    entry.getValue() < task2DeliveryTime) {
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                }
+            }
+        }
+
+        for (Entry<Task, Integer> entry: newSolution.pickupTimes.entrySet()) {
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
+                if (randomTask1DeliveryTime < task1DeliveryTime && 
+                    entry.getValue() >= randomTask1DeliveryTime &&
+                    entry.getValue() < task1DeliveryTime) {
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
+                } else if (randomTask1DeliveryTime > task1DeliveryTime && 
+                    entry.getValue() <= randomTask1DeliveryTime &&
+                    entry.getValue() > task1DeliveryTime)) {
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
+                }
+            }
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
+                if (randomTask2DeliveryTime < task2DeliveryTime && 
+                    entry.getValue() >= randomTask2DeliveryTime &&
+                    entry.getValue() < task2DeliveryTime) {
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
+                }
+            }
+        }
+        newSolution.deliveryTimes.put(task2, randomTask1DeliveryTime);
         newSolution.deliveryTimes.put(task1, randomTask2DeliveryTime);
+        */
         newSolutions.add(newSolution);
         return newSolutions;
     }
