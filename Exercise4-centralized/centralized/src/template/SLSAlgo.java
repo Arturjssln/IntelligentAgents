@@ -22,7 +22,7 @@ public class SLSAlgo {
     Solution currentSolution;
     List<Vehicle> vehicles;
 
-    final int MAX_ITERATION = 10000;
+    final int MAX_ITERATION = 2;
     final double PROBABILITY_UPDATE_SOLUTION = 0.3; 
 
 	// Constructor
@@ -35,16 +35,21 @@ public class SLSAlgo {
 
     public List<Plan> computePlans(TaskSet tasks, long end_time) {
         List<Plan> plans = new ArrayList<Plan> ();
+        
+        System.out.println("in computePlan"); 
         long current_time = System.currentTimeMillis();
 
         currentSolution = selectInitialSolution(tasks);
+        System.out.println("select initial sol"); 
         List<Solution> potentialSolutions = new ArrayList<Solution> ();
-
+        
         int iteration = 0;
         do {
             potentialSolutions = generateNeighbours(currentSolution);
+            System.out.println("generatePlan"); 
             currentSolution = localChoice(potentialSolutions);
             ++iteration;
+            
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
         plans = currentSolution.generatePlans(this.vehicles);
@@ -131,6 +136,7 @@ public class SLSAlgo {
 	}
 
     private List<Solution> generateNeighbours(Solution solution) {
+    	
         List<Solution> neighours = new ArrayList<Solution>();
         Vehicle vehicleI; 
         do {
