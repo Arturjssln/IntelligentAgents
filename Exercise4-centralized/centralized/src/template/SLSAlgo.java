@@ -13,7 +13,7 @@ import logist.simulation.Vehicle;
 import logist.task.Task;
 import logist.task.TaskSet;
 
-import template.Solution;
+import template.CentralizedAgent.Initialization;
 
 public class SLSAlgo {
 
@@ -23,16 +23,19 @@ public class SLSAlgo {
     List<Vehicle> vehicles;
     TaskSet tasks;
 
+    Initialization initialization;
+
     final int MAX_ITERATION = 10000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.3; 
 
 	// Constructor
-	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks) {
+	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks, Initialization initialization) {
         this.vehicles = vehicles;
         this.tasks = tasks;
+        this.initialization = initialization;
         this.currentSolution = selectInitialSolution();
 
-        whenModifyingOriginalObject_thenCopyShouldNotChange();
+        whenModifyingOriginalObject_thenCopyShouldNotChange(); //TODO: remove
         
 	}
 
@@ -50,68 +53,114 @@ public class SLSAlgo {
             potentialSolutions = generateNeighbours(currentSolution);
             //System.out.println("Potential solutions computed, size : "); 
             //System.out.println(potentialSolutions.size()); 
-            potentialSolutions.add(currentSolution);
             currentSolution = localChoice(potentialSolutions);
             //System.out.println("Local choice done");
             ++iteration;
-            
+            if (iteration%500 == 0) 
+                System.out.println(iteration);
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
         plans = currentSolution.generatePlans(this.vehicles);
-
         // need to be of size #vehicles
         return plans;
     }
 
 
     private Solution selectInitialSolution() {
-        //TODO : gerer le cas ou le total wieght de toute les task est plus grand que le total capacity dees voitures
         // return a plan that is valid
         // udpate the lists
         Solution initialSolution = new Solution();
-
-        List<Vehicle> sortedVehicles = sortByCapacity(vehicles); 
 
         HashMap<Task, Integer> vehicles = new HashMap<Task, Integer>();
         HashMap<Task, Task> nextTaskForTask = new HashMap<Task, Task>();
         HashMap<Integer, Task> nextTaskForVehicle = new HashMap<Integer, Task>();
         HashMap<Task, Integer> pickupTimes = new HashMap<Task, Integer>();
         HashMap<Task, Integer> deliveryTimes = new HashMap<Task, Integer>();
-
-        // Set vehicles
-        double totalWeight = 0.0; 
-        int indexVehicle = 0; 
-        Task lastTask = null;
-        int currentTimeStep = 0;
-        for (Task task: tasks) {
-            Vehicle vehicle = sortedVehicles.get(indexVehicle); 
-            if (vehicle.capacity() >= task.weight + totalWeight) {
-                vehicles.put(task, vehicle.id()); 
-                if (lastTask != null) {
-                    nextTaskForTask.put(lastTask, task);
-                } else {
-                    nextTaskForVehicle.put(vehicle.id(), task);
+        
+        int indexVehicle;
+        switch (initialization) {
+            case SEQUENTIAL:
+                List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
+                double totalWeight = 0.0; 
+                indexVehicle = 0; 
+                Task lastTask = null;
+                int currentTimeStep = 0;
+                for (Task task: tasks) {
+                    Vehicle vehicle = sortedVehicles.get(indexVehicle); 
+                    if (vehicle.capacity() >= task.weight + totalWeight) {
+                        vehicles.put(task, vehicle.id()); 
+                        if (lastTask != null) {
+                            nextTaskForTask.put(lastTask, task);
+                        } else {
+                            nextTaskForVehicle.put(vehicle.id(), task);
+                        }
+                        pickupTimes.put(task, currentTimeStep);
+                        deliveryTimes.put(task, currentTimeStep+1);
+            
+                        totalWeight += task.weight; 
+                        lastTask = task;
+                        currentTimeStep += 2;
+                    } else {
+                        nextTaskForTask.put(lastTask, null);
+                        indexVehicle++;
+                        totalWeight = task.weight;
+                        lastTask = task;
+                        currentTimeStep = 2;
+                        while (!(sortedVehicles.get(indexVehicle).capacity() >= task.weight)) {
+                            indexVehicle++; 
+                        }
+                        nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
+                        vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
+                        pickupTimes.put(task, 0);
+                        deliveryTimes.put(task, 1);
+                    }
                 }
-                pickupTimes.put(task, currentTimeStep);
-                deliveryTimes.put(task, currentTimeStep+1);
-
-                totalWeight += task.weight; 
-                lastTask = task;
-                currentTimeStep += 2;
-            } else {
-                //TODO: verify that capacity is enough
                 nextTaskForTask.put(lastTask, null);
-                indexVehicle++;
-                totalWeight = task.weight;
-                lastTask = task;
-                currentTimeStep = 2;
-                nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
-                vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
-                pickupTimes.put(task, 0);
-                deliveryTimes.put(task, 1);
-            }
+                break;
+
+            case DISTRIBUTED:
+                // Set vehicles
+                int nbVehicles = this.vehicles.size();
+                Task[] lastTaskForVehicle = new Task[nbVehicles];
+                int[] currentTimeStepForVehicle = new int[nbVehicles];
+                for (int i=0; i<nbVehicles; i++) {
+                    lastTaskForVehicle[i] = null;
+                    currentTimeStepForVehicle[i] = 0;
+                }
+                indexVehicle = 0;
+                for (Task task: tasks) {
+                    int vehiclesTested = 0;
+                    while (this.vehicles.get(indexVehicle).capacity() < task.weight) {
+                        indexVehicle = (indexVehicle + 1)%nbVehicles;
+                        vehiclesTested++;
+                        if (vehiclesTested >= nbVehicles) { throw new IllegalArgumentException("Cannot handle task with weight higher than all vehicles' capacity.");}
+                    }
+                    Vehicle vehicle = this.vehicles.get(indexVehicle);
+
+                    vehicles.put(task, vehicle.id()); 
+                    if (lastTaskForVehicle[indexVehicle] != null) {
+                        nextTaskForTask.put(lastTaskForVehicle[indexVehicle], task);
+                    } else {
+                        nextTaskForVehicle.put(vehicle.id(), task);
+                    }
+                    pickupTimes.put(task, currentTimeStepForVehicle[indexVehicle]);
+                    deliveryTimes.put(task, currentTimeStepForVehicle[indexVehicle]+1);
+
+                    lastTaskForVehicle[indexVehicle] = task;
+                    currentTimeStepForVehicle[indexVehicle] += 2;
+
+                    indexVehicle = (indexVehicle + 1)%nbVehicles;
+                }
+                
+                for (Task lastTask_ : lastTaskForVehicle) {
+                    if(lastTask_ != null) {
+                        nextTaskForTask.put(lastTask_, null);
+                    }
+                }
+                break;
+
+            default: throw new IllegalArgumentException("Should not happen");
         }
-        nextTaskForTask.put(lastTask, null);
         
         initialSolution.vehicles = vehicles; 
         initialSolution.nextTaskForVehicle = nextTaskForVehicle; 
@@ -145,15 +194,15 @@ public class SLSAlgo {
         LinkedList<Vehicle> sortedVehicles = new LinkedList<Vehicle>();
 		for (int index : sortedIndices) {
 			sortedVehicles.add(vehicles.get(index));
-		}
+        }
 		return sortedVehicles; 
     }
-    
-    // Sort List of costs by increasing order and return index if sorted list
+
+    // Sort List of costs by decreasing order and return index if sorted list
 	private int[] sortByCost(List<Double> costsForSolution) {
         // Get indices of the sorted List 
         int[] sortedIndices = IntStream.range(0, costsForSolution.size())
-			.boxed().sorted((i, j) -> Double.valueOf(costsForSolution.get(j)).compareTo(Double.valueOf(costsForSolution.get(i))))
+			.boxed().sorted((i, j) -> Double.valueOf(costsForSolution.get(i)).compareTo(Double.valueOf(costsForSolution.get(j))))
             .mapToInt(ele -> ele).toArray();
 		return sortedIndices; 
 	}
@@ -220,8 +269,6 @@ public class SLSAlgo {
         //newSolution.deliveryTimes.remove(firstTask); 
 
         // Solution where deliveryTime stays the same for both tasks 
-
-        // TODO: faire une fonction
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             //System.out.println(newSolution.vehicles.get(entry.getKey()));
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
@@ -263,9 +310,7 @@ public class SLSAlgo {
 
         // add new delivery and pickup 
         newSolution.pickupTimes.put(firstTask, 0);
-        newSolution.deliveryTimes.put(firstTask, firstTaskDeliveryTime);
-        //newSolution.pickupTimes.put(newSolution.nextTaskForVehicle.get(v1.id()), 0); //TODO: remove
-
+        newSolution.deliveryTimes.put(firstTask, firstTaskDeliveryTime); 
         newSolution.vehicles.put(firstTask, v2.id());
 
         return newSolution;
@@ -330,7 +375,7 @@ public class SLSAlgo {
         int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime + 1;
 
         // Swap the pickup times 
-        System.out.println("--------- START interesting part --------");
+        //System.out.println("--------- START interesting part --------");
 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             // if task for the vehicle 
@@ -375,7 +420,7 @@ public class SLSAlgo {
         newSolution.pickupTimes.put(task2, task1PickupTime);
         newSolution.pickupTimes.put(task1, task2PickupTime);
         if (newSolution.isValid(tasks, vehicles)) { newSolutions.add(newSolution);}
-        System.out.println("--------- END interesting part --------");
+        //System.out.println("--------- END interesting part --------");
         return newSolutions;
     }
 
@@ -391,7 +436,10 @@ public class SLSAlgo {
         int[] sortedIndices = sortByCost(costsForSolutions);
         //System.out.println("2 localChoice");
         if ((sortedIndices.length > 0) && ((new Random()).nextDouble() <= PROBABILITY_UPDATE_SOLUTION)) {
-        	//System.out.println("NEW SOLUTION HAS BEEN CHOSEN !!!!!!!!");
+            double cost = computeCost(potentialSolutions.get(sortedIndices[0]).generatePlans(vehicles));
+            double currentCost = computeCost(currentSolution.generatePlans(vehicles));
+            if(cost != currentCost)
+                System.out.println(cost);
             return potentialSolutions.get(sortedIndices[0]);
         }
         //System.out.println("3 localChoice");
@@ -405,21 +453,5 @@ public class SLSAlgo {
         }
         return costSum; 
     }
-    /*
-    private void updateTime(Solution solution, Vehicle vehicle) {
-        //TODO! : Adapt this code for multiple task
-        Task taskI = solution.nextTaskForVehicle.get(vehicle.id());
-        Task taskJ = null;
-        if (taskI != null) {
-            solution.pickupTimes.put(taskI, 0);
-            do {
-                taskJ = solution.nextTaskForTask.get(taskI);
-                if (taskJ != null) {
-                    solution.deliveryTimes.put(taskJ, solution.deliveryTimes.get(taskI)+1);
-                    taskI = taskJ;
-                } 
-            } while (taskJ != null);
-        }
-    }
-    */
+
 }

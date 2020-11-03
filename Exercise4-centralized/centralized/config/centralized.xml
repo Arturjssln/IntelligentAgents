@@ -41,7 +41,7 @@
 				<set color="#ff0000" />
 				<set home="Cardiff" />
 				<set speed="90" />
-				<set capacity="30" />
+				<set capacity="31" />
 				<set cost-per-km="5" />
 			</vehicle>
 			
@@ -50,7 +50,7 @@
 				<set color="#00ff00" />
 				<set home="Plymouth" />
 				<set speed="90" />
-				<set capacity="30" />
+				<set capacity="29" />
 				<set cost-per-km="5" />
 			</vehicle>
 			

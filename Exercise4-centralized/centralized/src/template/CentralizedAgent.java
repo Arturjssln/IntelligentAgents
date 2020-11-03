@@ -23,28 +23,30 @@ import logist.topology.Topology.City;
 import template.SLSAlgo;
 
 /**
- * A very simple auction agent that assigns all tasks to its first vehicle and
- * handles them sequentially.
+ * An auction agent that distributes all tasks to its vehicles and
+ * handles them in an optimal way in order to minimize the cost of the company plan.
  *
  */
 @SuppressWarnings("unused")
 public class CentralizedAgent implements CentralizedBehavior {
 
 	// Different algorithms implemented
-	enum Algorithm {SLS, NAIVE};
+    enum Algorithm {SLS, NAIVE};
+    enum Initialization {DISTRIBUTED, SEQUENTIAL}; 
 
     private Topology topology;
     private TaskDistribution distribution;
     private Agent agent;
-    private long timeout_setup; // TODO: a quoi ça sert ça ?????
+    private long timeout_setup; 
     private long timeout_plan;
     
     private Algorithm algorithm;
+    private Initialization initialization; 
 
     @Override
     public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
 
-        // this code is used to get the timeouts
+        // This code is used to get the timeouts
         LogistSettings ls = null;
         try {
             ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
@@ -54,13 +56,17 @@ public class CentralizedAgent implements CentralizedBehavior {
         }
 
         String algorithmName = agent.readProperty("algorithm", String.class, "SLS");
+        String initializationName = agent.readProperty("initialization", String.class, "DISTRIBUTED");
+
 
         // Throws IllegalArgumentException if algorithm is unknown
-		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
-
-        // the setup method cannot last more than timeout_setup milliseconds
+        this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
+        this.initialization = Initialization.valueOf(initializationName.toUpperCase()); 
+        System.out.println("Algorithm used : " + algorithm.toString());
+        System.out.println("Initialization used : " + initialization.toString());
+        // The setup method cannot last more than timeout_setup milliseconds
         timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
-        // the plan method cannot execute more than timeout_plan milliseconds
+        // The plan method cannot execute more than timeout_plan milliseconds
         timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
 
         this.topology = topology;
@@ -76,19 +82,23 @@ public class CentralizedAgent implements CentralizedBehavior {
         List<Plan> plans = new ArrayList<Plan>();
 		switch (algorithm) {
             case NAIVE:
+                /* A very simple auction agent that assigns all tasks to its first vehicle and handles them sequentially. */
                 plans = computeNaivePlans(vehicles, tasks);
                 break;
             case SLS:
-                SLSAlgo sls = new SLSAlgo(vehicles, tasks);
+                SLSAlgo sls = new SLSAlgo(vehicles, tasks, initialization); 
+                /* An auction agent that distributes all tasks to its vehicles and
+                * handles them in an optimal way in order to minimize the cost of the company plan. */
                 plans = sls.computePlans(tasks, time_start+this.timeout_plan);
                 break;
             default:
                 throw new AssertionError("Should not happen.");
         }
+
         long time_end = System.currentTimeMillis();
         double duration = (time_end - time_start) / 1000.0;
-        System.out.println("The plan was generated in " + duration + " seconds using " + algorithm.toString() + " alogirthm.");
-
+        System.out.println("The plan was generated in " + duration + " seconds.");
+        
         return plans;
     }
 
