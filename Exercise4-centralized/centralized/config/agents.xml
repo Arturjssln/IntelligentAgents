@@ -17,7 +17,7 @@
 		<set initialization="SEQUENTIAL"/>
 	</agent>
 
-	<agent name="centralized-main">
+	<agent name="centralized-dis">
 		<set class-path="bin/"/>
 		<set class-name="template.CentralizedAgent"/>
 		<set algorithm="SLS"/>
@@ -29,6 +29,13 @@
 		<set class-name="template.CentralizedAgent"/>
 		<set algorithm="SLS"/>
 		<set initialization="SLAVE"/>
+	</agent>
+
+	<agent name="centralized-main">
+		<set class-path="bin/"/>
+		<set class-name="template.CentralizedAgent"/>
+		<set algorithm="SLS"/>
+		<set initialization="DISTRIBUTED"/>
 	</agent>
 	
 </agents>

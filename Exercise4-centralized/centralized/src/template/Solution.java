@@ -1,7 +1,6 @@
 package template;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,7 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public List<Plan> generatePlans(List<Vehicle> vehicles, boolean debug) {
+    public List<Plan> generatePlans(List<Vehicle> vehicles) {
         
         List<Plan> plans = new ArrayList<Plan>();
         
@@ -91,8 +90,6 @@ public class Solution {
                             }
                             currentCity = taskToDeliver.deliveryCity;
                             plan.appendDelivery(taskToDeliver);
-                            if (debug)
-                                System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
                             currentTask = taskToDeliver;
                         }
                         currentTimeStep++;
@@ -103,8 +100,6 @@ public class Solution {
                     }
                     currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
-                    if (debug)
-                        System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
                     currentTask = nextTask;
                     currentTimeStep++;
                 }
@@ -122,8 +117,6 @@ public class Solution {
                         }
                         currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
-                        if (debug)
-                            System.out.println("Delivered :  " + taskToDeliver.toString() + " (delivered at " + currentTimeStep + ")");
                     }
                     currentTimeStep++;
                     currentTask = taskToDeliver;

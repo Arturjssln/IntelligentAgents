@@ -25,8 +25,8 @@ public class SLSAlgo {
 
     Initialization initialization;
 
-    final int MAX_ITERATION = 1000;
-    final double PROBABILITY_UPDATE_SOLUTION = 0.3; 
+    final int MAX_ITERATION = 100;
+    final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
 
 	// Constructor
 	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks, Initialization initialization) {
@@ -53,11 +53,11 @@ public class SLSAlgo {
             currentSolution = localChoice(potentialSolutions);
             ++iteration;
             if (iteration%500 == 0) 
-                System.out.println(iteration);
-            current_time = System.currentTimeMillis();
+                System.out.println("Iteration : " + iteration);
+            current_time = System.currentTimeMillis() + 10000;
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
-        plans = currentSolution.generatePlans(this.vehicles, true);
+        plans = currentSolution.generatePlans(this.vehicles);
         return plans;
     }
 
@@ -122,6 +122,9 @@ public class SLSAlgo {
                         totalWeight = task.weight;
                         lastTask = task;
                         currentTimeStep = 2;
+                        while (!(sortedVehicles.get(indexVehicle).capacity() >= task.weight)) {
+                            indexVehicle++; 
+                        }
                         nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
                         vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
                         pickupTimes.put(task, 0);
@@ -258,7 +261,6 @@ public class SLSAlgo {
 
         // Solution where deliveryTime stays the same for both tasks 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
-            //System.out.println(newSolution.vehicles.get(entry.getKey()));
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
                 if (entry.getValue() < firstTaskDeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
@@ -300,7 +302,6 @@ public class SLSAlgo {
         newSolution.pickupTimes.put(firstTask, 0);
         newSolution.deliveryTimes.put(firstTask, firstTaskDeliveryTime); 
         newSolution.vehicles.put(firstTask, v2.id());
-
         return newSolution;
     }
 
@@ -441,17 +442,13 @@ public class SLSAlgo {
     private Solution localChoice(List<Solution> potentialSolutions) {
         List<Double> costsForSolutions = new ArrayList<Double>(); 
         for (Solution solution: potentialSolutions) {
-            List<Plan> plansForSolution = solution.generatePlans(vehicles, false);
+            List<Plan> plansForSolution = solution.generatePlans(vehicles);
             costsForSolutions.add(computeCost(plansForSolution)); 
         }
         
         int[] sortedIndices = sortByCost(costsForSolutions);
 
         if ((sortedIndices.length > 0) && ((new Random()).nextDouble() <= PROBABILITY_UPDATE_SOLUTION)) {
-            double cost = computeCost(potentialSolutions.get(sortedIndices[0]).generatePlans(vehicles, false));
-            double currentCost = computeCost(currentSolution.generatePlans(vehicles, false));
-            if(cost != currentCost)
-                System.out.println(cost);
             return potentialSolutions.get(sortedIndices[0]);
         }
         return currentSolution; 
