@@ -85,20 +85,23 @@ public class Solution {
                     //System.out.println("Next task :  " + nextTask.toString() + " will be picked up at " + pickupTimeNextTask);
                     
                     while(pickupTimeNextTask > currentTimeStep) {
+                        taskToDeliver = null;
                         for (Map.Entry<Task, Integer> set : deliveryTimes.entrySet()) {
                             if (set.getValue().equals(currentTimeStep) && (this.vehicles.get(set.getKey()) == vehicle.id())) {
                                 taskToDeliver = set.getKey();
                             }
                         }
-                        //System.out.println(currentTask.deliveryCity.toString() + " --> " + taskToDeliver.deliveryCity.toString());
-                        for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
-                            plan.appendMove(city);
-                            //System.out.println("Move1 --> " + city.toString());
+                        if (taskToDeliver != null) {
+                            //System.out.println(currentTask.deliveryCity.toString() + " --> " + taskToDeliver.deliveryCity.toString());
+                            for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
+                                plan.appendMove(city);
+                                //System.out.println("Move1 --> " + city.toString());
+                            }
+                            currentCity = taskToDeliver.deliveryCity;
+                            plan.appendDelivery(taskToDeliver);
+                            //System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
+                            currentTask = taskToDeliver;
                         }
-                        currentCity = taskToDeliver.deliveryCity;
-                        plan.appendDelivery(taskToDeliver);
-                        //System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
-                        currentTask = taskToDeliver;
                         currentTimeStep++;
                     }
 
@@ -108,7 +111,7 @@ public class Solution {
                     }
                     currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
-                    //System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + ")");
+                    //System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
                     currentTask = nextTask;
                     currentTimeStep++;
                 }

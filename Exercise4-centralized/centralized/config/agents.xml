@@ -23,5 +23,12 @@
 		<set algorithm="SLS"/>
 		<set initialization="DISTRIBUTED"/>
 	</agent>
+
+	<agent name="centralized-slave">
+		<set class-path="bin/"/>
+		<set class-name="template.CentralizedAgent"/>
+		<set algorithm="SLS"/>
+		<set initialization="SLAVE"/>
+	</agent>
 	
 </agents>

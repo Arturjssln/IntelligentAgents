@@ -25,7 +25,7 @@ public class SLSAlgo {
 
     Initialization initialization;
 
-    final int MAX_ITERATION = 10000;
+    final int MAX_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.3; 
 
 	// Constructor
@@ -79,13 +79,31 @@ public class SLSAlgo {
         
         int indexVehicle;
         int nbVehicles = this.vehicles.size();
+        List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
+        Task lastTask = null;
+        int currentTimeStep = 0;
+
         switch (initialization) {
+            case SLAVE:
+                for (Task task: tasks) {
+                    Vehicle vehicle = sortedVehicles.get(0); 
+                    vehicles.put(task, vehicle.id()); 
+                    if (lastTask != null) {
+                        nextTaskForTask.put(lastTask, task);
+                    } else {
+                        nextTaskForVehicle.put(vehicle.id(), task);
+                    }
+                    pickupTimes.put(task, currentTimeStep);
+                    deliveryTimes.put(task, currentTimeStep+1);
+                    lastTask = task;
+                    currentTimeStep += 2;
+                }
+                nextTaskForTask.put(lastTask, null); 
+                break;
+
             case SEQUENTIAL:
-                List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
                 double totalWeight = 0.0; 
                 indexVehicle = 0; 
-                Task lastTask = null;
-                int currentTimeStep = 0;
                 for (Task task: tasks) {
                     Vehicle vehicle = sortedVehicles.get(indexVehicle); 
 
@@ -385,15 +403,27 @@ public class SLSAlgo {
                     entry.getValue() >= randomTask1DeliveryTime &&
                     entry.getValue() < task1DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                    if(entry.getValue() == randomTask2DeliveryTime) {randomTask2DeliveryTime++;}
                 } else if (randomTask1DeliveryTime > task1DeliveryTime && 
                     entry.getValue() <= randomTask1DeliveryTime &&
                     entry.getValue() > task1DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
+                    if(entry.getValue() == randomTask2DeliveryTime) {randomTask2DeliveryTime--;}
                 }
+            }
+        }
+
+        for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
+            // if task for the vehicle 
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
                 if (randomTask2DeliveryTime < task2DeliveryTime && 
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                } else if (randomTask2DeliveryTime > task2DeliveryTime && 
+                    entry.getValue() <= randomTask2DeliveryTime &&
+                    entry.getValue() > task2DeliveryTime) {
+                    newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
             }
         }
@@ -405,21 +435,34 @@ public class SLSAlgo {
                 if (randomTask1DeliveryTime < task1DeliveryTime && 
                     entry.getValue() >= randomTask1DeliveryTime &&
                     entry.getValue() < task1DeliveryTime) {
-                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1);
+                    if(entry.getValue() == randomTask2DeliveryTime) {randomTask2DeliveryTime++;} 
                 } else if (randomTask1DeliveryTime > task1DeliveryTime && 
                     entry.getValue() <= randomTask1DeliveryTime &&
                     entry.getValue() > task1DeliveryTime) {
                     newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
+                    if(entry.getValue() == randomTask2DeliveryTime) {randomTask2DeliveryTime--;}
                 }
+            }
+        }
+
+        for (Entry<Task, Integer> entry: newSolution.pickupTimes.entrySet()) {
+            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
                 if (randomTask2DeliveryTime < task2DeliveryTime && 
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
                     newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
+                } else if (randomTask2DeliveryTime > task2DeliveryTime && 
+                    entry.getValue() <= randomTask2DeliveryTime &&
+                    entry.getValue() > task2DeliveryTime) {
+                    newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
             }
         }
         newSolution.pickupTimes.put(task2, task1PickupTime);
         newSolution.pickupTimes.put(task1, task2PickupTime);
+        
+        
         if (newSolution.isValid(tasks, vehicles)) { newSolutions.add(newSolution);}
         //System.out.println("--------- END interesting part --------");
         return newSolutions;
