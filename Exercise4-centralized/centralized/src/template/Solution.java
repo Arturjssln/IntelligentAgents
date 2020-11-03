@@ -54,10 +54,9 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public List<Plan> generatePlans(List<Vehicle> vehicles) {
+    public List<Plan> generatePlans(List<Vehicle> vehicles, boolean debug) {
         
         List<Plan> plans = new ArrayList<Plan>();
-        //System.out.println("Sizes: " + nextTaskForTask.size() + " " + nextTaskForVehicle.size() + " " +  pickupTimes.size() + " " + deliveryTimes.size() + " " + vehicles.size());
         
         // Create a plan for each vehicle
         for (Vehicle vehicle : vehicles) {
@@ -67,22 +66,17 @@ public class Solution {
             // Set first task
             Task currentTask = nextTaskForVehicle.get(vehicle.id());
             if (currentTask != null) {
-                //System.out.println("First task : " + currentTask.toString());  
                 for (City city : currentCity.pathTo(currentTask.pickupCity)) {
                     plan.appendMove(city);
-                    //System.out.println("Move0 --> " + city.toString());
                 }
                 currentCity = currentTask.pickupCity;
                 plan.appendPickup(currentTask);
                 Task taskToDeliver = null;
                 int currentTimeStep = 1;
-                //System.out.println("Picked up :  " + currentTask.toString() + " (picked up at 0)");
 
                 while(nextTaskForTask.get(currentTask) != null) {
                     Task nextTask = nextTaskForTask.get(currentTask);
                     int pickupTimeNextTask = pickupTimes.get(nextTask);
-                    //System.out.println("Current timestep : " + currentTimeStep);
-                    //System.out.println("Next task :  " + nextTask.toString() + " will be picked up at " + pickupTimeNextTask);
                     
                     while(pickupTimeNextTask > currentTimeStep) {
                         taskToDeliver = null;
@@ -92,14 +86,13 @@ public class Solution {
                             }
                         }
                         if (taskToDeliver != null) {
-                            //System.out.println(currentTask.deliveryCity.toString() + " --> " + taskToDeliver.deliveryCity.toString());
                             for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
                                 plan.appendMove(city);
-                                //System.out.println("Move1 --> " + city.toString());
                             }
                             currentCity = taskToDeliver.deliveryCity;
                             plan.appendDelivery(taskToDeliver);
-                            //System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
+                            if (debug)
+                                System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
                             currentTask = taskToDeliver;
                         }
                         currentTimeStep++;
@@ -107,11 +100,11 @@ public class Solution {
 
                     for (City city : currentCity.pathTo(nextTask.pickupCity)) {
                         plan.appendMove(city);
-                        //System.out.println("Move2 --> " + city.toString());
                     }
                     currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
-                    //System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
+                    if (debug)
+                        System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
                     currentTask = nextTask;
                     currentTimeStep++;
                 }
@@ -126,11 +119,11 @@ public class Solution {
                     if (taskToDeliver != null) {
                         for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
                             plan.appendMove(city);
-                            //System.out.println("Move3 --> " + city.toString());
                         }
                         currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
-                        //System.out.println("Delivered :  " + taskToDeliver.toString() + " (delivered at " + currentTimeStep + ")");
+                        if (debug)
+                            System.out.println("Delivered :  " + taskToDeliver.toString() + " (delivered at " + currentTimeStep + ")");
                     }
                     currentTimeStep++;
                     currentTask = taskToDeliver;
@@ -146,9 +139,7 @@ public class Solution {
     public boolean isValid(TaskSet tasks, List<Vehicle> vehicles) {   
     	
         // All tasks must be delivered
-        //System.out.println("Bonjour je suis isValid");
         if (!attributeSizeValid(tasks, vehicles)) { return false; }
-        //System.out.println("ATTRIBUTE SIZE IS VALID");
         for (Map.Entry<Task, Task> set : nextTaskForTask.entrySet()) {
             // Task delivered after some task t cannot be the same task
             if (set.getKey() == set.getValue()) { return false; }
@@ -159,7 +150,6 @@ public class Solution {
             // Task delivered after some task t is handled with the same vehicle
             if ((set.getValue() != null) && (this.vehicles.get(set.getValue()) != this.vehicles.get(set.getKey()))) { return false;}
         }
-        //System.out.println("nextTaskForTask IS VALID");
         for (Map.Entry<Integer, Task> set : nextTaskForVehicle.entrySet()) {
             if (set.getValue() != null) {
                 // The first task of a vehicle must be picked up at time step 0
@@ -169,17 +159,20 @@ public class Solution {
             }
         }
 
-        //System.out.println("nextTaskForVehicle IS VALID");
         for (Map.Entry<Task, Integer> set : pickupTimes.entrySet()) {
             // The delivery time step of a task must be higher than its pickup time step
             if (deliveryTimes.get(set.getKey()) <= set.getValue()) { return false; }
         }
-        //System.out.println("pickupTimes IS VALID");
         
         int timeStep = 1;
         Double[] pickedUpTasksWeight = new Double[vehicles.size()]; 
-        Arrays.fill(pickedUpTasksWeight, 0.0);
-        while(updateTasksAtTimeStepForVehicles(timeStep, vehicles)) {
+        for (int i = 0; i < vehicles.size(); i++) {
+            pickedUpTasksWeight[i] = (nextTaskForVehicle.get(i) != null) ? nextTaskForVehicle.get(i).weight : 0.0;
+
+        }
+        int timeBeforeStopping = 0;
+        while(updateTasksAtTimeStepForVehicles(timeStep, vehicles) || (timeBeforeStopping < 10)) {
+        	timeBeforeStopping++;
             for (int i=0; i<vehicles.size(); i++) {
                 List<Task> tasksAtTimeStep = tasksAtTimeStepForVehicles.get(i);
                 // Only one action per vehicle can happen
@@ -193,11 +186,11 @@ public class Solution {
                     }
                     // A vehicle capacity cannot be exceeded
                     if (pickedUpTasksWeight[i] > vehicles.get(i).capacity()) { return false;}
+                    timeBeforeStopping = 0;
                 }
             }
             timeStep++;
         }
-        //System.out.println("pickedUpTasksWeight IS VALID");
         return true; 
     }
 

@@ -35,7 +35,6 @@ public class SLSAlgo {
         this.initialization = initialization;
         this.currentSolution = selectInitialSolution();
 
-        whenModifyingOriginalObject_thenCopyShouldNotChange(); //TODO: remove
         
 	}
 
@@ -51,17 +50,14 @@ public class SLSAlgo {
         int iteration = 0;
         do {
             potentialSolutions = generateNeighbours(currentSolution);
-            //System.out.println("Potential solutions computed, size : "); 
-            //System.out.println(potentialSolutions.size()); 
             currentSolution = localChoice(potentialSolutions);
-            //System.out.println("Local choice done");
             ++iteration;
             if (iteration%500 == 0) 
                 System.out.println(iteration);
+            current_time = System.currentTimeMillis();
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
-        plans = currentSolution.generatePlans(this.vehicles);
-        // need to be of size #vehicles
+        plans = currentSolution.generatePlans(this.vehicles, true);
         return plans;
     }
 
@@ -126,9 +122,6 @@ public class SLSAlgo {
                         totalWeight = task.weight;
                         lastTask = task;
                         currentTimeStep = 2;
-                        while (!(sortedVehicles.get(indexVehicle).capacity() >= task.weight)) {
-                            indexVehicle++; 
-                        }
                         nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
                         vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
                         pickupTimes.put(task, 0);
@@ -190,18 +183,6 @@ public class SLSAlgo {
         return initialSolution;
     }
 
-
-    public void whenModifyingOriginalObject_thenCopyShouldNotChange() {
-        Solution solution = new Solution();
-        solution = selectInitialSolution();
-
-        Solution deepCopy = new Solution(solution);
-
-        deepCopy.pickupTimes.put(deepCopy.nextTaskForVehicle.get(0), -1);
-
-        System.out.println(solution.pickupTimes.equals(deepCopy.pickupTimes));
-    }
-
     // Sort List of Vehicles by increasing order of capacity
 	private List<Vehicle> sortByCapacity(List<Vehicle> vehicles) {
         // Get indices of the sorted List 
@@ -239,16 +220,13 @@ public class SLSAlgo {
         
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
-                if (task.weight < vehicleJ.capacity()) { //TODO: pas la bonne capacité: doit prendre la capacité restante
-                    //System.out.println("Changing vehicleBefore"); 
+                if (task.weight < vehicleJ.capacity()) {
                     Solution temp = changingVehicle(solution, vehicleI, vehicleJ);
                     if (temp.isValid(tasks, vehicles)) { neighours.add(temp);}
-                    //System.out.println("Changing vehicleAfter"); 
                 }
             }
         }
         
-        //System.out.println("BeforeLength"); 
         int length = 0;
         do {
             task = solution.nextTaskForTask.get(task);
@@ -258,12 +236,8 @@ public class SLSAlgo {
         if (length > 2) {
             for (int tIdx1=0; tIdx1<length-1; tIdx1++) {
                 for (int tIdx2=tIdx1+1; tIdx2<length; tIdx2++) {
-                	//System.out.println("Changing task order"); 
-                    //TODO: check capacité: doit prendre la capacité restante
                     List<Solution> solutions = changingTaskOrder(solution, vehicleI, tIdx1, tIdx2);
-                    //System.out.println("Number of solutions : " + solutions.size()); 
                     neighours.addAll(solutions);
-                    //neighours.addAll(changingTaskOrder(solution, vehicleI, tIdx1, tIdx2));
                 }
             }
         }
@@ -271,7 +245,6 @@ public class SLSAlgo {
     }
 
     private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2) {
-        //System.out.println(v1.id() + "  " + v2.id());
         Solution newSolution = new Solution(solution);
 
         // first task of v1
@@ -282,10 +255,6 @@ public class SLSAlgo {
         newSolution.nextTaskForVehicle.put(v1.id(), newSolution.nextTaskForTask.get(firstTask));
         newSolution.nextTaskForTask.put(firstTask, newSolution.nextTaskForVehicle.get(v2.id()));
         newSolution.nextTaskForVehicle.put(v2.id(), firstTask);
-
-        // remove the old pickup and deivery 
-        //newSolution.pickupTimes.remove(firstTask); 
-        //newSolution.deliveryTimes.remove(firstTask); 
 
         // Solution where deliveryTime stays the same for both tasks 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
@@ -394,8 +363,6 @@ public class SLSAlgo {
         int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime + 1;
 
         // Swap the pickup times 
-        //System.out.println("--------- START interesting part --------");
-
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             // if task for the vehicle 
             if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
@@ -420,10 +387,12 @@ public class SLSAlgo {
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()+1); 
+                    if(entry.getValue() == randomTask1DeliveryTime) {randomTask1DeliveryTime++;}
                 } else if (randomTask2DeliveryTime > task2DeliveryTime && 
                     entry.getValue() <= randomTask2DeliveryTime &&
                     entry.getValue() > task2DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
+                    if(entry.getValue() == randomTask1DeliveryTime) {randomTask1DeliveryTime--;}
                 }
             }
         }
@@ -452,10 +421,12 @@ public class SLSAlgo {
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
                     newSolution.pickupTimes.put(entry.getKey(), entry.getValue()+1); 
+                    if(entry.getValue() == randomTask1DeliveryTime) {randomTask1DeliveryTime++;}
                 } else if (randomTask2DeliveryTime > task2DeliveryTime && 
                     entry.getValue() <= randomTask2DeliveryTime &&
                     entry.getValue() > task2DeliveryTime) {
                     newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
+                    if(entry.getValue() == randomTask1DeliveryTime) {randomTask1DeliveryTime--;}
                 }
             }
         }
@@ -464,29 +435,25 @@ public class SLSAlgo {
         
         
         if (newSolution.isValid(tasks, vehicles)) { newSolutions.add(newSolution);}
-        //System.out.println("--------- END interesting part --------");
         return newSolutions;
     }
 
     private Solution localChoice(List<Solution> potentialSolutions) {
-        //System.out.println("Start localChoice");
         List<Double> costsForSolutions = new ArrayList<Double>(); 
         for (Solution solution: potentialSolutions) {
-            List<Plan> plansForSolution = solution.generatePlans(vehicles);
+            List<Plan> plansForSolution = solution.generatePlans(vehicles, false);
             costsForSolutions.add(computeCost(plansForSolution)); 
         }
-        //System.out.println("1 localChoice");
         
         int[] sortedIndices = sortByCost(costsForSolutions);
-        //System.out.println("2 localChoice");
+
         if ((sortedIndices.length > 0) && ((new Random()).nextDouble() <= PROBABILITY_UPDATE_SOLUTION)) {
-            double cost = computeCost(potentialSolutions.get(sortedIndices[0]).generatePlans(vehicles));
-            double currentCost = computeCost(currentSolution.generatePlans(vehicles));
+            double cost = computeCost(potentialSolutions.get(sortedIndices[0]).generatePlans(vehicles, false));
+            double currentCost = computeCost(currentSolution.generatePlans(vehicles, false));
             if(cost != currentCost)
                 System.out.println(cost);
             return potentialSolutions.get(sortedIndices[0]);
         }
-        //System.out.println("3 localChoice");
         return currentSolution; 
     }
 
