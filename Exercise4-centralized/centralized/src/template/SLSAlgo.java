@@ -78,6 +78,7 @@ public class SLSAlgo {
         HashMap<Task, Integer> deliveryTimes = new HashMap<Task, Integer>();
         
         int indexVehicle;
+        int nbVehicles = this.vehicles.size();
         switch (initialization) {
             case SEQUENTIAL:
                 List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
@@ -87,7 +88,8 @@ public class SLSAlgo {
                 int currentTimeStep = 0;
                 for (Task task: tasks) {
                     Vehicle vehicle = sortedVehicles.get(indexVehicle); 
-                    if (vehicle.capacity() >= task.weight + totalWeight) {
+
+                    if ((vehicle.capacity() >= task.weight + totalWeight) || (indexVehicle == nbVehicles-1)) {
                         vehicles.put(task, vehicle.id()); 
                         if (lastTask != null) {
                             nextTaskForTask.put(lastTask, task);
@@ -120,7 +122,6 @@ public class SLSAlgo {
 
             case DISTRIBUTED:
                 // Set vehicles
-                int nbVehicles = this.vehicles.size();
                 Task[] lastTaskForVehicle = new Task[nbVehicles];
                 int[] currentTimeStepForVehicle = new int[nbVehicles];
                 for (int i=0; i<nbVehicles; i++) {
