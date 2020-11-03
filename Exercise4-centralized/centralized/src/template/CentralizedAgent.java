@@ -38,7 +38,7 @@ public class CentralizedAgent implements CentralizedBehavior {
     private Agent agent;
     private long timeout_setup; // TODO: a quoi ça sert ça ?????
     private long timeout_plan;
-
+    
     private Algorithm algorithm;
 
     @Override

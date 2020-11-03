@@ -23,8 +23,8 @@ public class SLSAlgo {
     List<Vehicle> vehicles;
     TaskSet tasks;
 
-    final int MAX_ITERATION = 2;
-    final double PROBABILITY_UPDATE_SOLUTION = 1.0; 
+    final int MAX_ITERATION = 10000;
+    final double PROBABILITY_UPDATE_SOLUTION = 0.3; 
 
 	// Constructor
 	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks) {
@@ -50,6 +50,7 @@ public class SLSAlgo {
             potentialSolutions = generateNeighbours(currentSolution);
             //System.out.println("Potential solutions computed, size : "); 
             //System.out.println(potentialSolutions.size()); 
+            potentialSolutions.add(currentSolution);
             currentSolution = localChoice(potentialSolutions);
             //System.out.println("Local choice done");
             ++iteration;
@@ -64,6 +65,7 @@ public class SLSAlgo {
 
 
     private Solution selectInitialSolution() {
+        //TODO : gerer le cas ou le total wieght de toute les task est plus grand que le total capacity dees voitures
         // return a plan that is valid
         // udpate the lists
         Solution initialSolution = new Solution();
@@ -191,7 +193,7 @@ public class SLSAlgo {
                 	//System.out.println("Changing task order"); 
                     //TODO: check capacité: doit prendre la capacité restante
                     List<Solution> solutions = changingTaskOrder(solution, vehicleI, tIdx1, tIdx2);
-                    System.out.println("Number of solutions : " + solutions.size()); 
+                    //System.out.println("Number of solutions : " + solutions.size()); 
                     neighours.addAll(solutions);
                     //neighours.addAll(changingTaskOrder(solution, vehicleI, tIdx1, tIdx2));
                 }
@@ -201,7 +203,7 @@ public class SLSAlgo {
     }
 
     private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2) {
-        System.out.println(v1.id() + "  " + v2.id());
+        //System.out.println(v1.id() + "  " + v2.id());
         Solution newSolution = new Solution(solution);
 
         // first task of v1
@@ -313,6 +315,7 @@ public class SLSAlgo {
             newSolutionTemp.pickupTimes.put(task1, task2PickupTime);
             if (newSolutionTemp.isValid(tasks, vehicles)) { newSolutions.add(newSolutionTemp);}
         }
+        // Create another one 
         Solution newSolutionTemp =  new Solution(newSolution);
         newSolutionTemp.pickupTimes.put(task2, task1PickupTime);
         newSolutionTemp.deliveryTimes.put(task2, task1DeliveryTime);
@@ -323,13 +326,14 @@ public class SLSAlgo {
         // Create new solution by switching 
         Random random = new Random();
         int maxTime = Math.max(task1DeliveryTime, task2DeliveryTime);
-        int randomTask1DeliveryTime = random.nextInt(maxTime - task1PickupTime) + task1PickupTime;
-        int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime;
+        int randomTask1DeliveryTime = random.nextInt(maxTime - task1PickupTime) + task1PickupTime + 1;
+        int randomTask2DeliveryTime = random.nextInt(maxTime - task2PickupTime) + task2PickupTime + 1;
 
-        newSolution.pickupTimes.put(task2, task1PickupTime);
-        newSolution.pickupTimes.put(task1, task2PickupTime);
+        // Swap the pickup times 
+        System.out.println("--------- START interesting part --------");
 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
+            // if task for the vehicle 
             if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
                 if (randomTask1DeliveryTime < task1DeliveryTime && 
                     entry.getValue() >= randomTask1DeliveryTime &&
@@ -340,8 +344,6 @@ public class SLSAlgo {
                     entry.getValue() > task1DeliveryTime) {
                     newSolution.deliveryTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
-            }
-            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
                 if (randomTask2DeliveryTime < task2DeliveryTime && 
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
@@ -349,6 +351,8 @@ public class SLSAlgo {
                 }
             }
         }
+        newSolution.deliveryTimes.put(task2, randomTask1DeliveryTime);
+        newSolution.deliveryTimes.put(task1, randomTask2DeliveryTime);
 
         for (Entry<Task, Integer> entry: newSolution.pickupTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
@@ -361,8 +365,6 @@ public class SLSAlgo {
                     entry.getValue() > task1DeliveryTime) {
                     newSolution.pickupTimes.put(entry.getKey(), entry.getValue()-1); 
                 }
-            }
-            if (newSolution.vehicles.get(entry.getKey()) == vehicle.id()) {
                 if (randomTask2DeliveryTime < task2DeliveryTime && 
                     entry.getValue() >= randomTask2DeliveryTime &&
                     entry.getValue() < task2DeliveryTime) {
@@ -370,10 +372,10 @@ public class SLSAlgo {
                 }
             }
         }
-        newSolution.deliveryTimes.put(task2, randomTask1DeliveryTime);
-        newSolution.deliveryTimes.put(task1, randomTask2DeliveryTime);
+        newSolution.pickupTimes.put(task2, task1PickupTime);
+        newSolution.pickupTimes.put(task1, task2PickupTime);
         if (newSolution.isValid(tasks, vehicles)) { newSolutions.add(newSolution);}
-        
+        System.out.println("--------- END interesting part --------");
         return newSolutions;
     }
 
@@ -389,7 +391,7 @@ public class SLSAlgo {
         int[] sortedIndices = sortByCost(costsForSolutions);
         //System.out.println("2 localChoice");
         if ((sortedIndices.length > 0) && ((new Random()).nextDouble() <= PROBABILITY_UPDATE_SOLUTION)) {
-        	System.out.println("NEW SOLUTION HAS BEEN CHOSEN !!!!!!!!");
+        	//System.out.println("NEW SOLUTION HAS BEEN CHOSEN !!!!!!!!");
             return potentialSolutions.get(sortedIndices[0]);
         }
         //System.out.println("3 localChoice");

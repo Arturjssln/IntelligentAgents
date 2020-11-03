@@ -37,7 +37,6 @@ public class Solution {
     }
 
     // TODO : verify that copy is enough !!
-    @SuppressWarnings("unchecked")
     // Copy constructor
 	public Solution(Solution solution) {
         this.nextTaskForTask = new HashMap<Task, Task>(solution.nextTaskForTask);
@@ -59,16 +58,18 @@ public class Solution {
         //System.out.println("Sizes: " + nextTaskForTask.size() + " " + nextTaskForVehicle.size() + " " +  pickupTimes.size() + " " + deliveryTimes.size() + " " + vehicles.size());
         for (Vehicle vehicle : vehicles) {
             // Create a plan for each vehicle
-            Plan plan = new Plan(vehicle.getCurrentCity());
+            City currentCity = vehicle.getCurrentCity();
+            Plan plan = new Plan(currentCity);
             // Set first task
             Task currentTask = nextTaskForVehicle.get(vehicle.id());
             if (currentTask != null) {
                 //System.out.println("First task : " + currentTask.toString());
                 // Go to pickup city and pick up the first task  
-                for (City city : vehicle.getCurrentCity().pathTo(currentTask.pickupCity)) {
+                for (City city : currentCity.pathTo(currentTask.pickupCity)) {
                     plan.appendMove(city);
                     //System.out.println("Move0 --> " + city.toString());
                 }
+                currentCity = currentTask.pickupCity;
                 plan.appendPickup(currentTask);
                 // Browse tasks to do while there are still some
                 Task taskToDeliver = null;
@@ -81,6 +82,7 @@ public class Solution {
                     int pickupTimeNextTask = pickupTimes.get(nextTask);
                     //System.out.println("Current timestep : " + currentTimeStep);
                     //System.out.println("Next task :  " + nextTask.toString() + " will be picked up at " + pickupTimeNextTask);
+                    
                     // While next task isn't to be picked up
                     while(pickupTimeNextTask > currentTimeStep) {
                         // We know there is a task to deliver, else would have to pick up next one 
@@ -93,10 +95,11 @@ public class Solution {
                         }
                         // Go to deliver city and deliver task 
                         //System.out.println(currentTask.deliveryCity.toString() + " --> " + taskToDeliver.deliveryCity.toString());
-                        for (City city : currentTask.pickupCity.pathTo(taskToDeliver.deliveryCity)) {
+                        for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
                             plan.appendMove(city);
                             //System.out.println("Move1 --> " + city.toString());
                         }
+                        currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
                         //System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
                         currentTask = taskToDeliver;
@@ -104,10 +107,11 @@ public class Solution {
                     }
 
                     // Time to move and pickup next task
-                    for (City city : currentTask.deliveryCity.pathTo(nextTask.pickupCity)) {
+                    for (City city : currentCity.pathTo(nextTask.pickupCity)) {
                         plan.appendMove(city);
                         //System.out.println("Move2 --> " + city.toString());
                     }
+                    currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
                     //System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + ")");
                     currentTask = nextTask;
@@ -124,10 +128,11 @@ public class Solution {
 
                     if (taskToDeliver != null) {
                         // Deliver all tasks that are not delivered
-                        for (City city : currentTask.deliveryCity.pathTo(taskToDeliver.deliveryCity)) {
+                        for (City city : currentCity.pathTo(taskToDeliver.deliveryCity)) {
                             plan.appendMove(city);
                             //System.out.println("Move3 --> " + city.toString());
                         }
+                        currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
                         //System.out.println("Delivered :  " + taskToDeliver.toString() + " (delivered at " + currentTimeStep + ")");
                     }
@@ -148,9 +153,9 @@ public class Solution {
     	
         // if the attributes are of the good size 
         // all tasks must be delivered
-        System.out.println("Bonjour je suis isValid");
+        //System.out.println("Bonjour je suis isValid");
         if (!attributeSizeValid(tasks, vehicles)) { return false; }
-        System.out.println("ATTRIBUTE SIZE IS VALID");
+        //System.out.println("ATTRIBUTE SIZE IS VALID");
         for (Map.Entry<Task, Task> set : nextTaskForTask.entrySet()) {
             // nextTask(t) != t: task delivered after some task t cannot be the same task
             if (set.getKey() == set.getValue()) { return false; }
@@ -201,7 +206,7 @@ public class Solution {
             }
             timeStep++;
         }
-        System.out.println("pickedUpTasksWeight IS VALID");
+        //System.out.println("pickedUpTasksWeight IS VALID");
         return true; 
     }
 
