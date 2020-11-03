@@ -97,43 +97,6 @@ public class SLSAlgo {
                 nextTaskForTask.put(lastTask, null); 
                 break;
 
-            case SEQUENTIAL:
-                double totalWeight = 0.0; 
-                indexVehicle = 0; 
-                for (Task task: tasks) {
-                    Vehicle vehicle = sortedVehicles.get(indexVehicle); 
-
-                    if ((vehicle.capacity() >= task.weight + totalWeight) || (indexVehicle == nbVehicles-1)) {
-                        vehicles.put(task, vehicle.id()); 
-                        if (lastTask != null) {
-                            nextTaskForTask.put(lastTask, task);
-                        } else {
-                            nextTaskForVehicle.put(vehicle.id(), task);
-                        }
-                        pickupTimes.put(task, currentTimeStep);
-                        deliveryTimes.put(task, currentTimeStep+1);
-            
-                        totalWeight += task.weight; 
-                        lastTask = task;
-                        currentTimeStep += 2;
-                    } else {
-                        nextTaskForTask.put(lastTask, null);
-                        indexVehicle++;
-                        totalWeight = task.weight;
-                        lastTask = task;
-                        currentTimeStep = 2;
-                        while (!(sortedVehicles.get(indexVehicle).capacity() >= task.weight)) {
-                            indexVehicle++; 
-                        }
-                        nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
-                        vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
-                        pickupTimes.put(task, 0);
-                        deliveryTimes.put(task, 1);
-                    }
-                }
-                nextTaskForTask.put(lastTask, null);
-                break;
-
             case DISTRIBUTED:
                 // Set vehicles
                 Task[] lastTaskForVehicle = new Task[nbVehicles];
