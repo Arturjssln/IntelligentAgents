@@ -13,8 +13,6 @@ import logist.simulation.Vehicle;
 import logist.task.Task;
 import logist.task.TaskSet;
 
-import template.CentralizedAgent.Initialization;
-
 public class SLSAlgo {
 
     // To solve discrete constraint optimization problem (COP)
@@ -23,19 +21,14 @@ public class SLSAlgo {
     List<Vehicle> vehicles;
     TaskSet tasks;
 
-    Initialization initialization;
-
     final int MAX_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
 
 	// Constructor
-	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks, Initialization initialization) {
+	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks) {
         this.vehicles = vehicles;
         this.tasks = tasks;
-        this.initialization = initialization;
         this.currentSolution = selectInitialSolution();
-
-        
 	}
 
 
@@ -44,6 +37,7 @@ public class SLSAlgo {
         
         long current_time = System.currentTimeMillis();
 
+        // Slave initialisation 
         currentSolution = selectInitialSolution();
         List<Solution> potentialSolutions = new ArrayList<Solution> ();
         
@@ -73,109 +67,25 @@ public class SLSAlgo {
         HashMap<Task, Integer> pickupTimes = new HashMap<Task, Integer>();
         HashMap<Task, Integer> deliveryTimes = new HashMap<Task, Integer>();
         
-        int indexVehicle;
-        int nbVehicles = this.vehicles.size();
         List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
         Task lastTask = null;
+        
         int currentTimeStep = 0;
-
-        switch (initialization) {
-            case SLAVE:
-                for (Task task: tasks) {
-                    Vehicle vehicle = sortedVehicles.get(0); 
-                    vehicles.put(task, vehicle.id()); 
-                    if (lastTask != null) {
-                        nextTaskForTask.put(lastTask, task);
-                    } else {
-                        nextTaskForVehicle.put(vehicle.id(), task);
-                    }
-                    pickupTimes.put(task, currentTimeStep);
-                    deliveryTimes.put(task, currentTimeStep+1);
-                    lastTask = task;
-                    currentTimeStep += 2;
-                }
-                nextTaskForTask.put(lastTask, null); 
-                break;
-
-            case SEQUENTIAL:
-                double totalWeight = 0.0; 
-                indexVehicle = 0; 
-                for (Task task: tasks) {
-                    Vehicle vehicle = sortedVehicles.get(indexVehicle); 
-
-                    if ((vehicle.capacity() >= task.weight + totalWeight) || (indexVehicle == nbVehicles-1)) {
-                        vehicles.put(task, vehicle.id()); 
-                        if (lastTask != null) {
-                            nextTaskForTask.put(lastTask, task);
-                        } else {
-                            nextTaskForVehicle.put(vehicle.id(), task);
-                        }
-                        pickupTimes.put(task, currentTimeStep);
-                        deliveryTimes.put(task, currentTimeStep+1);
-            
-                        totalWeight += task.weight; 
-                        lastTask = task;
-                        currentTimeStep += 2;
-                    } else {
-                        nextTaskForTask.put(lastTask, null);
-                        indexVehicle++;
-                        totalWeight = task.weight;
-                        lastTask = task;
-                        currentTimeStep = 2;
-                        while (!(sortedVehicles.get(indexVehicle).capacity() >= task.weight)) {
-                            indexVehicle++; 
-                        }
-                        nextTaskForVehicle.put(sortedVehicles.get(indexVehicle).id(), task);
-                        vehicles.put(task, sortedVehicles.get(indexVehicle).id()); 
-                        pickupTimes.put(task, 0);
-                        deliveryTimes.put(task, 1);
-                    }
-                }
-                nextTaskForTask.put(lastTask, null);
-                break;
-
-            case DISTRIBUTED:
-                // Set vehicles
-                Task[] lastTaskForVehicle = new Task[nbVehicles];
-                int[] currentTimeStepForVehicle = new int[nbVehicles];
-                for (int i=0; i<nbVehicles; i++) {
-                    lastTaskForVehicle[i] = null;
-                    currentTimeStepForVehicle[i] = 0;
-                }
-                indexVehicle = 0;
-                for (Task task: tasks) {
-                    int vehiclesTested = 0;
-                    while (this.vehicles.get(indexVehicle).capacity() < task.weight) {
-                        indexVehicle = (indexVehicle + 1)%nbVehicles;
-                        vehiclesTested++;
-                        if (vehiclesTested >= nbVehicles) { throw new IllegalArgumentException("Cannot handle task with weight higher than all vehicles' capacity.");}
-                    }
-                    Vehicle vehicle = this.vehicles.get(indexVehicle);
-
-                    vehicles.put(task, vehicle.id()); 
-                    if (lastTaskForVehicle[indexVehicle] != null) {
-                        nextTaskForTask.put(lastTaskForVehicle[indexVehicle], task);
-                    } else {
-                        nextTaskForVehicle.put(vehicle.id(), task);
-                    }
-                    pickupTimes.put(task, currentTimeStepForVehicle[indexVehicle]);
-                    deliveryTimes.put(task, currentTimeStepForVehicle[indexVehicle]+1);
-
-                    lastTaskForVehicle[indexVehicle] = task;
-                    currentTimeStepForVehicle[indexVehicle] += 2;
-
-                    indexVehicle = (indexVehicle + 1)%nbVehicles;
-                }
-                
-                for (Task lastTask_ : lastTaskForVehicle) {
-                    if(lastTask_ != null) {
-                        nextTaskForTask.put(lastTask_, null);
-                    }
-                }
-                break;
-
-            default: throw new IllegalArgumentException("Should not happen");
+        for (Task task: tasks) {
+            Vehicle vehicle = sortedVehicles.get(0); 
+            vehicles.put(task, vehicle.id()); 
+            if (lastTask != null) {
+                nextTaskForTask.put(lastTask, task);
+            } else {
+                nextTaskForVehicle.put(vehicle.id(), task);
+            }
+            pickupTimes.put(task, currentTimeStep);
+            deliveryTimes.put(task, currentTimeStep+1);
+            lastTask = task;
+            currentTimeStep += 2;
         }
+        nextTaskForTask.put(lastTask, null); 
+
         
         initialSolution.vehicles = vehicles; 
         initialSolution.nextTaskForVehicle = nextTaskForVehicle; 

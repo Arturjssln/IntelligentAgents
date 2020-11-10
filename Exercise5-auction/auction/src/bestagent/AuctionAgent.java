@@ -28,6 +28,9 @@ public class AuctionAgent implements AuctionBehavior {
 	
 	private Algorithm algorithm;
 
+	private long timeout_setup; 
+    private long timeout_plan;
+
 	private Topology topology;
 	private TaskDistribution distribution;
 	private Agent agent;
@@ -41,7 +44,13 @@ public class AuctionAgent implements AuctionBehavior {
 
 		String algorithmName = agent.readProperty("algorithm", String.class, "SLS");
 
-		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
+		// Throws IllegalArgumentException if algorithm is unknown
+        algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
+        System.out.println("Algorithm used : " + algorithm.toString());
+        // The setup method cannot last more than timeout_setup milliseconds
+        timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
+        // The plan method cannot execute more than timeout_plan milliseconds
+        timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
 
 		this.topology = topology;
 		this.distribution = distribution;
@@ -89,8 +98,10 @@ public class AuctionAgent implements AuctionBehavior {
                 plans = computeNaivePlans(vehicles, tasks);
                 break;
             case AUCTION:
-				//do nothing for now
-				
+				SLSAlgo algo = new SLSAlgo(vehicles, tasks, initialization); 
+                /* An auction agent that distributes all tasks to its vehicles and
+                * handles them in an optimal way in order to minimize the cost of the company plan. */
+                plans = algo.computePlans(tasks, time_start+this.timeout_plan);
                 break;
             default:
                 throw new AssertionError("Should not happen.");
