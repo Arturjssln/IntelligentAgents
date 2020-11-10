@@ -10,6 +10,13 @@
 		<set algorithm="NAIVE"/>
 	</agent>
 
+	<agent name="centralized-seq">
+		<set class-path="bin/"/>
+		<set class-name="template.CentralizedAgent"/>
+		<set algorithm="SLS"/>
+		<set initialization="SEQUENTIAL"/>
+	</agent>
+
 	<agent name="centralized-dis">
 		<set class-path="bin/"/>
 		<set class-name="template.CentralizedAgent"/>

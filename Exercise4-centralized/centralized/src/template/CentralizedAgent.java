@@ -32,7 +32,7 @@ public class CentralizedAgent implements CentralizedBehavior {
 
 	// Different algorithms implemented
     enum Algorithm {SLS, NAIVE};
-    enum Initialization {DISTRIBUTED, SLAVE}; 
+    enum Initialization {DISTRIBUTED, SEQUENTIAL, SLAVE}; 
 
     private Topology topology;
     private TaskDistribution distribution;
