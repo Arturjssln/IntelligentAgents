@@ -214,51 +214,103 @@ public class SLSAlgo {
     	
         List<Solution> neighours = new ArrayList<Solution>();
         Vehicle vehicleI; 
+
+
         do {
             Random rand = new Random();
             int idx = rand.nextInt(vehicles.size());
             vehicleI = vehicles.get(idx);
         } while (solution.nextTaskForVehicle.get(vehicleI.id()) == null); 
-        Task task = solution.nextTaskForVehicle.get(vehicleI.id());
         
-        for (Vehicle vehicleJ : vehicles) {
-            if (!vehicleJ.equals(vehicleI)) {
-                if (task.weight < vehicleJ.capacity()) {
-                    Solution temp = changingVehicle(solution, vehicleI, vehicleJ);
-                    if (temp.isValid(tasks, vehicles)) { neighours.add(temp);}
-                }
-            }
-        }
-        
+        int lengthI = getNumberTasks(vehicleI); 
+
+        /*Task task = solution.nextTaskForVehicle.get(vehicleI.id());
         int length = 0;
         do {
             task = solution.nextTaskForTask.get(task);
             length++;
-        } while(task != null);
-
-        if (length > 2) {
-            for (int tIdx1=0; tIdx1<length-1; tIdx1++) {
-                for (int tIdx2=tIdx1+1; tIdx2<length; tIdx2++) {
+        } while(task != null);*/
+       
+        
+        for (Vehicle vehicleJ : vehicles) {
+            if (!vehicleJ.equals(vehicleI)) {
+                for (int tIdx=0; tIdx<lengthI-1; tIdx++) {
+                //if (task.weight <= vehicleJ.capacity()) {
+                    Solution temp = changingVehicle(solution, vehicleI, vehicleJ, tIdx);
+                    if (temp.isValid(tasks, vehicles)) { neighours.add(temp);}
+                    int lengthJ = getNumberTasks(vehicleJ); 
+                    for (int tIdx2=1; tIdx2<lengthJ; tIdx2++) {
+                        List<Solution> solutions = changingTaskOrder(temp, vehicleJ, 0, tIdx2);
+                        neighours.addAll(solutions);
+                    }
+                }
+            }
+        }
+        /*
+        if (lengthI > 2) {
+            for (int tIdx1=0; tIdx1<lengthI-1; tIdx1++) {
+                for (int tIdx2=tIdx1+1; tIdx2<lengthI; tIdx2++) {
                     List<Solution> solutions = changingTaskOrder(solution, vehicleI, tIdx1, tIdx2);
                     neighours.addAll(solutions);
                 }
             }
-        }
+        }*/
+        
     	return neighours;
     }
 
-    private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2) {
+    private int getNumberTasks(Vehicle vehicle){
+        Task task = solution.nextTaskForVehicle.get(vehicle.id());
+        
+        int length = 0;
+        while (task != null) {
+            task = solution.nextTaskForTask.get(task);
+            length++;
+        }
+
+        return length;
+    }
+    
+    private Solution changingVehicle(Solution solution, Vehicle v1, Vehicle v2, int tIdx) {
         Solution newSolution = new Solution(solution);
 
-        // first task of v1
-        Task firstTask = newSolution.nextTaskForVehicle.get(v1.id()); 
-        // and corresponding delivery time 
-        Integer firstTaskDeliveryTime = newSolution.deliveryTimes.get(firstTask); 
+        Task prevMovedTask = newSolution.nextTaskForVehicle.get(v1.id());
+        Task movedTask = newSolution.nextTaskForTask.get(prevMovedTask);
+        Task postMovedTask = null;
 
-        newSolution.nextTaskForVehicle.put(v1.id(), newSolution.nextTaskForTask.get(firstTask));
-        newSolution.nextTaskForTask.put(firstTask, newSolution.nextTaskForVehicle.get(v2.id()));
-        newSolution.nextTaskForVehicle.put(v2.id(), firstTask);
+        if ((movedTask == null) || (tIdx==0)) {
+            movedTask = prevMovedTask;
+            prevMovedTask = null;
+        } else {
+            int count = 1;
+            while (count < tIdx) {
+                prevMovedTask = movedTask;
+                movedTask = newSolution.nextTaskForTask.get(prevMovedTask);
+                count++;
+            }
+            postMovedTask = newSolution.nextTaskForTask.get(movedTask);
+        }
 
+        if (movedTask.weight > v2.capacity()) {
+            // return unvalid solution 
+            return new Solution();
+        }
+
+        // Corresponding delivery time 
+        Integer movedTaskPickupTime = newSolution.pickupTimes.get(movedTask); 
+        Integer movedTaskDeliveryTime = newSolution.deliveryTimes.get(movedTask); 
+
+        if(tIdx==0) {
+            newSolution.nextTaskForVehicle.put(v1.id(), postMovedTask);
+        }
+        else {
+            newSolution.nextTaskForTask.put(prevMovedTask, postMovedTask); 
+        }
+        // Put it first in v2
+        newSolution.nextTaskForTask.put(movedTask, newSolution.nextTaskForVehicle.get(v2.id())); 
+        newSolution.nextTaskForVehicle.put(v2.id(), movedTask);
+
+       
         // Solution where deliveryTime stays the same for both tasks 
         for (Entry<Task, Integer> entry: newSolution.deliveryTimes.entrySet()) {
             if (newSolution.vehicles.get(entry.getKey()) == v1.id()) {
