@@ -22,7 +22,11 @@ import logist.topology.Topology.City;
  * 
  */
 @SuppressWarnings("unused")
-public class AuctionTemplate implements AuctionBehavior {
+public class AuctionAgent implements AuctionBehavior {
+	// Different algorithms implemented
+	enum Algorithm {AUCTION, NAIVE};
+	
+	private Algorithm algorithm;
 
 	private Topology topology;
 	private TaskDistribution distribution;
@@ -34,6 +38,10 @@ public class AuctionTemplate implements AuctionBehavior {
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
 			Agent agent) {
+
+		String algorithmName = agent.readProperty("algorithm", String.class, "SLS");
+
+		this.algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
 
 		this.topology = topology;
 		this.distribution = distribution;
@@ -72,17 +80,38 @@ public class AuctionTemplate implements AuctionBehavior {
 
 	@Override
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
-		
-//		System.out.println("Agent " + agent.id() + " has tasks " + tasks);
+		long time_start = System.currentTimeMillis();
+        // Compute the plans for each vehicle with the selected algorithm.
+        List<Plan> plans = new ArrayList<Plan>();
+		switch (algorithm) {
+            case NAIVE:
+                /* A very simple auction agent that assigns all tasks to its first vehicle and handles them sequentially. */
+                plans = computeNaivePlans(vehicles, tasks);
+                break;
+            case AUCTION:
+                //do nothing for now
+                break;
+            default:
+                throw new AssertionError("Should not happen.");
+        }
 
-		Plan planVehicle1 = naivePlan(vehicle, tasks);
+        long time_end = System.currentTimeMillis();
+        double duration = (time_end - time_start) / 1000.0;
+        System.out.println("The plan was generated in " + duration + " seconds.");
+        
+        return plans;
+	}
 
-		List<Plan> plans = new ArrayList<Plan>();
-		plans.add(planVehicle1);
-		while (plans.size() < vehicles.size())
-			plans.add(Plan.EMPTY);
+	private List<Plan> computeNaivePlans(List<Vehicle> vehicles, TaskSet tasks) {
+		// First vehicle get all the tasks, other vehicles can rest
+        Plan planVehicle1 = naivePlan(vehicles.get(0), tasks);
 
-		return plans;
+        List<Plan> plans = new ArrayList<Plan>();
+        plans.add(planVehicle1);
+        while (plans.size() < vehicles.size()) {
+            plans.add(Plan.EMPTY);
+        }
+        return plans;
 	}
 
 	private Plan naivePlan(Vehicle vehicle, TaskSet tasks) {
