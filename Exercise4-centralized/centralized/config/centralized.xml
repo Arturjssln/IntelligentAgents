@@ -42,7 +42,7 @@
 				<set home="Cardiff" />
 				<set speed="90" />
 				<set capacity="31" />
-				<set cost-per-km="5" />
+				<set cost-per-km="120" />
 			</vehicle>
 			
 			<!-- the third vehicle (green) -->

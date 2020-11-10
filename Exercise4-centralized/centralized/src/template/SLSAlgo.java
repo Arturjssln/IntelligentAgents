@@ -25,7 +25,7 @@ public class SLSAlgo {
 
     Initialization initialization;
 
-    final int MAX_ITERATION = 100;
+    final int MAX_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
 
 	// Constructor
@@ -57,7 +57,7 @@ public class SLSAlgo {
             current_time = System.currentTimeMillis() + 10000;
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
-        plans = currentSolution.generatePlans(this.vehicles);
+        plans = currentSolution.generatePlans(this.vehicles, true);
         return plans;
     }
 
@@ -442,7 +442,7 @@ public class SLSAlgo {
     private Solution localChoice(List<Solution> potentialSolutions) {
         List<Double> costsForSolutions = new ArrayList<Double>(); 
         for (Solution solution: potentialSolutions) {
-            List<Plan> plansForSolution = solution.generatePlans(vehicles);
+            List<Plan> plansForSolution = solution.generatePlans(vehicles, false);
             costsForSolutions.add(computeCost(plansForSolution)); 
         }
         

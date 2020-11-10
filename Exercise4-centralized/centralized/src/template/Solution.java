@@ -31,7 +31,7 @@ public class Solution {
     public HashMap<Task, Integer> deliveryTimes;
     public HashMap<Task, Integer> vehicles;
 
-    // useful private attribute to validate the constraits 
+    // useful private attribute to validate the constraints 
     private ArrayList<ArrayList<Task>> tasksAtTimeStepForVehicles;
 
     // Constructor 
@@ -53,7 +53,7 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public List<Plan> generatePlans(List<Vehicle> vehicles) {
+    public List<Plan> generatePlans(List<Vehicle> vehicles, boolean debug) {
         
         List<Plan> plans = new ArrayList<Plan>();
         
@@ -70,6 +70,8 @@ public class Solution {
                 }
                 currentCity = currentTask.pickupCity;
                 plan.appendPickup(currentTask);
+                if (debug)
+                    System.out.println("Picked up :  " + currentTask.toString() + " (picked up at 0), will be delivered at : " + deliveryTimes.get(currentTask));
                 Task taskToDeliver = null;
                 int currentTimeStep = 1;
 
@@ -91,6 +93,9 @@ public class Solution {
                             currentCity = taskToDeliver.deliveryCity;
                             plan.appendDelivery(taskToDeliver);
                             currentTask = taskToDeliver;
+                            if (debug)
+                                System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
+
                         }
                         currentTimeStep++;
                     }
@@ -101,6 +106,8 @@ public class Solution {
                     currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
                     currentTask = nextTask;
+                    if (debug)
+                        System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
                     currentTimeStep++;
                 }
                 do {
@@ -117,6 +124,9 @@ public class Solution {
                         }
                         currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
+                        if (debug)
+                            System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
+
                     }
                     currentTimeStep++;
                     currentTask = taskToDeliver;
@@ -223,4 +233,44 @@ public class Solution {
         }
         return tasksAtTime;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        Solution that = (Solution) obj;
+        return (this.nextTaskForTask == that.nextTaskForTask
+                    || (this.nextTaskForTask != null && this.nextTaskForTask.equals(that.nextTaskForTask)))
+                && (this.nextTaskForVehicle == that.nextTaskForVehicle 
+                    || (this.nextTaskForVehicle != null && this.nextTaskForVehicle.equals(that.nextTaskForVehicle)))
+                && (this.pickupTimes == that.pickupTimes 
+                    || (this.pickupTimes != null && this.pickupTimes.equals(that.pickupTimes)))
+                && (this.deliveryTimes == that.deliveryTimes 
+                    || (this.deliveryTimes != null && this.deliveryTimes.equals(that.deliveryTimes)))
+                && (this.vehicles == that.vehicles 
+                    || (this.vehicles != null && this.vehicles.equals(that.vehicles)));
+    }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((nextTaskForVehicle == null) ? 0 : nextTaskForVehicle.hashCode());
+        result = prime * result
+                + ((nextTaskForTask == null) ? 0 : nextTaskForTask.hashCode());
+        result = prime * result
+                + ((deliveryTimes == null) ? 0 : deliveryTimes.hashCode());
+        result = prime * result
+                + ((pickupTimes == null) ? 0 : pickupTimes.hashCode());
+        result = prime * result
+                + ((vehicles == null) ? 0 : vehicles.hashCode());
+        return result;
+    }
+
 }
