@@ -37,6 +37,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private Random random;
 	private Vehicle vehicle;
 	private City currentCity;
+	private List<Task> obtainedTasks;
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
@@ -57,6 +58,7 @@ public class AuctionAgent implements AuctionBehavior {
 		this.agent = agent;
 		this.vehicle = agent.vehicles().get(0);
 		this.currentCity = vehicle.homeCity();
+		this.obtainedTasks = new ArrayList<Task>(); 
 
 		long seed = -9019554669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
@@ -66,15 +68,23 @@ public class AuctionAgent implements AuctionBehavior {
 	public void auctionResult(Task previous, int winner, Long[] bids) {
 		if (winner == agent.id()) {
 			currentCity = previous.deliveryCity;
+			obtainedTasks.add(previous); 
 		}
+		//TODO: something with the distribution and with bids of opponents 
+
 	}
 	
 	@Override
 	public Long askPrice(Task task) {
 
-		if (vehicle.capacity() < task.weight)
+		if (vehicle.capacity() < task.weight){
 			return null;
+		}
+		
+		return naiveBid(task); 
+	}
 
+	private Long naiveBid(Task task){
 		long distanceTask = task.pickupCity.distanceUnitsTo(task.deliveryCity);
 		long distanceSum = distanceTask
 				+ currentCity.distanceUnitsTo(task.pickupCity);
@@ -83,8 +93,7 @@ public class AuctionAgent implements AuctionBehavior {
 
 		double ratio = 1.0 + (random.nextDouble() * 0.05 * task.id);
 		double bid = ratio * marginalCost;
-
-		return (long) Math.round(bid);
+		return (long) Math.round(bid); 
 	}
 
 	@Override
@@ -98,7 +107,7 @@ public class AuctionAgent implements AuctionBehavior {
                 plans = computeNaivePlans(vehicles, tasks);
                 break;
             case AUCTION:
-				SLSAlgo algo = new SLSAlgo(vehicles, tasks, initialization); 
+				SLSAlgo algo = new SLSAlgo(vehicles, tasks); 
                 /* An auction agent that distributes all tasks to its vehicles and
                 * handles them in an optimal way in order to minimize the cost of the company plan. */
                 plans = algo.computePlans(tasks, time_start+this.timeout_plan);
