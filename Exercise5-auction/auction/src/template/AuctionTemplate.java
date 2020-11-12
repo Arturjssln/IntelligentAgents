@@ -1,4 +1,4 @@
-package bestagent;
+package template;
 
 //the list of imports
 import java.util.ArrayList;

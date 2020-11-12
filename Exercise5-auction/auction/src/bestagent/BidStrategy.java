@@ -1,10 +1,9 @@
 package bestagent;
 
-public class BidStrategy {
+import logist.plan.Plan;
+import java.util.List;
 
-    
-    
-    public BidStrategy(){
+public abstract class BidStrategy {
 
-    }
+    public abstract Long computeBid(double ourMarginalCost, double opponentMarginalCost); 
 }

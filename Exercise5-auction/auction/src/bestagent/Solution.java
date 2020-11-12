@@ -1,4 +1,4 @@
-package template;
+package bestagent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ public class Solution {
     public HashMap<Task, Integer> pickupTimes;
     public HashMap<Task, Integer> deliveryTimes;
     public HashMap<Task, Integer> vehicles;
+    public List<Plan> plans;
 
     // useful private attribute to validate the constraints 
     private ArrayList<ArrayList<Task>> tasksAtTimeStepForVehicles;
@@ -53,7 +54,7 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public List<Plan> generatePlans(List<Vehicle> vehicles, boolean debug) {
+    public void computePlans(List<Vehicle> vehicles, boolean debug) {
         if (debug) {
             System.out.println(this.nextTaskForVehicle);
             System.out.println(this.nextTaskForTask);
@@ -62,7 +63,7 @@ public class Solution {
             System.out.println(this.vehicles);
         }
 
-        List<Plan> plans = new ArrayList<Plan>();
+        plans = new ArrayList<Plan>();
         
         // Create a plan for each vehicle
         for (Vehicle vehicle : vehicles) {
@@ -141,12 +142,11 @@ public class Solution {
             }
             plans.add(plan);
         }
-        return plans; 
     }
 
     
     // Check that this instance satisfies the constraints
-    public boolean isValid(TaskSet tasks, List<Vehicle> vehicles) {   
+    public boolean isValid(List<Task> tasks, List<Vehicle> vehicles) {   
     	
         // All tasks must be delivered
         if (!attributeSizeValid(tasks, vehicles)) { return false; }
@@ -222,7 +222,7 @@ public class Solution {
     }
 
     // Check the validity of the attribute size 
-    private boolean attributeSizeValid(TaskSet tasks, List<Vehicle> vehicles) {
+    private boolean attributeSizeValid(List<Task> tasks, List<Vehicle> vehicles) {
         return ((vehicles.size() >= nextTaskForVehicle.size()) &&
                 (tasks.size() == nextTaskForTask.size()) && 
                 (tasks.size() == pickupTimes.size()) &&

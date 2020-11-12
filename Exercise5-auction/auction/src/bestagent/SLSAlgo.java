@@ -1,4 +1,4 @@
-package template;
+package bestagent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,24 +17,24 @@ public class SLSAlgo {
 
     // To solve discrete constraint optimization problem (COP)
 
-    Solution currentSolution;
-    List<Vehicle> vehicles;
-    TaskSet tasks;
+    private Solution currentSolution;
+    private List<Vehicle> vehicles;
+    private List<Task> tasks;
+    private Solution bestSolutionEver; 
 
     final int MAX_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
 
 	// Constructor
-	public SLSAlgo(List<Vehicle> vehicles, TaskSet tasks) {
+	public SLSAlgo(List<Vehicle> vehicles, List<Task> tasks) {
         this.vehicles = vehicles;
         this.tasks = tasks;
         this.currentSolution = selectInitialSolution();
+        this.bestSolutionEver = currentSolution;
 	}
 
 
-    public List<Plan> computePlans(TaskSet tasks, long end_time) {
-        List<Plan> plans = new ArrayList<Plan> ();
-        
+    public List<Plan> computePlans(long end_time) {        
         long current_time = System.currentTimeMillis();
 
         // Slave initialisation 
@@ -48,11 +48,19 @@ public class SLSAlgo {
             ++iteration;
             if (iteration%500 == 0) 
                 System.out.println("Iteration : " + iteration);
-            current_time = System.currentTimeMillis() + 10000;
+            current_time = System.currentTimeMillis() + 10000; // TODO 
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
-        plans = currentSolution.generatePlans(this.vehicles, true);
-        return plans;
+        bestSolutionEver.computePlans(this.vehicles, true);
+        return bestSolutionEver.plans;
+    }
+
+    public double computeCostBestSolution(long end_time) {
+        return computeCost(computePlans(end_time));
+    }
+
+    public List<Plan> getBestPlansEver() {
+        return bestSolutionEver.plans; 
     }
 
 
@@ -133,14 +141,6 @@ public class SLSAlgo {
         } while (solution.nextTaskForVehicle.get(vehicleI.id()) == null); 
         
         int lengthI = getNumberTasks(solution, vehicleI); 
-
-        /*Task task = solution.nextTaskForVehicle.get(vehicleI.id());
-        int length = 0;
-        do {
-            task = solution.nextTaskForTask.get(task);
-            length++;
-        } while(task != null);*/
-       
         
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
@@ -407,14 +407,20 @@ public class SLSAlgo {
     private Solution localChoice(List<Solution> potentialSolutions) {
         List<Double> costsForSolutions = new ArrayList<Double>(); 
         for (Solution solution: potentialSolutions) {
-            List<Plan> plansForSolution = solution.generatePlans(vehicles, false);
-            costsForSolutions.add(computeCost(plansForSolution)); 
+            solution.computePlans(vehicles, false);
+            costsForSolutions.add(computeCost(solution.plans)); 
         }
         
         int[] sortedIndices = sortByCost(costsForSolutions);
+        
+        Solution bestNeighbourSolution = potentialSolutions.get(sortedIndices[0]);
+        // Save the best neighbour solution if best so far 
+        bestSolutionEver.computePlans(vehicles, false);
+        bestSolutionEver = (costsForSolutions.get(sortedIndices[0]) < computeCost(bestSolutionEver.plans))
+                ? bestNeighbourSolution : currentSolution; 
 
         if ((sortedIndices.length > 0) && ((new Random()).nextDouble() <= PROBABILITY_UPDATE_SOLUTION)) {
-            return potentialSolutions.get(sortedIndices[0]);
+            return bestNeighbourSolution;
         }
         return currentSolution; 
     }
