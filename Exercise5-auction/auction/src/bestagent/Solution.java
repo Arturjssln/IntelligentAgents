@@ -8,7 +8,6 @@ import java.util.Map;
 import logist.simulation.Vehicle;
 import logist.plan.Plan;
 import logist.task.Task;
-import logist.task.TaskSet;
 import logist.topology.Topology.City;
 
 public class Solution {

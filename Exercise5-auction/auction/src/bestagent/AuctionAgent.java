@@ -28,15 +28,19 @@ import logist.topology.Topology.City;
  */
 @SuppressWarnings("unused")
 public class AuctionAgent implements AuctionBehavior {
+
 	// Different algorithms implemented
 	enum Algorithm {AUCTION, NAIVE};
-	enum Strategy {HONNEST};
+	enum Strategy {RISKY, HONNEST, SAFE, VARIABLE};
 	
 	private Algorithm algorithm;
-	private BidStrategy strategy; 
+	private Strategy strategy; 
+	private BidStrategy biddingStrategy;
 
 	private long timeout_setup; 
-    private long timeout_plan;
+	private long timeout_plan;
+	private long timeout_bid;
+	private long minOpponentBid; 
 
 	private Topology topology;
 	private TaskDistribution distribution;
@@ -46,7 +50,9 @@ public class AuctionAgent implements AuctionBehavior {
 	private City currentCity; 
 
 	private double ourCost;
+	private double ourReward;
 	private double opponentCost;
+	private double opponentReward;
 	private double ourNewCost;
 	private double opponentNewCost;
 	private List<Task> opponentTasks; 
@@ -56,6 +62,9 @@ public class AuctionAgent implements AuctionBehavior {
 	private List<Plan> newBestPlans; 
 	private List<Plan> bestPlans; 
 
+	private int round; // todo check les operations with it 
+	private int nbTasks; 
+
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
@@ -64,7 +73,7 @@ public class AuctionAgent implements AuctionBehavior {
 		 // This code is used to get the timeouts
 		 LogistSettings ls = null;
 		 try {
-			 ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
+			 ls = Parsers.parseSettings("config" + File.separator + "settings_auction.xml");
 		 }
 		 catch (Exception exc) {
 			 System.out.println("There was a problem loading the configuration file.");
@@ -76,58 +85,100 @@ public class AuctionAgent implements AuctionBehavior {
 		// Throws IllegalArgumentException if algorithm is unknown
         algorithm = Algorithm.valueOf(algorithmName.toUpperCase());
 		System.out.println("Algorithm used : " + algorithm.toString());
-		Strategy strat = Strategy.valueOf(strategyName.toUpperCase());
-        System.out.println("Strategy used : " + strat.toString());
+		strategy = Strategy.valueOf(strategyName.toUpperCase());
+        System.out.println("Strategy used : " + strategy.toString());
         // The setup method cannot last more than timeout_setup milliseconds
         timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
         // The plan method cannot execute more than timeout_plan milliseconds
-        timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
+		timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
+		// The bid method cannot execute more than timeout_plan milliseconds
+		timeout_bid = ls.get(LogistSettings.TimeoutKey.BID);
 
 		this.topology = topology;
 		this.distribution = distribution; // TODO comprendre ce truc de distribution 
 		this.agent = agent;
 		this.vehicles = agent.vehicles();
 		this.currentCity = vehicles.get(0).homeCity();
-		initializeStrategy(strat); // TODO: choose the one we start with
 		this.maxCapacity = initMaxCapacity();
 
 		long seed = -9019554669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
+		this.round = 0; 
+		this.nbTasks = 0; 
+		this.ourReward = 0.0;
+		this.opponentReward = 0.0; 
+		this.minOpponentBid = Long.MAX_VALUE; 
+
+		initialiseStrategy();
 	}
 
-	public void initializeStrategy(Strategy strategyName) {
-		switch (strategyName) {
+	private void initialiseStrategy() {
+		switch (strategy) {
+			case RISKY:
+				biddingStrategy = new RiskyStrategy();
+				break;
+			case SAFE:
+				biddingStrategy = new SafeStrategy();
+				break;
 			case HONNEST:
-				this.strategy = new HonnestStrategy(); // TODO: choose the one we start with
+				biddingStrategy = new HonnestStrategy();
+				break;
+			case VARIABLE:
+				biddingStrategy = new RiskyStrategy();
 				break;
 			default: 
-				throw new IllegalArgumentException("Should not happen.");
-
+				throw new IllegalArgumentException("Strategy is invalid.");
+	
 		}
-	}	
-		
+	}
+
 	@Override
 	public void auctionResult(Task previous, int winner, Long[] bids) {
 		
+		// bids is comoposed of only 2 values
+		ourReward += bids[agent.id()];
+
+		Long opponentBid = bids[1 - agent.id()];
+		opponentReward += opponentBid;
+
+		// todo estimate initial cities 
+		
+		// Choose strategy here (depending on progression in the trial)
+		switch (strategy) {
+			case VARIABLE: 
+				if (round == 5) { // TODO : once enough task 
+					biddingStrategy = new CatchingUpStrategy();
+				} else if (round == 17) { // TODO : once caught up 
+					biddingStrategy = new SafeStrategy();
+				}
+				break;
+			default: //do nothing
+		}
+	
+		minOpponentBid = Math.min(bids[1 - agent.id()], minOpponentBid); 
+
+		// Wins 
 		if (winner == agent.id()) {
 			this.bestPlans = this.newBestPlans; 
+			++nbTasks; 
+			biddingStrategy.computeRatio(true, round, nbTasks, ourCost, ourNewCost-ourCost, opponentBid, opponentNewCost-opponentCost);
 			this.ourCost = this.ourNewCost; //TODO: verify
-		} 
+		}
+		// Loses
 		else {
 			this.opponentTasks.add(previous);
-			// TODO marginal cost de l'opponent 
+			biddingStrategy.computeRatio(false, round, nbTasks,ourCost, ourNewCost-ourCost, opponentBid, opponentNewCost-opponentCost);	
 			this.opponentCost = estimateOpponentCost(bids); //TODO 
-
-			
 		}
 
-		//TODO: something with the distribution and with bids of opponents 
+		
+		//TODO: something with the distributions 
 
 	}
 
 	//TODO: mettre dans Strategy ? 
 	private double estimateOpponentCost(Long[] bids) {
-		return this.opponentNewCost;
+		return this.opponentNewCost; // TODO voir si c'est utile 
 	}
 	
 
@@ -149,7 +200,9 @@ public class AuctionAgent implements AuctionBehavior {
 		ourNewCost = totalCost(possibleTasks, task, true); 
 		opponentNewCost = totalCost(opponentTasks, task, false); 
 
-		return strategy.computeBid(ourNewCost - ourCost, opponentNewCost - opponentCost); 
+		++round; 
+
+		return biddingStrategy.computeBid(ourNewCost - ourCost, opponentNewCost - opponentCost, minOpponentBid); 
 	}
 
 	private double totalCost(List<Task> obtainedTasks, Task extraTask, boolean isUs){
