@@ -37,6 +37,14 @@ public class SLSAlgo {
     public List<Plan> computePlans(long end_time) {        
         long current_time = System.currentTimeMillis();
 
+        if (tasks.size()==0) {
+            List<Plan> plans =  new ArrayList<Plan>();
+            for(Vehicle vehicle : vehicles) {
+                plans.add(Plan.EMPTY);
+            }
+            return plans;
+        }
+
         // Slave initialisation 
         currentSolution = selectInitialSolution();
         List<Solution> potentialSolutions = new ArrayList<Solution> ();
@@ -51,7 +59,7 @@ public class SLSAlgo {
             current_time = System.currentTimeMillis() + 10000; // TODO 
         } while((iteration<MAX_ITERATION) && (current_time < end_time));
 
-        bestSolutionEver.computePlans(this.vehicles, true);
+        bestSolutionEver.computePlans(this.vehicles, false); //true
         return bestSolutionEver.plans;
     }
 

@@ -39,5 +39,13 @@
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE"/>
 	</agent>
+
+
+	<agent name="auction-honnest">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="HONNEST"/>
+	</agent>
 	
 </agents>

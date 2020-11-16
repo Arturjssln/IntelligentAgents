@@ -108,6 +108,7 @@ public class AuctionAgent implements AuctionBehavior {
 		this.ourReward = 0.0;
 		this.opponentReward = 0.0; 
 		this.minOpponentBid = Long.MAX_VALUE; 
+		this.opponentTasks = new ArrayList<Task>();
 
 		initialiseStrategy();
 	}
@@ -134,7 +135,8 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public void auctionResult(Task previous, int winner, Long[] bids) {
-		
+		System.out.println("COUCOU" + agent.id());
+		System.out.println(previous);
 		// bids is comoposed of only 2 values
 		ourReward += bids[agent.id()];
 
@@ -154,7 +156,7 @@ public class AuctionAgent implements AuctionBehavior {
 				break;
 			default: //do nothing
 		}
-	
+
 		minOpponentBid = Math.min(bids[1 - agent.id()], minOpponentBid); 
 
 		// Wins 
@@ -181,7 +183,6 @@ public class AuctionAgent implements AuctionBehavior {
 		return this.opponentNewCost; // TODO voir si c'est utile 
 	}
 	
-
 	private int initMaxCapacity(){
 		int maxCapacity = 0; 
 		for (Vehicle vehicle: this.vehicles) {
@@ -219,12 +220,16 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
+		System.out.println(tasks);
 		long time_start = System.currentTimeMillis();
-        // Compute the plans for each vehicle with the selected algorithm.
-		List<Plan> plans = bestPlans;
+		// Compute the plans for each vehicle with the selected algorithm.
+		SLSAlgo algo = new SLSAlgo(vehicles, new ArrayList<Task>(tasks));
+
+		List<Plan> plans = algo.computePlans(time_start+10000000);
 		
         long time_end = System.currentTimeMillis();
         double duration = (time_end - time_start) / 1000.0;
+        System.out.println(plans);
         System.out.println("The plan was generated in " + duration + " seconds.");
         
         return plans;
