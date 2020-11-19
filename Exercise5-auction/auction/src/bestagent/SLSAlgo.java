@@ -24,6 +24,7 @@ public class SLSAlgo {
 
     final int MAX_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
+    final long timeToComputePlan = 1;
 
 	// Constructor
 	public SLSAlgo(List<Vehicle> vehicles, List<Task> tasks) {
@@ -35,11 +36,10 @@ public class SLSAlgo {
 
 
     public List<Plan> computePlans(long end_time) {        
-        long current_time = System.currentTimeMillis();
-
+        long currentTime = System.currentTimeMillis();
         if (tasks.size()==0) {
             List<Plan> plans =  new ArrayList<Plan>();
-            for(Vehicle vehicle : vehicles) {
+            for(int i=0;i<vehicles.size();++i) {
                 plans.add(Plan.EMPTY);
             }
             return plans;
@@ -50,14 +50,15 @@ public class SLSAlgo {
         List<Solution> potentialSolutions = new ArrayList<Solution> ();
         
         int iteration = 0;
+        long timeForOneIteration = 0;
+        long startTime = System.currentTimeMillis(); 
         do {
             potentialSolutions = generateNeighbours(currentSolution);
             currentSolution = localChoice(potentialSolutions);
-            ++iteration;
-            if (iteration%500 == 0) 
-                System.out.println("Iteration : " + iteration);
-            current_time = System.currentTimeMillis() + 10000; // TODO 
-        } while((iteration<MAX_ITERATION) && (current_time < end_time));
+            ++iteration; 
+            currentTime = System.currentTimeMillis(); 
+            timeForOneIteration = (currentTime - startTime)/((long)iteration) + 1;
+        } while((iteration<MAX_ITERATION)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
 
         bestSolutionEver.computePlans(this.vehicles, false); //true
         return bestSolutionEver.plans;
@@ -267,13 +268,6 @@ public class SLSAlgo {
         newSolution.pickupTimes.put(movedTask, 0);
         newSolution.deliveryTimes.put(movedTask, 1); 
         newSolution.vehicles.put(movedTask, v2.id());
-
-        /*System.out.println(tIdx);
-        System.out.println(newSolution.nextTaskForVehicle);
-        System.out.println(newSolution.nextTaskForTask);
-        System.out.println(newSolution.pickupTimes);
-        System.out.println(newSolution.deliveryTimes);
-        System.out.println(newSolution.vehicles);*/
 
         return newSolution;
     }

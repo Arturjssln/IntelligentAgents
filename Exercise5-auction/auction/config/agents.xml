@@ -32,12 +32,32 @@
 		<set strategy="SAFE"/>
 	</agent>
 
+	<agent name="auction-catch">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="CATCHING_UP"/>
+	</agent>
+
 	
-	<agent name="auction-variable">
+	<agent name="auction-var">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE"/>
+	</agent>
+
+	<agent name="auction-var-smart">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART"/>
+	</agent>
+	<agent name="auction-var-smart2">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART_2"/>
 	</agent>
 
 

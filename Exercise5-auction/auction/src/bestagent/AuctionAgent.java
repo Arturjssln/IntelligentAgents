@@ -31,7 +31,7 @@ public class AuctionAgent implements AuctionBehavior {
 
 	// Different algorithms implemented
 	enum Algorithm {AUCTION, NAIVE};
-	enum Strategy {RISKY, HONNEST, SAFE, VARIABLE};
+	enum Strategy {RISKY, HONNEST, SAFE, VARIABLE, CATCHING_UP, VARIABLE_SMART, VARIABLE_SMART_2};
 	
 	private Algorithm algorithm;
 	private Strategy strategy; 
@@ -40,7 +40,6 @@ public class AuctionAgent implements AuctionBehavior {
 	private long timeout_setup; 
 	private long timeout_plan;
 	private long timeout_bid;
-	private long minOpponentBid; 
 
 	private Topology topology;
 	private TaskDistribution distribution;
@@ -107,7 +106,6 @@ public class AuctionAgent implements AuctionBehavior {
 		this.nbTasks = 0; 
 		this.ourReward = 0.0;
 		this.opponentReward = 0.0; 
-		this.minOpponentBid = Long.MAX_VALUE; 
 		this.opponentTasks = new ArrayList<Task>();
 
 		initialiseStrategy();
@@ -115,17 +113,20 @@ public class AuctionAgent implements AuctionBehavior {
 
 	private void initialiseStrategy() {
 		switch (strategy) {
-			case RISKY:
-				biddingStrategy = new RiskyStrategy();
-				break;
 			case SAFE:
 				biddingStrategy = new SafeStrategy();
 				break;
 			case HONNEST:
 				biddingStrategy = new HonnestStrategy();
 				break;
+			case RISKY:
 			case VARIABLE:
+			case VARIABLE_SMART: 
+			case VARIABLE_SMART_2: 
 				biddingStrategy = new RiskyStrategy();
+				break;
+			case CATCHING_UP:
+				biddingStrategy = new CatchingUpStrategy();
 				break;
 			default: 
 				throw new IllegalArgumentException("Strategy is invalid.");
@@ -135,34 +136,45 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public void auctionResult(Task previous, int winner, Long[] bids) {
-		System.out.println("COUCOU" + agent.id());
-		System.out.println(previous);
 		// bids is comoposed of only 2 values
 		ourReward += bids[agent.id()];
 
 		Long opponentBid = bids[1 - agent.id()];
 		opponentReward += opponentBid;
 
-		// todo estimate initial cities 
+		// TODO estimate initial cities 
 		
 		// Choose strategy here (depending on progression in the trial)
 		switch (strategy) {
 			case VARIABLE: 
-				if (round == 5) { // TODO : once enough task 
+				if (round == 5) {
 					biddingStrategy = new CatchingUpStrategy();
-				} else if (round == 17) { // TODO : once caught up 
+				} else if (round == 17) {
+					biddingStrategy = new SafeStrategy();
+				}
+				break;
+			case VARIABLE_SMART: 
+				if (nbTasks == 2) {
+					biddingStrategy = new CatchingUpStrategy();
+				} else if (ourReward > ourNewCost && winner == agent.id()) {
+					biddingStrategy = new SafeStrategy();
+				}
+				break;
+			case VARIABLE_SMART_2: 
+				if (nbTasks == 3) {
+					biddingStrategy = new CatchingUpStrategy();
+				} else if (ourReward > ourNewCost && winner == agent.id()) { 
 					biddingStrategy = new SafeStrategy();
 				}
 				break;
 			default: //do nothing
 		}
 
-		minOpponentBid = Math.min(bids[1 - agent.id()], minOpponentBid); 
-
+		System.out.println("(round " + round + ") WINNER " + winner);
 		// Wins 
 		if (winner == agent.id()) {
 			this.bestPlans = this.newBestPlans; 
-			++nbTasks; 
+			++nbTasks;
 			biddingStrategy.computeRatio(true, round, nbTasks, ourCost, ourNewCost-ourCost, opponentBid, opponentNewCost-opponentCost);
 			this.ourCost = this.ourNewCost; //TODO: verify
 		}
@@ -193,40 +205,39 @@ public class AuctionAgent implements AuctionBehavior {
 	
 	@Override
 	public Long askPrice(Task task) {
-
+		long startTime = System.currentTimeMillis();
 		if (maxCapacity < task.weight) { return null; }
 		
 		TaskSet currentTasks = agent.getTasks();
 		List<Task> possibleTasks = new ArrayList<Task>(currentTasks);
-		ourNewCost = totalCost(possibleTasks, task, true); 
-		opponentNewCost = totalCost(opponentTasks, task, false); 
+		ourNewCost = totalCost(possibleTasks, task, true, startTime); 
+		opponentNewCost = totalCost(opponentTasks, task, false, startTime); 
 
 		++round; 
-
-		return biddingStrategy.computeBid(ourNewCost - ourCost, opponentNewCost - opponentCost, minOpponentBid); 
+		Long bid = biddingStrategy.computeBid(ourNewCost - ourCost, opponentNewCost - opponentCost); 
+		System.out.println("Agent " + agent.id() + " bid " + bid);
+		return bid;
 	}
 
-	private double totalCost(List<Task> obtainedTasks, Task extraTask, boolean isUs){
+	private double totalCost(List<Task> obtainedTasks, Task extraTask, boolean isUs, long startTime) {
 		List<Task> potentialTasks = new ArrayList<Task>(obtainedTasks); 
-		potentialTasks.add(extraTask); 
+		potentialTasks.add(extraTask);
 		SLSAlgo algo = new SLSAlgo(vehicles, potentialTasks); // TODO : vehicles is for us
-		double cost = algo.computeCostBestSolution(this.timeout_plan); //TODO: Change timeout
+		double cost = algo.computeCostBestSolution(startTime+timeout_bid);
 		if (isUs) {
 			this.newBestPlans = algo.getBestPlansEver();
 		}
 		return cost;
 	}
 
-
 	@Override
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
-		System.out.println(tasks);
 		long time_start = System.currentTimeMillis();
 		// Compute the plans for each vehicle with the selected algorithm.
 		SLSAlgo algo = new SLSAlgo(vehicles, new ArrayList<Task>(tasks));
 
-		List<Plan> plans = algo.computePlans(time_start+10000000);
-		
+		List<Plan> plans = algo.computePlans(time_start+timeout_plan);
+
         long time_end = System.currentTimeMillis();
         double duration = (time_end - time_start) / 1000.0;
         System.out.println(plans);

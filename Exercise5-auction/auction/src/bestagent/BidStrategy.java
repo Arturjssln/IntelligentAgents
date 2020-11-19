@@ -12,8 +12,8 @@ public abstract class BidStrategy {
     public double riskRatio;
     public double opponentRatio;
 
-    public Long computeBid(double ourMarginalCost, double opponentMarginalCost, Long minOpponentBid) {
-        return Math.round(Math.max(Math.max(riskRatio*ourMarginalCost, opponentRatio*opponentMarginalCost-1), (double) minOpponentBid-1)); // TODO check the minus
+    public Long computeBid(double ourMarginalCost, double opponentMarginalCost) {
+        return Math.round(Math.max(riskRatio*ourMarginalCost, opponentRatio*opponentMarginalCost-1)); // TODO check the minus
     }
 
     public void computeRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {}
