@@ -23,9 +23,10 @@ public class SafeStrategy extends BidStrategy {
          * 
         */
 
-        
+        // TODO: voir si on peut en faire un truc plus smart 
         if (ourMarginalCost < ourCost/nbTasks){ 
-            riskRatio =  Math.max(minRatio, riskRatio * (1-EPSILON));              
+            riskRatio =  Math.max(minRatio, riskRatio * (1-EPSILON));
+                          
         } 
         else {
             riskRatio = Math.min(maxRatio, riskRatio * (1+EPSILON)); 

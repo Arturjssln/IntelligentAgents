@@ -202,12 +202,37 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 		return maxCapacity; 
 	}
+
+	private double distributionRatio(Task task) {
+		/**
+		 * Compute the ratio that we multiply to the cost or something
+		 * as a ratio ? 
+		 * depending on the proba that the to city is a from city after ? probability(from, null) = proba que city ait des tasks dans le futur
+		 * depending on the proba that the from/to city get tasks to/from with task that we have already 
+		 */
+
+		double probaFutureTask = distribution.probability(task.deliveryCity, null); 
+
+		TaskSet currentTasks = agent.getTasks();
+
+		List<Double> probaFutureLink = new ArrayList<Double>(); 
+		for (Task ourTask: currentTasks) {
+			probaFutureLink.add(distribution.probability(ourTask.deliveryCity, task.pickupCity));
+			probaFutureLink.add(distribution.probability(task.deliveryCity, ourTask.pickupCity)); 
+		}
+		
+		// TODO: faire qqch avec toutes les proba 
+
+		return 0.0; 
+	}
 	
 	@Override
 	public Long askPrice(Task task) {
 		long startTime = System.currentTimeMillis();
 		if (maxCapacity < task.weight) { return null; }
-		
+
+		// TODO: add distribution here as ratio to do something with the bid : we want higher if fits with the tasks we have ?
+
 		TaskSet currentTasks = agent.getTasks();
 		List<Task> possibleTasks = new ArrayList<Task>(currentTasks);
 		ourNewCost = totalCost(possibleTasks, task, true, startTime); 
