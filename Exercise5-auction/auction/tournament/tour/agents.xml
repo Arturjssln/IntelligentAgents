@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <agents>
-	<!-- A list of agents and their behavior classes -->
-	
-	<!-- #### AUCTION AGENTS ### -->
-	<agent name="auction-main-01">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="NAIVE"/>
-		<set distribution="FALSE"/>
-	</agent>
-
-	<agent name="auction-main">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="HONNEST"/>
-		<set distribution="FALSE"/>
-	</agent>
+	<!-- An auto-generated list of agents and their behavior classes -->
+	<!--  - jar directory : ./agents/ -->
+	<!--  - generated on  : Sat Nov 21 13:54:47 CET 2020 -->
 
 	<agent name="auction-risky">
 		<set class-path="bin/"/>
@@ -59,6 +44,15 @@
 		<set strategy="VARIABLE_SMART"/>
 		<set distribution="FALSE"/>
 	</agent>
+
+	<agent name="auction-var-smart_dis">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART"/>
+		<set distribution="TRUE"/>
+	</agent>
+
 	<agent name="auction-var-smart2">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
@@ -75,5 +69,4 @@
 		<set strategy="HONNEST"/>
 		<set distribution="FALSE"/>
 	</agent>
-	
 </agents>

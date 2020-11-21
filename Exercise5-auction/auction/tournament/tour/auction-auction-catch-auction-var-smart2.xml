@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<history configuration="./config/auction.xml">
+	<agents>
+		<agent name="auction-catch">
+			<vehicle name="Vehicle 1"/>
+			<vehicle name="Vehicle 2"/>
+		</agent>
+		<agent name="auction-var-smart2">
+			<vehicle name="Vehicle 3"/>
+			<vehicle name="Vehicle 4"/>
+		</agent>
+	</agents>
+	<rounds>
+		<round id="1">
+			<tasks>
+				<task id="0" pickup="Cardiff" delivery="Sheffield" weight="3" reward="69479">
+					<bid agent="auction-catch" bid="2191"/>
+					<bid agent="auction-var-smart2" bid="1708"/>
+				</task>
+				<task id="1" pickup="Manchester" delivery="Norwich" weight="3" reward="47516">
+					<bid agent="auction-catch" bid="2668"/>
+					<bid agent="auction-var-smart2" bid="1315"/>
+				</task>
+				<task id="2" pickup="Cardiff" delivery="Manchester" weight="3" reward="68638">
+					<bid agent="auction-catch" bid="2215"/>
+					<bid agent="auction-var-smart2" bid="2789"/>
+				</task>
+				<task id="3" pickup="Sheffield" delivery="Portsmouth" weight="3" reward="55553">
+					<bid agent="auction-catch" bid="2972"/>
+					<bid agent="auction-var-smart2" bid="2829"/>
+				</task>
+				<task id="4" pickup="Liverpool" delivery="Norwich" weight="3" reward="41305">
+					<bid agent="auction-catch" bid="2668"/>
+					<bid agent="auction-var-smart2" bid="2816"/>
+				</task>
+				<task id="5" pickup="Norwich" delivery="London" weight="3" reward="85625">
+					<bid agent="auction-catch" bid="2319"/>
+					<bid agent="auction-var-smart2" bid="444"/>
+				</task>
+				<task id="6" pickup="Cardiff" delivery="London" weight="3" reward="64503">
+					<bid agent="auction-catch" bid="2209"/>
+					<bid agent="auction-var-smart2" bid="3204"/>
+				</task>
+				<task id="7" pickup="London" delivery="Manchester" weight="3" reward="68101">
+					<bid agent="auction-catch" bid="1118"/>
+					<bid agent="auction-var-smart2" bid="392"/>
+				</task>
+				<task id="8" pickup="Plymouth" delivery="Birmingham" weight="3" reward="41269">
+					<bid agent="auction-catch" bid="11808"/>
+					<bid agent="auction-var-smart2" bid="2521"/>
+				</task>
+				<task id="9" pickup="Portsmouth" delivery="Plymouth" weight="3" reward="75780">
+					<bid agent="auction-catch" bid="1224"/>
+					<bid agent="auction-var-smart2" bid="100"/>
+				</task>
+				<task id="10" pickup="Birmingham" delivery="Cardiff" weight="3" reward="85625">
+					<bid agent="auction-catch" bid="100"/>
+					<bid agent="auction-var-smart2" bid="100"/>
+				</task>
+				<task id="11" pickup="Portsmouth" delivery="Sheffield" weight="3" reward="55553">
+					<bid agent="auction-catch" bid="3117"/>
+					<bid agent="auction-var-smart2" bid="1881"/>
+				</task>
+				<task id="12" pickup="Cardiff" delivery="Manchester" weight="3" reward="68638">
+					<bid agent="auction-catch" bid="2144"/>
+					<bid agent="auction-var-smart2" bid="1597"/>
+				</task>
+				<task id="13" pickup="Newcastle" delivery="Manchester" weight="3" reward="69390">
+					<bid agent="auction-catch" bid="3608"/>
+					<bid agent="auction-var-smart2" bid="4756"/>
+				</task>
+				<task id="14" pickup="Portsmouth" delivery="Liverpool" weight="3" reward="48501">
+					<bid agent="auction-catch" bid="100"/>
+					<bid agent="auction-var-smart2" bid="333"/>
+				</task>
+			</tasks>
+			<events>
+				<event id="0" time="0" vehicle="Vehicle 1" move="Leeds"/>
+				<event id="1" time="0" vehicle="Vehicle 3" move="Portsmouth"/>
+				<event id="2" time="1094444444" vehicle="Vehicle 1" move="Sheffield"/>
+				<event id="3" time="1553333332" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="4" time="1888888888" vehicle="Vehicle 3" move="London"/>
+				<event id="5" time="2555555553" vehicle="Vehicle 1" pickup="10"/>
+				<event id="6" time="2719999999" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="7" time="2855555553" vehicle="Vehicle 1" move="Cardiff"/>
+				<event id="8" time="4031111110" vehicle="Vehicle 3" move="Cardiff"/>
+				<event id="9" time="4133333330" vehicle="Vehicle 1" deliver="10"/>
+				<event id="10" time="4433333330" vehicle="Vehicle 1" pickup="2"/>
+				<event id="11" time="4733333330" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="12" time="5308888886" vehicle="Vehicle 3" pickup="0"/>
+				<event id="13" time="5608888886" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="14" time="6011111107" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="15" time="6886666663" vehicle="Vehicle 3" move="Sheffield"/>
+				<event id="16" time="7065555550" vehicle="Vehicle 1" deliver="2"/>
+				<event id="17" time="7365555550" vehicle="Vehicle 1" move="Liverpool"/>
+				<event id="18" time="7751111105" vehicle="Vehicle 1" pickup="4"/>
+				<event id="19" time="7888888884" vehicle="Vehicle 3" deliver="0"/>
+				<event id="20" time="8051111104" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="21" time="8188888883" vehicle="Vehicle 3" move="Leeds"/>
+				<event id="22" time="8436666659" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="23" time="8647777771" vehicle="Vehicle 3" move="Liverpool"/>
+				<event id="24" time="9453333326" vehicle="Vehicle 3" move="Manchester"/>
+				<event id="25" time="9491111103" vehicle="Vehicle 1" move="Cardiff"/>
+				<event id="26" time="9838888881" vehicle="Vehicle 3" pickup="1"/>
+				<event id="27" time="10138888880" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="28" time="10768888879" vehicle="Vehicle 1" pickup="6"/>
+				<event id="29" time="11068888878" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="30" time="11193333324" vehicle="Vehicle 3" move="London"/>
+				<event id="31" time="12346666655" vehicle="Vehicle 1" move="London"/>
+				<event id="32" time="12504444434" vehicle="Vehicle 3" move="Norwich"/>
+				<event id="33" time="13657777765" vehicle="Vehicle 1" deliver="6"/>
+				<event id="34" time="13782222211" vehicle="Vehicle 3" deliver="1"/>
+				<event id="35" time="13957777765" vehicle="Vehicle 1" move="Portsmouth"/>
+				<event id="36" time="14082222210" vehicle="Vehicle 3" pickup="5"/>
+				<event id="37" time="14382222210" vehicle="Vehicle 3" move="London"/>
+				<event id="38" time="14788888875" vehicle="Vehicle 1" pickup="14"/>
+				<event id="39" time="15088888874" vehicle="Vehicle 1" move="London"/>
+				<event id="40" time="15659999987" vehicle="Vehicle 3" move="Portsmouth"/>
+				<event id="41" time="15919999985" vehicle="Vehicle 1" move="Norwich"/>
+				<event id="42" time="16491111098" vehicle="Vehicle 3" pickup="11"/>
+				<event id="43" time="16791111098" vehicle="Vehicle 3" move="London"/>
+				<event id="44" time="17197777762" vehicle="Vehicle 1" deliver="4"/>
+				<event id="45" time="17497777762" vehicle="Vehicle 1" move="London"/>
+				<event id="46" time="17622222208" vehicle="Vehicle 3" deliver="5"/>
+				<event id="47" time="17922222208" vehicle="Vehicle 3" pickup="7"/>
+				<event id="48" time="18222222207" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="49" time="18775555539" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="50" time="19533333317" vehicle="Vehicle 3" move="Manchester"/>
+				<event id="51" time="20086666649" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="52" time="20587777760" vehicle="Vehicle 3" deliver="7"/>
+				<event id="53" time="20887777760" vehicle="Vehicle 3" move="Liverpool"/>
+				<event id="54" time="21141111093" vehicle="Vehicle 1" move="Liverpool"/>
+				<event id="55" time="21273333315" vehicle="Vehicle 3" move="Leeds"/>
+				<event id="56" time="21526666648" vehicle="Vehicle 1" deliver="14"/>
+				<event id="57" time="21826666648" vehicle="Vehicle 1" move="Leeds"/>
+				<event id="58" time="22078888869" vehicle="Vehicle 3" move="Sheffield"/>
+				<event id="59" time="22537777757" vehicle="Vehicle 3" pickup="3"/>
+				<event id="60" time="22632222203" vehicle="Vehicle 1" move="Newcastle"/>
+				<event id="61" time="22837777757" vehicle="Vehicle 3" deliver="11"/>
+				<event id="62" time="23137777756" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="63" time="23726666646" vehicle="Vehicle 1" pickup="13"/>
+				<event id="64" time="24026666645" vehicle="Vehicle 1" move="Leeds"/>
+				<event id="65" time="24139999978" vehicle="Vehicle 3" move="London"/>
+				<event id="66" time="25121111089" vehicle="Vehicle 1" move="Liverpool"/>
+				<event id="67" time="25451111089" vehicle="Vehicle 3" move="Portsmouth"/>
+				<event id="68" time="25926666644" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="69" time="26282222199" vehicle="Vehicle 3" deliver="3"/>
+				<event id="70" time="26312222199" vehicle="Vehicle 1" deliver="13"/>
+				<event id="71" time="26582222199" vehicle="Vehicle 3" pickup="9"/>
+				<event id="72" time="26882222199" vehicle="Vehicle 3" move="Plymouth"/>
+				<event id="73" time="28771111087" vehicle="Vehicle 3" deliver="9"/>
+				<event id="74" time="29071111086" vehicle="Vehicle 3" pickup="8"/>
+				<event id="75" time="29371111086" vehicle="Vehicle 3" move="Portsmouth"/>
+				<event id="76" time="31259999974" vehicle="Vehicle 3" move="London"/>
+				<event id="77" time="32091111085" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="78" time="33402222195" vehicle="Vehicle 3" deliver="8"/>
+				<event id="79" time="33702222195" vehicle="Vehicle 3" move="Cardiff"/>
+				<event id="80" time="34979999972" vehicle="Vehicle 3" pickup="12"/>
+				<event id="81" time="35279999972" vehicle="Vehicle 3" move="Birmingham"/>
+				<event id="82" time="36557777749" vehicle="Vehicle 3" move="Manchester"/>
+				<event id="83" time="37612222193" vehicle="Vehicle 3" deliver="12"/>
+			</events>
+		</round>
+	</rounds>
+	<statistics>
+		<stat rank="1" agent="auction-catch">
+			<total-tasks value="6"/>
+			<total-distance value="2071.1"/>
+			<total-cost value="10356"/>
+			<total-reward value="10900"/>
+			<total-profit value="544"/>
+		</stat>
+		<stat rank="2" agent="auction-var-smart2">
+			<total-tasks value="9"/>
+			<total-distance value="2926.1"/>
+			<total-cost value="14631"/>
+			<total-reward value="12787"/>
+			<total-profit value="-1844"/>
+		</stat>
+	</statistics>
+</history>

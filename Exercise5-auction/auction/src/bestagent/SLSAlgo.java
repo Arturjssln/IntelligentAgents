@@ -2,7 +2,6 @@ package bestagent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -18,7 +17,7 @@ public class SLSAlgo {
     // To solve discrete constraint optimization problem (COP)
 
     private Solution currentSolution;
-    private List<Vehicle> vehicles;
+    private List<FashionVehicle> vehicles;
     private List<Task> tasks;
     private Solution bestSolutionEver; 
 
@@ -27,7 +26,7 @@ public class SLSAlgo {
     final long timeToComputePlan = 1;
 
 	// Constructor
-	public SLSAlgo(List<Vehicle> vehicles, List<Task> tasks) {
+	public SLSAlgo(List<FashionVehicle> vehicles, List<Task> tasks) {
         this.vehicles = vehicles;
         this.tasks = tasks;
         this.currentSolution = selectInitialSolution();
@@ -84,12 +83,12 @@ public class SLSAlgo {
         HashMap<Task, Integer> pickupTimes = new HashMap<Task, Integer>();
         HashMap<Task, Integer> deliveryTimes = new HashMap<Task, Integer>();
         
-        List<Vehicle> sortedVehicles = sortByCapacity(this.vehicles);
+        FashionVehicle maxCapacityVehicle = getMaxCapacityVehicle(this.vehicles);
         Task lastTask = null;
         
         int currentTimeStep = 0;
         for (Task task: tasks) {
-            Vehicle vehicle = sortedVehicles.get(0); 
+            Vehicle vehicle = maxCapacityVehicle;
             vehicles.put(task, vehicle.id()); 
             if (lastTask != null) {
                 nextTaskForTask.put(lastTask, task);
@@ -114,18 +113,19 @@ public class SLSAlgo {
     }
 
     // Sort List of Vehicles by increasing order of capacity
-	private List<Vehicle> sortByCapacity(List<Vehicle> vehicles) {
+	private FashionVehicle getMaxCapacityVehicle(List<FashionVehicle> vehicles) {
         // Get indices of the sorted List 
         int[] sortedIndices = IntStream.range(0, vehicles.size())
 			.boxed().sorted((i, j) -> Double.valueOf(vehicles.get(j).capacity()).compareTo(Double.valueOf(vehicles.get(i).capacity())))
             .mapToInt(ele -> ele).toArray();
         
+        return vehicles.get(sortedIndices[0]);
         //Reorder list
-        LinkedList<Vehicle> sortedVehicles = new LinkedList<Vehicle>();
-		for (int index : sortedIndices) {
-			sortedVehicles.add(vehicles.get(index));
-        }
-		return sortedVehicles; 
+        // LinkedList<Vehicle> sortedVehicles = new LinkedList<Vehicle>();
+		// for (int index : sortedIndices) {
+		// 	sortedVehicles.add(sortedVehicles);
+        // }
+		// return sortedVehicles; 
     }
 
     // Sort List of costs by decreasing order and return index if sorted list

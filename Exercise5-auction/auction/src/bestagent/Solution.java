@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import logist.simulation.Vehicle;
 import logist.plan.Plan;
 import logist.task.Task;
 import logist.topology.Topology.City;
@@ -53,7 +52,7 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public void computePlans(List<Vehicle> vehicles, boolean debug) {
+    public void computePlans(List<FashionVehicle> vehicles, boolean debug) {
         if (debug) {
             System.out.println(this.nextTaskForVehicle);
             System.out.println(this.nextTaskForTask);
@@ -65,7 +64,7 @@ public class Solution {
         plans = new ArrayList<Plan>();
         
         // Create a plan for each vehicle
-        for (Vehicle vehicle : vehicles) {
+        for (FashionVehicle vehicle : vehicles) {
             City currentCity = vehicle.getCurrentCity();
             Plan plan = new Plan(currentCity);
             
@@ -145,7 +144,7 @@ public class Solution {
 
     
     // Check that this instance satisfies the constraints
-    public boolean isValid(List<Task> tasks, List<Vehicle> vehicles) {   
+    public boolean isValid(List<Task> tasks, List<FashionVehicle> vehicles) {   
     	
         // All tasks must be delivered
         if (!attributeSizeValid(tasks, vehicles)) { return false; }
@@ -204,7 +203,7 @@ public class Solution {
     }
 
     // Returns all the tasks performed by a given vehicle at a given timetep 
-    private boolean updateTasksAtTimeStepForVehicles(Integer timeStep, List<Vehicle> vehicles) {
+    private boolean updateTasksAtTimeStepForVehicles(Integer timeStep, List<FashionVehicle> vehicles) {
         List<Task> tasksAtTime = new ArrayList<Task>(); 
         tasksAtTime.addAll(getTasksAtTime(pickupTimes, timeStep));
         tasksAtTime.addAll(getTasksAtTime(deliveryTimes, timeStep));
@@ -221,7 +220,7 @@ public class Solution {
     }
 
     // Check the validity of the attribute size 
-    private boolean attributeSizeValid(List<Task> tasks, List<Vehicle> vehicles) {
+    private boolean attributeSizeValid(List<Task> tasks, List<FashionVehicle> vehicles) {
         return ((vehicles.size() >= nextTaskForVehicle.size()) &&
                 (tasks.size() == nextTaskForTask.size()) && 
                 (tasks.size() == pickupTimes.size()) &&

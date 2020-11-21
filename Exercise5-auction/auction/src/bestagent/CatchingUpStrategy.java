@@ -10,7 +10,7 @@ public class CatchingUpStrategy extends BidStrategy {
     }
 
     @Override
-    public void computeRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
+    public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
         double opponentPotentialRatio = opponentBid / opponentMarginalCost;
         if (winner) {
             riskRatio = Math.min(maxRatio, riskRatio * (1+EPSILON)); 
