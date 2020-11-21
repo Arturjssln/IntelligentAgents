@@ -258,17 +258,6 @@ public class AuctionAgent implements AuctionBehavior {
 		 * depending on the proba that the from/to city get tasks to/from with task that we have already 
 		 */
 
-		// Proba that deliveryCity from extra task will be pickupCity from a future task
-		// double probaFutureTask = distribution.probability(task.deliveryCity, null); 
-
-		// // Probas that extra task will be linked to a town we have already 
-		// List<Task> currentTasks = (us) ? new ArrayList<Task>(agent.getTasks()) : opponentTasks;
-		// List<Double> probaFutureLink = new ArrayList<Double>(); 
-		// for (Task currentTask: currentTasks) {
-		// 	probaFutureLink.add(distribution.probability(currentTask.deliveryCity, task.pickupCity));
-		// 	probaFutureLink.add(distribution.probability(task.deliveryCity, currentTask.pickupCity)); 
-		// }
-
 		if (!useDistribution) {
 			return 1.0;
 		}
@@ -285,8 +274,8 @@ public class AuctionAgent implements AuctionBehavior {
 				maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
 			}
 		}
-		// Constraint ratio to be between 0.75 and 1 
-		maxProbaFutureTask = 1 - maxProbaFutureTask / 4;
+		// Constraint ratio to be between 0.9 and 1 
+		maxProbaFutureTask = 1 - maxProbaFutureTask/10;
 
 		System.out.println(maxProbaFutureTask);
 		return maxProbaFutureTask; 

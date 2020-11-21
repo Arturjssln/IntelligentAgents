@@ -63,6 +63,8 @@ public class Solution {
 
         plans = new ArrayList<Plan>();
         
+        int nbTasksPickedUp = 0;
+        int nbTasksDelivered = 0;
         // Create a plan for each vehicle
         for (FashionVehicle vehicle : vehicles) {
             City currentCity = vehicle.getCurrentCity();
@@ -76,6 +78,7 @@ public class Solution {
                 }
                 currentCity = currentTask.pickupCity;
                 plan.appendPickup(currentTask);
+                nbTasksPickedUp++;
                 if (debug)
                     System.out.println("Picked up :  " + currentTask.toString() + " (picked up at 0), will be delivered at : " + deliveryTimes.get(currentTask));
                 Task taskToDeliver = null;
@@ -98,6 +101,7 @@ public class Solution {
                             }
                             currentCity = taskToDeliver.deliveryCity;
                             plan.appendDelivery(taskToDeliver);
+                            nbTasksDelivered++;
                             currentTask = taskToDeliver;
                             if (debug)
                                 System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
@@ -111,6 +115,7 @@ public class Solution {
                     }
                     currentCity = nextTask.pickupCity;
                     plan.appendPickup(nextTask);
+                    nbTasksPickedUp++;
                     currentTask = nextTask;
                     if (debug)
                         System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
@@ -130,13 +135,13 @@ public class Solution {
                         }
                         currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
+                        nbTasksDelivered++;
                         if (debug)
                             System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
-
                     }
                     currentTimeStep++;
                     currentTask = taskToDeliver;
-                } while(taskToDeliver != null);
+                } while(nbTasksDelivered != nbTasksPickedUp);
             }
             plans.add(plan);
         }

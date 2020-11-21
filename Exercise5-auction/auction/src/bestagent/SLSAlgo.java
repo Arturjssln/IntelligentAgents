@@ -59,7 +59,7 @@ public class SLSAlgo {
             timeForOneIteration = (currentTime - startTime)/((long)iteration) + 1;
         } while((iteration<MAX_ITERATION)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
 
-        bestSolutionEver.computePlans(this.vehicles, false); //true
+        bestSolutionEver.computePlans(this.vehicles, true); 
         if (debug) {
             System.out.println(bestSolutionEver.nextTaskForVehicle);
             System.out.println(bestSolutionEver.nextTaskForTask);
