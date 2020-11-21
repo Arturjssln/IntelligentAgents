@@ -211,10 +211,11 @@ public class AuctionAgent implements AuctionBehavior {
 		 * depending on the proba that the from/to city get tasks to/from with task that we have already 
 		 */
 
+		// Proba that deliveryCity from extra task will be pickupCity from a future task
 		double probaFutureTask = distribution.probability(task.deliveryCity, null); 
 
+		// Probas that extra task will be linked to a town we have already 
 		TaskSet currentTasks = agent.getTasks();
-
 		List<Double> probaFutureLink = new ArrayList<Double>(); 
 		for (Task ourTask: currentTasks) {
 			probaFutureLink.add(distribution.probability(ourTask.deliveryCity, task.pickupCity));
