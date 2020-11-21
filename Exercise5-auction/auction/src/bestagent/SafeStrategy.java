@@ -20,7 +20,8 @@ public class SafeStrategy extends BidStrategy {
 
     @Override
     public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
-        /**
+    //public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourReward, long opponentBid) {
+            /**
          * avg of the rewards 
          * utility = tout ce qu' on a gagné = reward - cost 
          * plus utility plus risque 
@@ -28,7 +29,9 @@ public class SafeStrategy extends BidStrategy {
          * marginal > totalCost/nbTasks -> bofpas du tout  => increases or null
         */
 
-        // Cost less than usual 
+        //double ourUtility = ourReward - ourCost; 
+
+
         if (ourMarginalCost < ourCost/nbTasks){ 
             riskRatio =  Math.max(minRatio, riskRatio * (1-EPSILON));
                           

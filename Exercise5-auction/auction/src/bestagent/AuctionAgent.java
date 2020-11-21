@@ -270,17 +270,20 @@ public class AuctionAgent implements AuctionBehavior {
 		// }
 
 		if (!useDistribution) {
-			return 1;
+			return 1.0;
 		}
 
 		// Proba that deliveryCity from extra task will be pickupCity from a future task
 		double maxProbaFutureTask = distribution.probability(task.deliveryCity, null); 
 
-		// Probas that extra task will be linked to a town we have already 
-		List<Task> currentTasks = (us) ? new ArrayList<Task>(agent.getTasks()) : opponentTasks;
-		for (Task currentTask: currentTasks) {
-			maxProbaFutureTask =  Math.max(distribution.probability(currentTask.deliveryCity, task.pickupCity), maxProbaFutureTask);
-			maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
+		//TODO check que make sense 
+		if (nbTasks >= 1) {
+			// Probas that extra task will be linked to a town we have already 
+			List<Task> currentTasks = (us) ? new ArrayList<Task>(agent.getTasks()) : opponentTasks;
+			for (Task currentTask: currentTasks) {
+				maxProbaFutureTask =  Math.max(distribution.probability(currentTask.deliveryCity, task.pickupCity), maxProbaFutureTask);
+				maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
+			}
 		}
 		// Constraint ratio to be between 0.75 and 1 
 		maxProbaFutureTask = 1 - maxProbaFutureTask / 4;
@@ -305,7 +308,7 @@ public class AuctionAgent implements AuctionBehavior {
 		double ourDistributionRatio = computeDistributionRatio(task, true); 
 		double opponentDistributionRatio = computeDistributionRatio(task, false); 
 		Long bid = biddingStrategy.computeBid(ourNewCost-ourCost, opponentNewCost-opponentCost, ourDistributionRatio, opponentDistributionRatio); 
-		System.out.println("Agent " + agent.id() + " bid " + bid);
+		System.out.println("Agent " + agent.id() + " bid " + bid + " marg cost " + (ourNewCost-ourCost));
 		return bid;
 	}
 
@@ -335,7 +338,7 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 		SLSAlgo algo = new SLSAlgo(fashionVehicles, new ArrayList<Task>(tasks));
 
-		List<Plan> plans = algo.computePlans(time_start+timeout_plan);
+		List<Plan> plans = algo.computePlans(time_start+timeout_plan, true);
 
         long time_end = System.currentTimeMillis();
         double duration = (time_end - time_start) / 1000.0;

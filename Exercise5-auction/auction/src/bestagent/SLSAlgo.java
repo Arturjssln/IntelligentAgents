@@ -34,7 +34,7 @@ public class SLSAlgo {
 	}
 
 
-    public List<Plan> computePlans(long end_time) {        
+    public List<Plan> computePlans(long end_time, boolean debug) {        
         long currentTime = System.currentTimeMillis();
         if (tasks.size()==0) {
             List<Plan> plans =  new ArrayList<Plan>();
@@ -60,11 +60,17 @@ public class SLSAlgo {
         } while((iteration<MAX_ITERATION)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
 
         bestSolutionEver.computePlans(this.vehicles, false); //true
+        if (debug) {
+            System.out.println(bestSolutionEver.nextTaskForVehicle);
+            System.out.println(bestSolutionEver.nextTaskForTask);
+            System.out.println(bestSolutionEver.pickupTimes);
+            System.out.println(bestSolutionEver.deliveryTimes);
+        }
         return bestSolutionEver.plans;
     }
 
     public double computeCostBestSolution(long end_time) {
-        return computeCost(computePlans(end_time));
+        return computeCost(computePlans(end_time, false));
     }
 
     public List<Plan> getBestPlansEver() {
@@ -85,15 +91,14 @@ public class SLSAlgo {
         
         FashionVehicle maxCapacityVehicle = getMaxCapacityVehicle(this.vehicles);
         Task lastTask = null;
-        
         int currentTimeStep = 0;
+
         for (Task task: tasks) {
-            Vehicle vehicle = maxCapacityVehicle;
-            vehicles.put(task, vehicle.id()); 
+            vehicles.put(task, maxCapacityVehicle.id()); 
             if (lastTask != null) {
                 nextTaskForTask.put(lastTask, task);
             } else {
-                nextTaskForVehicle.put(vehicle.id(), task);
+                nextTaskForVehicle.put(maxCapacityVehicle.id(), task);
             }
             pickupTimes.put(task, currentTimeStep);
             deliveryTimes.put(task, currentTimeStep+1);

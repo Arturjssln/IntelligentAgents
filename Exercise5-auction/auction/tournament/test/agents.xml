@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<agents>
+	<!-- An auto-generated list of agents and their behavior classes -->
+	<!--  - jar directory : agents/ -->
+	<!--  - generated on  : Sat Nov 21 15:14:31 CET 2020 -->
+	<agent name="auction-risky">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="RISKY"/>
+		<set distribution="FALSE"/>
+	</agent>
+	
+	<agent name="auction-safe">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="SAFE"/>
+		<set distribution="FALSE"/>
+	</agent>
+
+	<agent name="auction-catch">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="CATCHING_UP"/>
+		<set distribution="FALSE"/>
+	</agent>
+
+	<agent name="auction-honnest">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="HONNEST"/>
+		<set distribution="FALSE"/>
+	</agent>
+</agents>
