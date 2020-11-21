@@ -34,7 +34,7 @@ public class SLSAlgo {
 	}
 
 
-    public List<Plan> computePlans(long end_time, boolean debug) {        
+    public List<Plan> computePlans(long end_time) {        
         long currentTime = System.currentTimeMillis();
         if (tasks.size()==0) {
             List<Plan> plans =  new ArrayList<Plan>();
@@ -59,18 +59,12 @@ public class SLSAlgo {
             timeForOneIteration = (currentTime - startTime)/((long)iteration) + 1;
         } while((iteration<MAX_ITERATION)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
 
-        bestSolutionEver.computePlans(this.vehicles, true); 
-        if (debug) {
-            System.out.println(bestSolutionEver.nextTaskForVehicle);
-            System.out.println(bestSolutionEver.nextTaskForTask);
-            System.out.println(bestSolutionEver.pickupTimes);
-            System.out.println(bestSolutionEver.deliveryTimes);
-        }
+        bestSolutionEver.computePlans(this.vehicles); 
         return bestSolutionEver.plans;
     }
 
     public double computeCostBestSolution(long end_time) {
-        return computeCost(computePlans(end_time, false));
+        return computeCost(computePlans(end_time));
     }
 
     public List<Plan> getBestPlansEver() {
@@ -125,12 +119,6 @@ public class SLSAlgo {
             .mapToInt(ele -> ele).toArray();
         
         return vehicles.get(sortedIndices[0]);
-        //Reorder list
-        // LinkedList<Vehicle> sortedVehicles = new LinkedList<Vehicle>();
-		// for (int index : sortedIndices) {
-		// 	sortedVehicles.add(sortedVehicles);
-        // }
-		// return sortedVehicles; 
     }
 
     // Sort List of costs by decreasing order and return index if sorted list
@@ -414,7 +402,7 @@ public class SLSAlgo {
     private Solution localChoice(List<Solution> potentialSolutions) {
         List<Double> costsForSolutions = new ArrayList<Double>(); 
         for (Solution solution: potentialSolutions) {
-            solution.computePlans(vehicles, false);
+            solution.computePlans(vehicles);
             costsForSolutions.add(computeCost(solution.plans)); 
         }
         
@@ -422,7 +410,7 @@ public class SLSAlgo {
         
         Solution bestNeighbourSolution = potentialSolutions.get(sortedIndices[0]);
         // Save the best neighbour solution if best so far 
-        bestSolutionEver.computePlans(vehicles, false);
+        bestSolutionEver.computePlans(vehicles);
         bestSolutionEver = (costsForSolutions.get(sortedIndices[0]) < computeCost(bestSolutionEver.plans))
                 ? bestNeighbourSolution : currentSolution; 
 

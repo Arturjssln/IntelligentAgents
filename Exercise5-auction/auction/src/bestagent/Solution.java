@@ -52,15 +52,7 @@ public class Solution {
     }
 
     // Generate company plan based on the attributes of the solution 
-    public void computePlans(List<FashionVehicle> vehicles, boolean debug) {
-        if (debug) {
-            System.out.println(this.nextTaskForVehicle);
-            System.out.println(this.nextTaskForTask);
-            System.out.println(this.pickupTimes);
-            System.out.println(this.deliveryTimes);
-            System.out.println(this.vehicles);
-        }
-
+    public void computePlans(List<FashionVehicle> vehicles) {
         plans = new ArrayList<Plan>();
         
         int nbTasksPickedUp = 0;
@@ -79,8 +71,6 @@ public class Solution {
                 currentCity = currentTask.pickupCity;
                 plan.appendPickup(currentTask);
                 nbTasksPickedUp++;
-                if (debug)
-                    System.out.println("Picked up :  " + currentTask.toString() + " (picked up at 0), will be delivered at : " + deliveryTimes.get(currentTask));
                 Task taskToDeliver = null;
                 int currentTimeStep = 1;
 
@@ -103,9 +93,6 @@ public class Solution {
                             plan.appendDelivery(taskToDeliver);
                             nbTasksDelivered++;
                             currentTask = taskToDeliver;
-                            if (debug)
-                                System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
-
                         }
                         currentTimeStep++;
                     }
@@ -117,8 +104,6 @@ public class Solution {
                     plan.appendPickup(nextTask);
                     nbTasksPickedUp++;
                     currentTask = nextTask;
-                    if (debug)
-                        System.out.println("Picked up :  " + nextTask.toString() + " (picked up at " + currentTimeStep + "), will be delivered at : " + deliveryTimes.get(nextTask));
                     currentTimeStep++;
                 }
                 do {
@@ -136,8 +121,6 @@ public class Solution {
                         currentCity = taskToDeliver.deliveryCity;
                         plan.appendDelivery(taskToDeliver);
                         nbTasksDelivered++;
-                        if (debug)
-                            System.out.println("Delivered :  " + taskToDeliver.toString() + " ( delivered at " + currentTimeStep + ")");
                     }
                     currentTimeStep++;
                     currentTask = taskToDeliver;

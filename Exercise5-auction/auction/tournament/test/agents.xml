@@ -4,35 +4,35 @@
 	<!-- An auto-generated list of agents and their behavior classes -->
 	<!--  - jar directory : agents/ -->
 	<!--  - generated on  : Sat Nov 21 15:14:31 CET 2020 -->
-	<agent name="auction-risky">
+	<agent name="auction-var">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
-		<set strategy="RISKY"/>
-		<set distribution="FALSE"/>
-	</agent>
-	
-	<agent name="auction-safe">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="SAFE"/>
+		<set strategy="VARIABLE"/>
 		<set distribution="FALSE"/>
 	</agent>
 
-	<agent name="auction-catch">
+	<agent name="auction-var-smart">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
-		<set strategy="CATCHING_UP"/>
+		<set strategy="VARIABLE_SMART"/>
+		<set distribution="FALSE"/>
+	</agent>
+	<agent name="auction-var-smart2">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART_2"/>
 		<set distribution="FALSE"/>
 	</agent>
 
-	<agent name="auction-honnest">
+	<agent name="auction-var-dis">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
-		<set strategy="HONNEST"/>
-		<set distribution="FALSE"/>
+		<set strategy="VARIABLE_SMART"/>
+		<set distribution="TRUE"/>
 	</agent>
+
 </agents>

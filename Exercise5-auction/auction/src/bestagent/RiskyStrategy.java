@@ -17,7 +17,7 @@ public class RiskyStrategy extends BidStrategy {
     }
 
     @Override
-    public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
+    public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourReward, long opponentBid, double opponentCost, double opponentReward, double opponentMarginalCost) {
         if (nbTasks > round/2) {
             // nice : increases
             riskRatio = Math.min(maxRatio, riskRatio * (1 + EPSILON * (1.0 - ((double)nbTasks)/round)));

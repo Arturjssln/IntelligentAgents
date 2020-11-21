@@ -7,8 +7,8 @@ public class SafeStrategy extends BidStrategy {
     public SafeStrategy(){
         this.minRatio = 1; 
         this.maxRatio = Double.MAX_VALUE; 
-        this.riskRatio = 1; 
-        this.opponentRatio = 1; 
+        this.riskRatio = 1.25; 
+        this.opponentRatio = 1.2; 
     }
 
     @Override
@@ -19,9 +19,9 @@ public class SafeStrategy extends BidStrategy {
     }
 
     @Override
-    public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
-    //public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourReward, long opponentBid) {
-            /**
+    //public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourMarginalCost, long opponentBid, double opponentMarginalCost) {
+    public void computeRiskRatio(boolean winner, int round, int nbTasks, double ourCost, double ourReward, long opponentBid, double opponentCost, double opponentReward, double opponentMarginalCost) {
+        /**
          * avg of the rewards 
          * utility = tout ce qu' on a gagné = reward - cost 
          * plus utility plus risque 
@@ -29,19 +29,17 @@ public class SafeStrategy extends BidStrategy {
          * marginal > totalCost/nbTasks -> bofpas du tout  => increases or null
         */
 
-        //double ourUtility = ourReward - ourCost; 
+        double ourUtility = ourReward - ourCost;
+       double opponentUtility = opponentReward - opponentCost; 
 
-
-        if (ourMarginalCost < ourCost/nbTasks){ 
-            riskRatio =  Math.max(minRatio, riskRatio * (1-EPSILON));
-                          
+        if (ourUtility > opponentUtility && winner) {
+            riskRatio =  Math.max(minRatio, riskRatio * (1+EPSILON));
         } 
-        else {
-            riskRatio = Math.min(maxRatio, riskRatio * (1+EPSILON)); 
+        else if (ourUtility < opponentUtility && !winner) {
+            riskRatio = Math.min(maxRatio, riskRatio * (1-EPSILON)); 
         }
 
         double opponentPotentialRatio = opponentBid / opponentMarginalCost;
-
         if (winner) {
             double newOpponentRatio = opponentPotentialRatio * (1 - (opponentPotentialRatio - opponentRatio)*0.25);
             opponentRatio = Math.max(Math.min(maxRatio, newOpponentRatio), minRatio);

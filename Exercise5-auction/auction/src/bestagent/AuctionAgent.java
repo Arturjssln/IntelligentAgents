@@ -48,6 +48,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private List<FashionVehicle> vehicles;
 	private List<FashionVehicle> opponentVehicles; 
 	private City currentCity; 
+	private int maxCapacity; 
 
 	private double ourCost;
 	private double ourReward;
@@ -56,8 +57,6 @@ public class AuctionAgent implements AuctionBehavior {
 	private double ourNewCost;
 	private double opponentNewCost;
 	private List<Task> opponentTasks; 
-
-	private int maxCapacity; 
 
 	private List<Plan> newBestPlans; 
 	private List<Plan> bestPlans; 
@@ -114,6 +113,10 @@ public class AuctionAgent implements AuctionBehavior {
 		this.round = 0; 
 		this.nbTasks = 0; 
 		this.ourReward = 0.0;
+		this.ourCost = 0.0;
+		this.ourNewCost = 0.0;
+		this.opponentCost = 0.0;
+		this.opponentNewCost = 0.0;
 		this.opponentReward = 0.0; 
 		this.opponentTasks = new ArrayList<Task>();
 
@@ -194,25 +197,25 @@ public class AuctionAgent implements AuctionBehavior {
 		if (winner == agent.id()) {
 			this.bestPlans = this.newBestPlans; 
 			++nbTasks;
-			biddingStrategy.computeRiskRatio(true, round, nbTasks, ourCost, ourNewCost-ourCost, opponentBid, opponentNewCost-opponentCost);
+			biddingStrategy.computeRiskRatio(true, round, nbTasks, ourCost, ourReward, opponentBid, opponentCost, opponentReward, opponentNewCost-opponentCost);
 			this.ourCost = this.ourNewCost; //TODO: verify
 		}
 		// Loses
 		else {
 			this.opponentTasks.add(previous);
-			biddingStrategy.computeRiskRatio(false, round, nbTasks,ourCost, ourNewCost-ourCost, opponentBid, opponentNewCost-opponentCost);	
-			this.opponentCost = estimateOpponentCost(bids); //TODO 
+			biddingStrategy.computeRiskRatio(false, round, nbTasks, ourCost, ourReward, opponentBid, opponentNewCost, opponentReward, opponentNewCost-opponentCost);	
+			this.opponentCost = this.opponentNewCost;
 		}
 
 		
 		//TODO: something with the distributions 
 
 	}
-
+	/*
 	//TODO: mettre dans Strategy ? 
 	private double estimateOpponentCost(Long[] bids) {
 		return this.opponentNewCost; // TODO voir si c'est utile 
-	}
+	}*/
 	
 	private int initMaxCapacity(){
 		int maxCapacity = 0; 
@@ -237,7 +240,6 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 		opponentVehicles.get(0).setHomeCity(estimatedHome);
 
-		Random random = new Random();
 		double distance;
 		for(int i=1; i<opponentVehicles.size(); i++) {
 			City randomCity;
@@ -265,17 +267,15 @@ public class AuctionAgent implements AuctionBehavior {
 		// Proba that deliveryCity from extra task will be pickupCity from a future task
 		double maxProbaFutureTask = distribution.probability(task.deliveryCity, null); 
 
-		//TODO check que make sense 
-		if (nbTasks >= 1) {
-			// Probas that extra task will be linked to a town we have already 
-			List<Task> currentTasks = (us) ? new ArrayList<Task>(agent.getTasks()) : opponentTasks;
-			for (Task currentTask: currentTasks) {
-				maxProbaFutureTask =  Math.max(distribution.probability(currentTask.deliveryCity, task.pickupCity), maxProbaFutureTask);
-				maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
-			}
+		// Probas that extra task will be linked to a town we have already 
+		List<Task> currentTasks = (us) ? new ArrayList<Task>(agent.getTasks()) : opponentTasks;
+		for (Task currentTask: currentTasks) {
+			maxProbaFutureTask =  Math.max(distribution.probability(currentTask.deliveryCity, task.pickupCity), maxProbaFutureTask);
+			maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
 		}
-		// Constraint ratio to be between 0.9 and 1 
-		maxProbaFutureTask = 1 - maxProbaFutureTask/10;
+		
+		// Constraint ratio to be between 0.9 and 1.1
+		maxProbaFutureTask = 1.1 - maxProbaFutureTask/5;
 
 		System.out.println(maxProbaFutureTask);
 		return maxProbaFutureTask; 
@@ -297,7 +297,7 @@ public class AuctionAgent implements AuctionBehavior {
 		double ourDistributionRatio = computeDistributionRatio(task, true); 
 		double opponentDistributionRatio = computeDistributionRatio(task, false); 
 		Long bid = biddingStrategy.computeBid(ourNewCost-ourCost, opponentNewCost-opponentCost, ourDistributionRatio, opponentDistributionRatio); 
-		System.out.println("Agent " + agent.id() + " bid " + bid + " marg cost " + (ourNewCost-ourCost));
+		System.out.println("Agent " + agent.id() + " bid " + bid + " new cost " + ourNewCost + " old cost " + ourCost);
 		return bid;
 	}
 
@@ -327,7 +327,7 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 		SLSAlgo algo = new SLSAlgo(fashionVehicles, new ArrayList<Task>(tasks));
 
-		List<Plan> plans = algo.computePlans(time_start+timeout_plan, true);
+		List<Plan> plans = algo.computePlans(time_start+timeout_plan);
 
         long time_end = System.currentTimeMillis();
         double duration = (time_end - time_start) / 1000.0;

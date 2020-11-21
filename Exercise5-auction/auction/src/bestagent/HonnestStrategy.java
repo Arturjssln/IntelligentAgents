@@ -8,8 +8,4 @@ public class HonnestStrategy extends BidStrategy {
         this.riskRatio = 1.0; 
         this.opponentRatio = 0.0;
     }
-
-
-
-
 }
