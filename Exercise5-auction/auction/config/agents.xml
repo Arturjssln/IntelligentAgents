@@ -8,16 +8,6 @@
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
-		<set strategy="NAIVE"/>
-		<set distribution="FALSE"/>
-	</agent>
-
-	<agent name="auction-main">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="HONNEST"/>
-		<set distribution="FALSE"/>
 	</agent>
 
 	<agent name="auction-risky">
@@ -44,28 +34,14 @@
 		<set distribution="FALSE"/>
 	</agent>
 
-	<agent name="auction-var">
+	<agent name="auction-best">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE"/>
-		<set distribution="FALSE"/>
+		<set distribution="true"/>
 	</agent>
 
-	<agent name="auction-var-smart">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="VARIABLE_SMART"/>
-		<set distribution="FALSE"/>
-	</agent>
-	<agent name="auction-var-smart2">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="VARIABLE_SMART_2"/>
-		<set distribution="FALSE"/>
-	</agent>
 
 
 	<agent name="auction-honnest">

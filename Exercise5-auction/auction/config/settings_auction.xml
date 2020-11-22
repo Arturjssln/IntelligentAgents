@@ -27,6 +27,6 @@
 	<set timeout-bid="100000" />
 	
 	<!-- Flags -->
-	<set flag-show-ui="false" />
+	<set flag-show-ui="true" />
 	
 </settings>
