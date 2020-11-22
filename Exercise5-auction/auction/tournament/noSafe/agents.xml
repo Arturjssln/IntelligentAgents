@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<agents>
+	<!-- An auto-generated list of agents and their behavior classes -->
+	<!--  - jar directory : agents/ -->
+	<!--  - generated on  : Sun Nov 22 14:26:47 CET 2020 -->
+	<agent name="auction-best">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART"/>
+		<set distribution="TRUE"/>
+	</agent>
+	<agent name="auction-noSafe">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART_2"/>
+		<set distribution="TRUE"/>
+	</agent>
+</agents>

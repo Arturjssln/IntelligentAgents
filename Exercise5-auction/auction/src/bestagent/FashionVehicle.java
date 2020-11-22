@@ -7,6 +7,11 @@ import logist.task.TaskSet;
 import logist.topology.Topology.City;
 
 public class FashionVehicle implements Vehicle {
+	/*
+	 * Implementation of the vehicle interface that allows
+	 * the home city to be update
+	 */
+
 
     private Vehicle vehicle;
     private City homeCity;
@@ -26,6 +31,7 @@ public class FashionVehicle implements Vehicle {
 		return homeCity;
 	}
 
+	// Added method to update home city
 	public void setHomeCity(City homeCity) {
 		this.homeCity = homeCity;
 	}

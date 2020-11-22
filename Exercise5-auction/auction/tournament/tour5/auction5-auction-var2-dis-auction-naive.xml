@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<history configuration="./config/auction5.xml">
+	<agents>
+		<agent name="auction-var2-dis">
+			<vehicle name="Vehicle 1"/>
+			<vehicle name="Vehicle 2"/>
+		</agent>
+		<agent name="auction-naive">
+			<vehicle name="Vehicle 3"/>
+			<vehicle name="Vehicle 4"/>
+		</agent>
+	</agents>
+	<rounds>
+		<round id="1">
+			<tasks>
+				<task id="0" pickup="Cardiff" delivery="Sheffield" weight="3" reward="69479">
+					<bid agent="auction-var2-dis" bid="1643"/>
+					<bid agent="auction-naive" bid="3415"/>
+				</task>
+				<task id="1" pickup="Manchester" delivery="Norwich" weight="3" reward="47516">
+					<bid agent="auction-var2-dis" bid="2001"/>
+					<bid agent="auction-naive" bid="3962"/>
+				</task>
+				<task id="2" pickup="Cardiff" delivery="Manchester" weight="3" reward="68638">
+					<bid agent="auction-var2-dis" bid="1574"/>
+					<bid agent="auction-naive" bid="3575"/>
+				</task>
+				<task id="3" pickup="Sheffield" delivery="Portsmouth" weight="3" reward="55553">
+					<bid agent="auction-var2-dis" bid="1181"/>
+					<bid agent="auction-naive" bid="3800"/>
+				</task>
+				<task id="4" pickup="Liverpool" delivery="Norwich" weight="3" reward="41305">
+					<bid agent="auction-var2-dis" bid="3050"/>
+					<bid agent="auction-naive" bid="4302"/>
+				</task>
+			</tasks>
+			<events>
+				<event id="0" time="0" vehicle="Vehicle 1" move="Leeds"/>
+				<event id="1" time="1094444444" vehicle="Vehicle 1" move="Liverpool"/>
+				<event id="2" time="1899999999" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="3" time="2285555554" vehicle="Vehicle 1" pickup="1"/>
+				<event id="4" time="2585555554" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="5" time="3639999998" vehicle="Vehicle 1" move="London"/>
+				<event id="6" time="4951111109" vehicle="Vehicle 1" move="Norwich"/>
+				<event id="7" time="6228888885" vehicle="Vehicle 1" deliver="1"/>
+				<event id="8" time="6528888885" vehicle="Vehicle 1" move="London"/>
+				<event id="9" time="7806666662" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="10" time="9117777772" vehicle="Vehicle 1" move="Cardiff"/>
+				<event id="11" time="10395555549" vehicle="Vehicle 1" pickup="0"/>
+				<event id="12" time="10695555549" vehicle="Vehicle 1" pickup="2"/>
+				<event id="13" time="10995555549" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="14" time="12273333326" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="15" time="13327777769" vehicle="Vehicle 1" deliver="2"/>
+				<event id="16" time="13627777769" vehicle="Vehicle 1" move="Liverpool"/>
+				<event id="17" time="14013333324" vehicle="Vehicle 1" pickup="4"/>
+				<event id="18" time="14313333324" vehicle="Vehicle 1" move="Manchester"/>
+				<event id="19" time="14698888879" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="20" time="15753333323" vehicle="Vehicle 1" move="London"/>
+				<event id="21" time="17064444433" vehicle="Vehicle 1" move="Norwich"/>
+				<event id="22" time="18342222210" vehicle="Vehicle 1" deliver="4"/>
+				<event id="23" time="18642222210" vehicle="Vehicle 1" move="London"/>
+				<event id="24" time="19919999987" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="25" time="21231111098" vehicle="Vehicle 1" move="Sheffield"/>
+				<event id="26" time="22233333319" vehicle="Vehicle 1" deliver="0"/>
+				<event id="27" time="22533333319" vehicle="Vehicle 1" pickup="3"/>
+				<event id="28" time="22833333319" vehicle="Vehicle 1" move="Birmingham"/>
+				<event id="29" time="23835555540" vehicle="Vehicle 1" move="London"/>
+				<event id="30" time="25146666650" vehicle="Vehicle 1" move="Portsmouth"/>
+				<event id="31" time="25977777761" vehicle="Vehicle 1" deliver="3"/>
+			</events>
+		</round>
+	</rounds>
+	<statistics>
+		<stat rank="1" agent="auction-naive">
+			<total-tasks value="0"/>
+			<total-distance value="0.0"/>
+			<total-cost value="0"/>
+			<total-reward value="0"/>
+			<total-profit value="0"/>
+		</stat>
+		<stat rank="2" agent="auction-var2-dis">
+			<total-tasks value="5"/>
+			<total-distance value="2095.0"/>
+			<total-cost value="10475"/>
+			<total-reward value="9449"/>
+			<total-profit value="-1026"/>
+		</stat>
+	</statistics>
+</history>

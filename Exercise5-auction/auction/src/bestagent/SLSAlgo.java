@@ -63,6 +63,7 @@ public class SLSAlgo {
         return bestSolutionEver.plans;
     }
 
+    // Compute best solution and return its cost
     public double computeCostBestSolution(long end_time) {
         return computeCost(computePlans(end_time, null));
     }
@@ -71,10 +72,8 @@ public class SLSAlgo {
         return bestSolutionEver.plans; 
     }
 
-
+    // Compute a valid initial solution
     private Solution selectInitialSolution() {
-        // return a plan that is valid
-        // udpate the lists
         Solution initialSolution = new Solution();
 
         HashMap<Task, Integer> vehicles = new HashMap<Task, Integer>();
@@ -130,12 +129,11 @@ public class SLSAlgo {
 		return sortedIndices; 
 	}
 
+    // Generate neighbours 
     private List<Solution> generateNeighbours(Solution solution) { 
     	
         List<Solution> neighours = new ArrayList<Solution>();
         Vehicle vehicleI; 
-
-
         do {
             Random rand = new Random();
             int idx = rand.nextInt(vehicles.size());
@@ -147,7 +145,7 @@ public class SLSAlgo {
         for (Vehicle vehicleJ : vehicles) {
             if (!vehicleJ.equals(vehicleI)) {
                 for (int tIdx=0; tIdx<lengthI; tIdx++) {
-                //if (task.weight <= vehicleJ.capacity()) {
+                    //Change
                     Solution temp = changingVehicle(solution, vehicleI, vehicleJ, tIdx);
                     if (temp.isValid(tasks, vehicles)) { neighours.add(temp);}
                     int lengthJ = getNumberTasks(temp, vehicleJ); 
@@ -420,6 +418,7 @@ public class SLSAlgo {
         return currentSolution; 
     }
 
+    // Compute cost of the given plan
     private double computeCost(List<Plan> plansForSolution) {
         double costSum = 0.0; 
         for (int i=0; i<plansForSolution.size(); i++) {

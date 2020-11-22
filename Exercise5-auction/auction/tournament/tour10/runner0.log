@@ -1,0 +1,76 @@
+01:44:30.253 FINE | Run command: java -Xmx1024m -classpath ../logist/logist.jar logist.LogistPlatform -o tournament/tour10/auction10-auction-var2-dis-auction-naive.xml -a tournament/tour10/agents.xml ./config/auction10.xml auction-var2-dis auction-naive
+01:44:30.447 CONFIG | Reading ./config/auction10.xml
+01:44:30.594 CONFIG | Reading config/settings_auction.xml
+01:44:30.631 CONFIG | Reading config/topology/england.xml
+01:44:30.649 CONFIG | Reading tournament/tour10/agents.xml
+01:44:30.685 CONFIG | Reading config/settings_auction.xml
+01:44:30.691 CONFIG | Algorithm used : AUCTION
+01:44:30.693 CONFIG | Strategy used : VARIABLE_SMART_2
+01:44:30.693 CONFIG | Using distribution : TRUE
+01:44:30.701 CONFIG | Reading config/settings_auction.xml
+01:44:30.705 CONFIG | Algorithm used : NAIVE
+01:44:30.706 CONFIG | Strategy used : RISKY
+01:44:30.706 CONFIG | Using distribution : FALSE
+01:44:30.892 CONFIG | Agent 0 bid 1643 new cost 2191.0 old cost 0.0
+01:44:30.894 CONFIG | (round 1) WINNER 0
+01:44:30.980 CONFIG | Agent 0 bid 2207 new cost 5133.0 old cost 2191.0
+01:44:30.982 CONFIG | (round 2) WINNER 0
+01:44:31.237 CONFIG | Agent 0 bid 1104 new cost 6605.0 old cost 5133.0
+01:44:31.245 CONFIG | (round 3) WINNER 0
+01:44:32.281 CONFIG | Agent 0 bid 1061 new cost 8020.0 old cost 6605.0
+01:44:32.283 CONFIG | (round 4) WINNER 0
+01:44:33.049 CONFIG | Agent 0 bid 3050 new cost 7980.0 old cost 8020.0
+01:44:33.053 CONFIG | (round 5) WINNER 0
+01:44:33.858 CONFIG | Agent 0 bid 1689 new cost 9331.0 old cost 7980.0
+01:44:33.861 CONFIG | (round 6) WINNER 0
+01:44:36.156 CONFIG | Agent 0 bid 3888 new cost 10496.0 old cost 9331.0
+01:44:36.159 CONFIG | (round 7) WINNER 0
+01:44:37.702 CONFIG | Agent 0 bid 1905 new cost 12020.0 old cost 10496.0
+01:44:37.703 CONFIG | (round 8) WINNER 0
+01:44:38.803 CONFIG | Agent 0 bid 5073 new cost 11794.0 old cost 12020.0
+01:44:38.805 CONFIG | (round 9) WINNER 1
+01:44:40.441 CONFIG | Agent 0 bid 500 new cost 11460.0 old cost 12020.0
+01:44:40.443 CONFIG | (round 10) WINNER 0
+01:44:51.379 CONFIG | [[Move (Leeds), Move (Sheffield), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Move (Birmingham), Move (Sheffield), Deliver (Task 0), Move (Birmingham), Move (Cardiff), Pickup (Task 6), Pickup (Task 2), Move (Birmingham), Move (Manchester), Deliver (Task 2), Move (Liverpool), Pickup (Task 4), Move (Manchester), Pickup (Task 1), Move (Birmingham), Move (London), Move (Norwich), Deliver (Task 1), Pickup (Task 5), Deliver (Task 4), Move (London), Deliver (Task 5), Deliver (Task 6), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 7), Move (Liverpool), Move (Leeds), Move (Sheffield), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9)], 2292.0, [], 0.0]
+01:44:51.381 CONFIG | [[Move (Leeds), Move (Sheffield), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Pickup (Task 2), Pickup (Task 6), Move (Birmingham), Move (Manchester), Deliver (Task 2), Pickup (Task 1), Move (Liverpool), Pickup (Task 4), Move (Leeds), Move (Sheffield), Deliver (Task 0), Move (Birmingham), Move (London), Deliver (Task 6), Move (Norwich), Deliver (Task 4), Deliver (Task 1), Move (London), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 7), Move (Liverpool), Move (Leeds), Move (Sheffield), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9)], 1956.0, [Move (Norwich), Pickup (Task 5), Move (London), Deliver (Task 5)], 230.0]
+01:44:51.381 CONFIG | The plan was generated in 10.936 seconds.
+01:44:51.393 CONFIG | Wrote tournament/tour10/auction10-auction-var2-dis-auction-naive.xml
+01:44:51.429 INFO | LogistPlatform finished successfully!
+01:44:51.462 FINE | Run command: java -Xmx1024m -classpath ../logist/logist.jar logist.LogistPlatform -o tournament/tour10/auction10-auction-naive-auction-var2-dis.xml -a tournament/tour10/agents.xml ./config/auction10.xml auction-naive auction-var2-dis
+01:44:51.590 CONFIG | Reading ./config/auction10.xml
+01:44:51.727 CONFIG | Reading config/settings_auction.xml
+01:44:51.761 CONFIG | Reading config/topology/england.xml
+01:44:51.779 CONFIG | Reading tournament/tour10/agents.xml
+01:44:51.814 CONFIG | Reading config/settings_auction.xml
+01:44:51.819 CONFIG | Algorithm used : NAIVE
+01:44:51.820 CONFIG | Strategy used : RISKY
+01:44:51.821 CONFIG | Using distribution : FALSE
+01:44:51.828 CONFIG | Reading config/settings_auction.xml
+01:44:51.834 CONFIG | Algorithm used : AUCTION
+01:44:51.835 CONFIG | Strategy used : VARIABLE_SMART_2
+01:44:51.835 CONFIG | Using distribution : TRUE
+01:44:52.111 CONFIG | Agent 1 bid 2075 new cost 2766.0 old cost 0.0
+01:44:52.113 CONFIG | (round 1) WINNER 1
+01:44:52.305 CONFIG | Agent 1 bid 2459 new cost 6045.0 old cost 2766.0
+01:44:52.308 CONFIG | (round 2) WINNER 1
+01:44:52.629 CONFIG | Agent 1 bid 1557 new cost 8120.5 old cost 6045.0
+01:44:52.632 CONFIG | (round 3) WINNER 1
+01:44:52.887 CONFIG | Agent 1 bid 854 new cost 9259.0 old cost 8120.5
+01:44:52.889 CONFIG | (round 4) WINNER 1
+01:44:53.776 CONFIG | Agent 1 bid 4899 new cost 8845.0 old cost 9259.0
+01:44:53.778 CONFIG | (round 5) WINNER 0
+01:44:54.366 CONFIG | Agent 1 bid 1169 new cost 9886.0 old cost 9259.0
+01:44:54.367 CONFIG | (round 6) WINNER 1
+01:44:55.372 CONFIG | Agent 1 bid 3928 new cost 10161.0 old cost 9886.0
+01:44:55.380 CONFIG | (round 7) WINNER 0
+01:44:56.333 CONFIG | Agent 1 bid 964 new cost 10697.5 old cost 9886.0
+01:44:56.339 CONFIG | (round 8) WINNER 1
+01:44:57.197 CONFIG | Agent 1 bid 1213 new cost 11668.0 old cost 10697.5
+01:44:57.198 CONFIG | (round 9) WINNER 1
+01:44:58.118 CONFIG | Agent 1 bid 500 new cost 11707.0 old cost 11668.0
+01:44:58.121 CONFIG | (round 10) WINNER 1
+01:45:04.244 CONFIG | [[Move (Portsmouth), Move (London), Move (Norwich), Pickup (Task 5), Move (London), Deliver (Task 5), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 7), Move (Birmingham), Move (Cardiff), Pickup (Task 2), Pickup (Task 0), Move (Birmingham), Move (Sheffield), Deliver (Task 0), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9), Pickup (Task 8), Move (Portsmouth), Move (London), Move (Birmingham), Deliver (Task 8), Move (Manchester), Deliver (Task 2), Pickup (Task 1), Move (Birmingham), Move (London), Move (Norwich), Deliver (Task 1)], 2341.4, [], 0.0]
+01:45:04.244 CONFIG | [[Move (Portsmouth), Move (London), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 7), Move (Birmingham), Move (Cardiff), Pickup (Task 2), Pickup (Task 0), Move (Birmingham), Move (Sheffield), Deliver (Task 0), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9), Pickup (Task 8), Move (Portsmouth), Move (London), Move (Birmingham), Deliver (Task 8), Move (Manchester), Deliver (Task 2), Pickup (Task 1), Move (Birmingham), Move (London), Move (Norwich), Deliver (Task 1)], 2111.4, [Pickup (Task 5), Move (London), Deliver (Task 5)], 115.0]
+01:45:04.244 CONFIG | The plan was generated in 6.122 seconds.
+01:45:04.256 CONFIG | Wrote tournament/tour10/auction10-auction-naive-auction-var2-dis.xml
+01:45:04.288 INFO | LogistPlatform finished successfully!

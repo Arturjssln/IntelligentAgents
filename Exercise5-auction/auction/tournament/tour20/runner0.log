@@ -1,0 +1,116 @@
+01:45:42.949 FINE | Run command: java -Xmx1024m -classpath ../logist/logist.jar logist.LogistPlatform -o tournament/tour20/auction20-auction-var2-dis-auction-naive.xml -a tournament/tour20/agents.xml ./config/auction20.xml auction-var2-dis auction-naive
+01:45:43.128 CONFIG | Reading ./config/auction20.xml
+01:45:43.302 CONFIG | Reading config/settings_auction.xml
+01:45:43.336 CONFIG | Reading config/topology/england.xml
+01:45:43.356 CONFIG | Reading tournament/tour20/agents.xml
+01:45:43.389 CONFIG | Reading config/settings_auction.xml
+01:45:43.394 CONFIG | Algorithm used : AUCTION
+01:45:43.397 CONFIG | Strategy used : VARIABLE_SMART_2
+01:45:43.398 CONFIG | Using distribution : TRUE
+01:45:43.404 CONFIG | Reading config/settings_auction.xml
+01:45:43.409 CONFIG | Algorithm used : NAIVE
+01:45:43.410 CONFIG | Strategy used : RISKY
+01:45:43.410 CONFIG | Using distribution : FALSE
+01:45:43.589 CONFIG | Agent 0 bid 2063 new cost 2751.0 old cost 0.0
+01:45:43.591 CONFIG | (round 1) WINNER 0
+01:45:43.690 CONFIG | Agent 0 bid 1787 new cost 5133.0 old cost 2751.0
+01:45:43.691 CONFIG | (round 2) WINNER 0
+01:45:43.884 CONFIG | Agent 0 bid 1104 new cost 6605.0 old cost 5133.0
+01:45:43.887 CONFIG | (round 3) WINNER 0
+01:45:44.166 CONFIG | Agent 0 bid 1446 new cost 8533.0 old cost 6605.0
+01:45:44.172 CONFIG | (round 4) WINNER 0
+01:45:44.967 CONFIG | Agent 0 bid 3050 new cost 8741.0 old cost 8533.0
+01:45:44.969 CONFIG | (round 5) WINNER 0
+01:45:45.662 CONFIG | Agent 0 bid 1535 new cost 8647.0 old cost 8741.0
+01:45:45.663 CONFIG | (round 6) WINNER 0
+01:45:46.912 CONFIG | Agent 0 bid 3888 new cost 9316.0 old cost 8647.0
+01:45:46.913 CONFIG | (round 7) WINNER 0
+01:45:48.197 CONFIG | Agent 0 bid 1618 new cost 10610.0 old cost 9316.0
+01:45:48.198 CONFIG | (round 8) WINNER 0
+01:45:49.514 CONFIG | Agent 0 bid 5073 new cost 13029.5 old cost 10610.0
+01:45:49.515 CONFIG | (round 9) WINNER 1
+01:45:51.192 CONFIG | Agent 0 bid 1813 new cost 11460.0 old cost 10610.0
+01:45:51.193 CONFIG | (round 10) WINNER 0
+01:45:53.586 CONFIG | Agent 0 bid 3680 new cost 14404.0 old cost 11460.0
+01:45:53.595 CONFIG | (round 11) WINNER 1
+01:45:55.572 CONFIG | Agent 0 bid 20749 new cost 11569.0 old cost 11460.0
+01:45:55.573 CONFIG | (round 12) WINNER 1
+01:45:56.962 CONFIG | Agent 0 bid 1049 new cost 12110.0 old cost 11460.0
+01:45:56.962 CONFIG | (round 13) WINNER 0
+01:45:58.786 CONFIG | Agent 0 bid 3669 new cost 13002.5 old cost 12110.0
+01:45:58.786 CONFIG | (round 14) WINNER 0
+01:46:01.881 CONFIG | Agent 0 bid 2672 new cost 11148.5 old cost 13002.5
+01:46:01.882 CONFIG | (round 15) WINNER 0
+01:46:05.274 CONFIG | Agent 0 bid 4998 new cost 15146.5 old cost 11148.5
+01:46:05.275 CONFIG | (round 16) WINNER 1
+01:46:08.600 CONFIG | Agent 0 bid 6068 new cost 16002.5 old cost 11148.5
+01:46:08.600 CONFIG | (round 17) WINNER 1
+01:46:11.503 CONFIG | Agent 0 bid 7956 new cost 17513.0 old cost 11148.5
+01:46:11.504 CONFIG | (round 18) WINNER 1
+01:46:15.439 CONFIG | Agent 0 bid 9581 new cost 18813.0 old cost 11148.5
+01:46:15.439 CONFIG | (round 19) WINNER 1
+01:46:19.418 CONFIG | Agent 0 bid 8046 new cost 17585.0 old cost 11148.5
+01:46:19.419 CONFIG | (round 20) WINNER 1
+01:46:44.188 CONFIG | [[Move (Leeds), Move (Sheffield), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Pickup (Task 2), Pickup (Task 12), Pickup (Task 6), Move (Birmingham), Move (Manchester), Move (Liverpool), Pickup (Task 4), Move (Manchester), Pickup (Task 1), Deliver (Task 2), Deliver (Task 12), Move (Liverpool), Move (Leeds), Move (Sheffield), Pickup (Task 3), Deliver (Task 0), Move (Birmingham), Move (London), Move (Norwich), Deliver (Task 1), Deliver (Task 4), Pickup (Task 5), Move (London), Deliver (Task 5), Deliver (Task 6), Move (Portsmouth), Pickup (Task 14), Deliver (Task 3), Move (London), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 7), Move (Liverpool), Deliver (Task 14), Move (Leeds), Move (Newcastle), Pickup (Task 13), Move (Leeds), Move (Liverpool), Move (Manchester), Deliver (Task 13)], 1984.9, [Move (Portsmouth), Pickup (Task 9), Move (Plymouth), Deliver (Task 9)], 244.8]
+01:46:44.193 CONFIG | [[Pickup (Task 13), Move (Leeds), Move (Liverpool), Move (Manchester), Deliver (Task 13), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Pickup (Task 6), Move (Birmingham), Move (Manchester), Pickup (Task 1), Move (Liverpool), Pickup (Task 4), Move (Leeds), Move (Sheffield), Deliver (Task 0), Move (Birmingham), Move (London), Move (Norwich), Deliver (Task 1), Deliver (Task 4), Move (London), Pickup (Task 7), Deliver (Task 6), Move (Birmingham), Move (Cardiff), Pickup (Task 2), Pickup (Task 12), Move (Birmingham), Move (Manchester), Deliver (Task 7), Deliver (Task 12), Deliver (Task 2)], 1655.1, [Move (Norwich), Pickup (Task 5), Move (London), Deliver (Task 5), Move (Portsmouth), Pickup (Task 14), Move (London), Move (Birmingham), Move (Manchester), Move (Liverpool), Deliver (Task 14), Move (Leeds), Move (Sheffield), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9)], 1194.0]
+01:46:44.194 CONFIG | The plan was generated in 24.768 seconds.
+01:46:44.222 CONFIG | Wrote tournament/tour20/auction20-auction-var2-dis-auction-naive.xml
+01:46:44.296 INFO | LogistPlatform finished successfully!
+01:46:44.330 FINE | Run command: java -Xmx1024m -classpath ../logist/logist.jar logist.LogistPlatform -o tournament/tour20/auction20-auction-naive-auction-var2-dis.xml -a tournament/tour20/agents.xml ./config/auction20.xml auction-naive auction-var2-dis
+01:46:44.488 CONFIG | Reading ./config/auction20.xml
+01:46:44.669 CONFIG | Reading config/settings_auction.xml
+01:46:44.704 CONFIG | Reading config/topology/england.xml
+01:46:44.723 CONFIG | Reading tournament/tour20/agents.xml
+01:46:44.758 CONFIG | Reading config/settings_auction.xml
+01:46:44.763 CONFIG | Algorithm used : NAIVE
+01:46:44.765 CONFIG | Strategy used : RISKY
+01:46:44.769 CONFIG | Using distribution : FALSE
+01:46:44.774 CONFIG | Reading config/settings_auction.xml
+01:46:44.778 CONFIG | Algorithm used : AUCTION
+01:46:44.779 CONFIG | Strategy used : VARIABLE_SMART_2
+01:46:44.779 CONFIG | Using distribution : TRUE
+01:46:44.975 CONFIG | Agent 1 bid 2075 new cost 2766.0 old cost 0.0
+01:46:44.977 CONFIG | (round 1) WINNER 1
+01:46:45.097 CONFIG | Agent 1 bid 2459 new cost 6045.0 old cost 2766.0
+01:46:45.100 CONFIG | (round 2) WINNER 1
+01:46:45.411 CONFIG | Agent 1 bid 1557 new cost 8120.5 old cost 6045.0
+01:46:45.413 CONFIG | (round 3) WINNER 1
+01:46:45.707 CONFIG | Agent 1 bid 854 new cost 9259.0 old cost 8120.5
+01:46:45.714 CONFIG | (round 4) WINNER 1
+01:46:47.966 CONFIG | Agent 1 bid 3496 new cost 10307.0 old cost 9259.0
+01:46:47.967 CONFIG | (round 5) WINNER 0
+01:46:49.381 CONFIG | Agent 1 bid 2606 new cost 9886.0 old cost 9259.0
+01:46:49.382 CONFIG | (round 6) WINNER 1
+01:46:51.189 CONFIG | Agent 1 bid 4547 new cost 10161.0 old cost 9886.0
+01:46:51.195 CONFIG | (round 7) WINNER 0
+01:46:51.666 CONFIG | Agent 1 bid 964 new cost 10697.5 old cost 9886.0
+01:46:51.668 CONFIG | (round 8) WINNER 1
+01:46:52.192 CONFIG | Agent 1 bid 1213 new cost 11668.0 old cost 10697.5
+01:46:52.192 CONFIG | (round 9) WINNER 1
+01:46:52.906 CONFIG | Agent 1 bid 1223 new cost 11132.0 old cost 11668.0
+01:46:52.911 CONFIG | (round 10) WINNER 1
+01:46:53.935 CONFIG | Agent 1 bid 2156 new cost 12857.0 old cost 11132.0
+01:46:53.936 CONFIG | (round 11) WINNER 0
+01:46:55.431 CONFIG | Agent 1 bid 1166 new cost 12114.0 old cost 11132.0
+01:46:55.431 CONFIG | (round 12) WINNER 1
+01:46:57.546 CONFIG | Agent 1 bid 1201 new cost 13075.0 old cost 12114.0
+01:46:57.547 CONFIG | (round 13) WINNER 1
+01:46:59.370 CONFIG | Agent 1 bid 2398 new cost 14993.5 old cost 13075.0
+01:46:59.371 CONFIG | (round 14) WINNER 0
+01:47:01.410 CONFIG | Agent 1 bid 3171 new cost 15745.0 old cost 13075.0
+01:47:01.410 CONFIG | (round 15) WINNER 1
+01:47:07.226 CONFIG | Agent 1 bid 2179 new cost 17488.0 old cost 15745.0
+01:47:07.226 CONFIG | (round 16) WINNER 1
+01:47:14.215 CONFIG | Agent 1 bid 500 new cost 14211.0 old cost 17488.0
+01:47:14.216 CONFIG | (round 17) WINNER 1
+01:47:20.795 CONFIG | Agent 1 bid 500 new cost 13508.0 old cost 14211.0
+01:47:20.796 CONFIG | (round 18) WINNER 1
+01:47:36.345 CONFIG | Agent 1 bid 5460 new cost 17876.0 old cost 13508.0
+01:47:36.345 CONFIG | (round 19) WINNER 1
+01:47:57.680 CONFIG | Agent 1 bid 1764 new cost 19287.0 old cost 17876.0
+01:47:57.691 CONFIG | (round 20) WINNER 1
+01:49:37.189 CONFIG | [[Move (Portsmouth), Move (London), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Move (Birmingham), Move (Sheffield), Deliver (Task 0), Move (Birmingham), Move (Cardiff), Pickup (Task 19), Pickup (Task 2), Pickup (Task 12), Move (Birmingham), Move (London), Move (Portsmouth), Pickup (Task 14), Move (Plymouth), Pickup (Task 18), Move (Portsmouth), Move (London), Pickup (Task 7), Move (Birmingham), Move (Manchester), Deliver (Task 2), Deliver (Task 12), Move (Liverpool), Deliver (Task 14), Move (Manchester), Deliver (Task 7), Pickup (Task 1), Move (Liverpool), Move (Leeds), Deliver (Task 19), Move (Sheffield), Move (Birmingham), Move (London), Move (Portsmouth), Pickup (Task 11), Pickup (Task 17), Move (London), Move (Norwich), Deliver (Task 1), Pickup (Task 5), Deliver (Task 18), Deliver (Task 17), Move (London), Deliver (Task 5), Pickup (Task 16), Move (Birmingham), Deliver (Task 16), Move (Sheffield), Deliver (Task 11), Pickup (Task 3), Move (Birmingham), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 9), Move (Plymouth), Deliver (Task 9), Pickup (Task 8), Move (Portsmouth), Move (London), Move (Birmingham), Deliver (Task 8), Move (Sheffield), Pickup (Task 15), Move (Leeds), Move (Liverpool), Deliver (Task 15)], 3857.4, [], 0.0]
+01:49:37.190 CONFIG | [[Move (Portsmouth), Move (London), Move (Birmingham), Move (Cardiff), Pickup (Task 0), Move (Birmingham), Move (Sheffield), Deliver (Task 0), Move (Birmingham), Move (Cardiff), Pickup (Task 2), Pickup (Task 12), Move (Birmingham), Move (Manchester), Deliver (Task 12), Deliver (Task 2), Move (Birmingham), Move (London), Move (Portsmouth), Pickup (Task 11), Pickup (Task 9), Move (Plymouth), Deliver (Task 9), Pickup (Task 8), Pickup (Task 18), Move (Portsmouth), Move (London), Move (Norwich), Deliver (Task 18), Move (London), Pickup (Task 7), Move (Birmingham), Move (Sheffield), Pickup (Task 15), Deliver (Task 11), Pickup (Task 3), Move (Birmingham), Deliver (Task 8), Move (London), Move (Portsmouth), Deliver (Task 3), Pickup (Task 14), Move (London), Move (Birmingham), Move (Manchester), Move (Liverpool), Deliver (Task 14), Deliver (Task 15), Move (Manchester), Deliver (Task 7), Pickup (Task 1), Move (Birmingham), Move (London), Move (Portsmouth), Pickup (Task 17), Move (London), Move (Norwich), Deliver (Task 17), Pickup (Task 5), Deliver (Task 1), Move (London), Deliver (Task 5), Pickup (Task 16), Move (Birmingham), Deliver (Task 16), Move (Cardiff), Pickup (Task 19), Move (Birmingham), Move (Sheffield), Move (Leeds), Deliver (Task 19)], 3950.9, [], 0.0]
+01:49:37.191 CONFIG | The plan was generated in 99.501 seconds.
+01:49:37.201 CONFIG | Wrote tournament/tour20/auction20-auction-naive-auction-var2-dis.xml
+01:49:37.247 INFO | LogistPlatform finished successfully!

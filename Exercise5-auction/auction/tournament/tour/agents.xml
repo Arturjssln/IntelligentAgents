@@ -21,12 +21,12 @@
 		<set distribution="FALSE"/>
 	</agent>
 
-	<agent name="auction-honnest">
+	<agent name="auction-best">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
-		<set strategy="HONNEST"/>
-		<set distribution="FALSE"/>
+		<set strategy="VARIABLE_SMART"/>
+		<set distribution="TRUE"/>
 	</agent>
 
 	<agent name="auction-risky">

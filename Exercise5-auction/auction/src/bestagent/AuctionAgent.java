@@ -31,11 +31,12 @@ public class AuctionAgent implements AuctionBehavior {
 
 	// Different algorithms implemented
 	enum Algorithm {AUCTION, NAIVE};
-	enum Strategy {RISKY, HONNEST, SAFE, VARIABLE, CATCHING_UP, VARIABLE_SMART, VARIABLE_SMART_2};
+	enum Strategy {RISKY, HONNEST, SAFE, CATCHING_UP, VARIABLE};
 	
 	private Algorithm algorithm;
 	private Strategy strategy; 
 	private BidStrategy biddingStrategy;
+	private Double epsilon;
 
 	private long timeout_setup; 
 	private long timeout_plan;
@@ -61,9 +62,9 @@ public class AuctionAgent implements AuctionBehavior {
 	private List<Plan> newBestPlans; 
 	private List<Plan> bestPlans; 
 
-	private int round; // todo check les operations with it 
+	private int round; 
 	private int nbTasks;
-	private boolean useDistribution;
+	private Boolean useDistribution;
 
 
 	@Override
@@ -80,8 +81,9 @@ public class AuctionAgent implements AuctionBehavior {
 		 }
 
 		String algorithmName = agent.readProperty("algorithm", String.class, "SLS");
-		String strategyName = agent.readProperty("strategy", String.class, "HONNEST");
-		String useDistributionName = agent.readProperty("distribution", String.class, "TRUE");
+		String strategyName = agent.readProperty("strategy", String.class, "VARIABLE");
+		useDistribution = agent.readProperty("distribution", Boolean.class, true);
+		epsilon = agent.readProperty("epsilon", Double.class, 0.1);
 
 
 		// Throws IllegalArgumentException if algorithm is unknown
@@ -90,8 +92,8 @@ public class AuctionAgent implements AuctionBehavior {
 		strategy = Strategy.valueOf(strategyName.toUpperCase());
 		System.out.println("Strategy used : " + strategy.toString());
 		
-		useDistribution = (useDistributionName == "TRUE") ? true : false;
-		System.out.println("Using distribution : " + useDistributionName);
+		System.out.println("Using distribution : " + useDistribution.toString());
+		System.out.println("Epsilon used : " + epsilon.toString());
 
         // The setup method cannot last more than timeout_setup milliseconds
         timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
@@ -101,12 +103,14 @@ public class AuctionAgent implements AuctionBehavior {
 		timeout_bid = ls.get(LogistSettings.TimeoutKey.BID);
 
 
+		// Initialisation of the attributes 
+
 		this.topology = topology;
 		this.distribution = distribution;
 		this.agent = agent;
 		initialiseVehiclesAndPlan();
 		this.currentCity = vehicles.get(0).homeCity();
-		this.maxCapacity = initMaxCapacity();
+		initMaxCapacity();
 
 		long seed = -9019554669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
@@ -124,6 +128,7 @@ public class AuctionAgent implements AuctionBehavior {
 	}
 	
 	private void initialiseVehiclesAndPlan() {
+		// Initialise the agent's vehicles and their plans
 		vehicles = new ArrayList<FashionVehicle>();
 		opponentVehicles = new ArrayList<FashionVehicle>();
 		bestPlans = new ArrayList<Plan>();
@@ -134,30 +139,30 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 	}
 
-	private int initMaxCapacity(){
+	private void initMaxCapacity(){
+		// Find the max capacity from all vehicles 
 		int maxCapacity = 0; 
 		for (FashionVehicle vehicle: this.vehicles) {
 			maxCapacity = (vehicle.capacity() > maxCapacity) ? vehicle.capacity() : maxCapacity; 
 		}
-		return maxCapacity; 
+		this.maxCapacity = maxCapacity; 
 	}
 	
 	private void initialiseStrategy() {
+		// Initialise the dtrategy depending on the strategy name given in the .xml
 		switch (strategy) {
 			case SAFE:
-				biddingStrategy = new SafeStrategy();
+				biddingStrategy = new SafeStrategy(epsilon);
 				break;
 			case HONNEST:
-				biddingStrategy = new HonnestStrategy();
+				biddingStrategy = new HonnestStrategy(epsilon);
 				break;
 			case RISKY:
 			case VARIABLE:
-			case VARIABLE_SMART: 
-			case VARIABLE_SMART_2: 
-				biddingStrategy = new RiskyStrategy();
+				biddingStrategy = new RiskyStrategy(epsilon);
 				break;
 			case CATCHING_UP:
-				biddingStrategy = new CatchingUpStrategy();
+				biddingStrategy = new CatchingUpStrategy(epsilon);
 				break;
 			default: 
 				throw new IllegalArgumentException("Strategy is invalid.");
@@ -166,27 +171,42 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public Long askPrice(Task task) {
+		// Return the bid price of the company
 		long startTime = System.currentTimeMillis();
+
+		// Naive implementation 
+		if (algorithm == Algorithm.NAIVE)
+		return naiveBid(task);
+		
+		// If the task is too heavy for the company
 		if (maxCapacity < task.weight) { return null; }
 
+		// Compute costs with the extra task
 		List<Task> possibleTasks = new ArrayList<Task>(agent.getTasks());
-
 		ourNewCost = totalCost(possibleTasks, task, true, startTime); 
 		opponentNewCost = totalCost(opponentTasks, task, false, startTime); 
 
 		++round; 
+
 		double ourDistributionRatio = computeDistributionRatio(task, true); 
 		double opponentDistributionRatio = computeDistributionRatio(task, false); 
+
 		Long bid = biddingStrategy.computeBid(ourNewCost-ourCost, opponentNewCost-opponentCost, ourDistributionRatio, opponentDistributionRatio); 
+		
 		System.out.println("Agent " + agent.id() + " bid " + bid + " new cost " + ourNewCost + " old cost " + ourCost);
 		return bid;
 	}
 
 	@Override
 	public void auctionResult(Task previous, int winner, Long[] bids) {
-		// bids is comoposed of only 2 values
-		ourReward += bids[agent.id()];
+		// Treat info from the previous round
 
+		// Naive implementation 
+		if (algorithm == Algorithm.NAIVE)
+			return;
+
+		// Bids is comoposed of only 2 values
+		ourReward += bids[agent.id()];
 		Long opponentBid = bids[1 - agent.id()];
 		opponentReward += opponentBid;
 
@@ -194,33 +214,18 @@ public class AuctionAgent implements AuctionBehavior {
 			estimateOpponentHomeCity(opponentBid, previous);
 		}
 		
-		// Choose strategy here (depending on progression in the trial)
+		// Choose strategy depending on progression in the trial
 		switch (strategy) {
 			case VARIABLE: 
-				if (round == 5) {
-					biddingStrategy = new CatchingUpStrategy();
-				} else if (round == 17) {
-					biddingStrategy = new SafeStrategy();
-				}
-				break;
-			case VARIABLE_SMART: 
 				if (nbTasks == 2) {
-					biddingStrategy = new CatchingUpStrategy();
+					biddingStrategy = new CatchingUpStrategy(epsilon);
 				} else if (ourReward > ourNewCost && winner == agent.id()) {
-					biddingStrategy = new SafeStrategy();
-				}
-				break;
-			case VARIABLE_SMART_2: 
-				if (nbTasks == 1) {
-					biddingStrategy = new CatchingUpStrategy();
-				} else if (ourReward > ourNewCost && winner == agent.id()) { 
-					biddingStrategy = new SafeStrategy();
+					biddingStrategy = new SafeStrategy(epsilon);
 				}
 				break;
 			default: //do nothing
 		}
 
-		System.out.println("(round " + round + ") WINNER " + winner);
 		// Wins 
 		if (winner == agent.id()) {
 			this.bestPlans = this.newBestPlans; 
@@ -238,8 +243,14 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
+		// Return final plan from all the tasks obtained
 		long time_start = System.currentTimeMillis();
-		// Compute the plans for each vehicle with the selected algorithm.
+
+		// Naive implementation
+		if (algorithm == Algorithm.NAIVE)
+			return computeNaivePlans(vehicles, tasks);
+
+		// Compute the plans for each vehicle with the selected algorithm
 		List<FashionVehicle> fashionVehicles = new ArrayList<FashionVehicle>();
 		for (Vehicle vehicle : vehicles) {
 			fashionVehicles.add(new FashionVehicle(vehicle)); 
@@ -249,14 +260,13 @@ public class AuctionAgent implements AuctionBehavior {
 
         long time_end = System.currentTimeMillis();
 		double duration = (time_end - time_start) / 1000.0;
-		System.out.println(this.bestPlans);
-        System.out.println(plans);
 		System.out.println("The plan was generated in " + duration + " seconds.");
-		//return this.bestPlans;
         return plans;
 	}
 
-	private void estimateOpponentHomeCity(double opponentBid, Task task) {		
+	private void estimateOpponentHomeCity(double opponentBid, Task task) {	
+		// Returns the most probable Home cities for vehicles of the opponent
+
 		double minDiffBid = Double.MAX_VALUE;
 		double estimatedDistance = Double.MAX_VALUE;
 		City estimatedHome = topology.cities().get(0); 
@@ -284,12 +294,6 @@ public class AuctionAgent implements AuctionBehavior {
 	}
 
 	private double computeDistributionRatio(Task task, boolean us) {
-		/**
-		 * Compute the ratio that we multiply to the cost or something
-		 * as a ratio ? 
-		 * depending on the proba that the to city is a from city after ? probability(from, null) = proba que city ait des tasks dans le futur
-		 * depending on the proba that the from/to city get tasks to/from with task that we have already 
-		 */
 
 		if (!useDistribution) {
 			return 1.0;
@@ -304,32 +308,33 @@ public class AuctionAgent implements AuctionBehavior {
 			maxProbaFutureTask =  Math.max(distribution.probability(currentTask.deliveryCity, task.pickupCity), maxProbaFutureTask);
 			maxProbaFutureTask = Math.max(distribution.probability(task.deliveryCity, currentTask.pickupCity), maxProbaFutureTask);
 		}
-		
+
 		// Constraint ratio to be between 0.9 and 1.1
 		maxProbaFutureTask = 1.1 - maxProbaFutureTask/5;
-
-		System.out.println(maxProbaFutureTask);
 		return maxProbaFutureTask; 
 	}
 	
 
 	private double totalCost(List<Task> obtainedTasks, Task extraTask, boolean isUs, long startTime) {
+		// Return the cost of the plan with the extra task
+
 		List<Task> potentialTasks = new ArrayList<Task>(obtainedTasks); 
 		potentialTasks.add(extraTask);
 		
 		double cost;
 		if (isUs) {
-			SLSAlgo algo = new SLSAlgo(vehicles, potentialTasks); // TODO : vehicles is for us
+			SLSAlgo algo = new SLSAlgo(vehicles, potentialTasks); 
 			cost = algo.computeCostBestSolution(startTime+timeout_bid);
 			this.newBestPlans = algo.getBestPlansEver();
 		}
 		else {
-			SLSAlgo algo = new SLSAlgo(opponentVehicles, potentialTasks); // TODO : vehicles is for us
+			SLSAlgo algo = new SLSAlgo(opponentVehicles, potentialTasks); 
 			cost = algo.computeCostBestSolution(startTime+timeout_bid);
 		}
 		return cost;
 	}
 
+	// Make naive bid
 	private Long naiveBid(Task task){
 		long distanceTask = task.pickupCity.distanceUnitsTo(task.deliveryCity);
 		long distanceSum = distanceTask

@@ -21,6 +21,7 @@ public class Solution {
      * pickupTimes: maps a task to its pickup time step
      * deliveryTimes: maps a task to its delivery time step
      * vehicles: maps a task to the vehicle handling it
+     * plans: contain plans of the current solution
      */
 
     public HashMap<Integer, Task> nextTaskForVehicle;

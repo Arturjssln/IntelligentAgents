@@ -5,14 +5,14 @@
 	<!--  - jar directory : agents/ -->
 	<!--  - generated on  : Sat Nov 21 15:14:31 CET 2020 -->
 
-	<agent name="auction-var-smart">
+	<agent name="auction-var">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE_SMART"/>
 		<set distribution="TRUE"/>
 	</agent>
-	<agent name="auction-var-smart2">
+	<agent name="auction-var2">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
@@ -25,6 +25,13 @@
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE_SMART"/>
+		<set distribution="TRUE"/>
+	</agent>
+	<agent name="auction-var2-dis">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="VARIABLE_SMART_2"/>
 		<set distribution="TRUE"/>
 	</agent>
 
