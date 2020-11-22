@@ -5,7 +5,7 @@ package bestagent;
 
 public abstract class BidStrategy {
 
-    final protected double EPSILON = 0.05; //TODO test that
+    final protected double EPSILON = 0.05; 
     final protected double MIN_BID = 500;
 
     public double maxRatio; 

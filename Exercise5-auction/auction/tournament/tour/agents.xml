@@ -5,14 +5,6 @@
 	<!--  - jar directory : ./agents/ -->
 	<!--  - generated on  : Sat Nov 21 13:54:47 CET 2020 -->
 
-	<agent name="auction-risky">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="RISKY"/>
-		<set distribution="FALSE"/>
-	</agent>
-	
 	<agent name="auction-safe">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
@@ -34,6 +26,14 @@
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="HONNEST"/>
+		<set distribution="FALSE"/>
+	</agent>
+
+	<agent name="auction-risky">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="RISKY"/>
 		<set distribution="FALSE"/>
 	</agent>
 </agents>

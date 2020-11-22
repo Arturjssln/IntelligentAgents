@@ -40,6 +40,7 @@ public class Solution {
         this.pickupTimes = new HashMap<Task, Integer>();
         this.deliveryTimes = new HashMap<Task, Integer>();
         this.vehicles = new HashMap<Task, Integer>();
+        this.plans = new ArrayList<Plan>(); 
     }
 
     // Copy constructor
@@ -49,6 +50,7 @@ public class Solution {
         this.pickupTimes = new HashMap<Task, Integer>(solution.pickupTimes);
         this.deliveryTimes = new HashMap<Task, Integer>(solution.deliveryTimes);
         this.vehicles = new HashMap<Task, Integer>(solution.vehicles);
+        this.plans = new ArrayList<Plan>(solution.plans);
     }
 
     // Generate company plan based on the attributes of the solution 
@@ -59,7 +61,7 @@ public class Solution {
         int nbTasksDelivered = 0;
         // Create a plan for each vehicle
         for (FashionVehicle vehicle : vehicles) {
-            City currentCity = vehicle.getCurrentCity();
+            City currentCity = vehicle.homeCity();
             Plan plan = new Plan(currentCity);
             
             // Set first task
@@ -246,7 +248,9 @@ public class Solution {
                 && (this.deliveryTimes == that.deliveryTimes 
                     || (this.deliveryTimes != null && this.deliveryTimes.equals(that.deliveryTimes)))
                 && (this.vehicles == that.vehicles 
-                    || (this.vehicles != null && this.vehicles.equals(that.vehicles)));
+                    || (this.vehicles != null && this.vehicles.equals(that.vehicles)))
+                && (this.plans == that.plans 
+                    || (this.plans != null && this.plans.equals(that.plans)));
     }
     
     @Override
@@ -263,6 +267,8 @@ public class Solution {
                 + ((pickupTimes == null) ? 0 : pickupTimes.hashCode());
         result = prime * result
                 + ((vehicles == null) ? 0 : vehicles.hashCode());
+        result = prime * result
+                + ((plans == null) ? 0 : plans.hashCode());
         return result;
     }
 

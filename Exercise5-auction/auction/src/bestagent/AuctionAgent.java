@@ -104,7 +104,7 @@ public class AuctionAgent implements AuctionBehavior {
 		this.topology = topology;
 		this.distribution = distribution;
 		this.agent = agent;
-		initialiseVehicles();
+		initialiseVehiclesAndPlan();
 		this.currentCity = vehicles.get(0).homeCity();
 		this.maxCapacity = initMaxCapacity();
 
@@ -123,13 +123,23 @@ public class AuctionAgent implements AuctionBehavior {
 		initialiseStrategy();
 	}
 	
-	private void initialiseVehicles() {
+	private void initialiseVehiclesAndPlan() {
 		vehicles = new ArrayList<FashionVehicle>();
 		opponentVehicles = new ArrayList<FashionVehicle>();
+		bestPlans = new ArrayList<Plan>();
 		for (Vehicle vehicle : agent.vehicles()) {
 			vehicles.add(new FashionVehicle(vehicle));
 			opponentVehicles.add(new FashionVehicle(vehicle));
+			bestPlans.add(Plan.EMPTY);
 		}
+	}
+
+	private int initMaxCapacity(){
+		int maxCapacity = 0; 
+		for (FashionVehicle vehicle: this.vehicles) {
+			maxCapacity = (vehicle.capacity() > maxCapacity) ? vehicle.capacity() : maxCapacity; 
+		}
+		return maxCapacity; 
 	}
 	
 	private void initialiseStrategy() {
@@ -152,6 +162,24 @@ public class AuctionAgent implements AuctionBehavior {
 			default: 
 				throw new IllegalArgumentException("Strategy is invalid.");
 		}
+	}
+
+	@Override
+	public Long askPrice(Task task) {
+		long startTime = System.currentTimeMillis();
+		if (maxCapacity < task.weight) { return null; }
+
+		List<Task> possibleTasks = new ArrayList<Task>(agent.getTasks());
+
+		ourNewCost = totalCost(possibleTasks, task, true, startTime); 
+		opponentNewCost = totalCost(opponentTasks, task, false, startTime); 
+
+		++round; 
+		double ourDistributionRatio = computeDistributionRatio(task, true); 
+		double opponentDistributionRatio = computeDistributionRatio(task, false); 
+		Long bid = biddingStrategy.computeBid(ourNewCost-ourCost, opponentNewCost-opponentCost, ourDistributionRatio, opponentDistributionRatio); 
+		System.out.println("Agent " + agent.id() + " bid " + bid + " new cost " + ourNewCost + " old cost " + ourCost);
+		return bid;
 	}
 
 	@Override
@@ -196,9 +224,9 @@ public class AuctionAgent implements AuctionBehavior {
 		// Wins 
 		if (winner == agent.id()) {
 			this.bestPlans = this.newBestPlans; 
+			this.ourCost = this.ourNewCost; 
 			++nbTasks;
 			biddingStrategy.computeRiskRatio(true, round, nbTasks, ourCost, ourReward, opponentBid, opponentCost, opponentReward, opponentNewCost-opponentCost);
-			this.ourCost = this.ourNewCost; //TODO: verify
 		}
 		// Loses
 		else {
@@ -206,23 +234,26 @@ public class AuctionAgent implements AuctionBehavior {
 			biddingStrategy.computeRiskRatio(false, round, nbTasks, ourCost, ourReward, opponentBid, opponentNewCost, opponentReward, opponentNewCost-opponentCost);	
 			this.opponentCost = this.opponentNewCost;
 		}
+	}	
 
-		
-		//TODO: something with the distributions 
-
-	}
-	/*
-	//TODO: mettre dans Strategy ? 
-	private double estimateOpponentCost(Long[] bids) {
-		return this.opponentNewCost; // TODO voir si c'est utile 
-	}*/
-	
-	private int initMaxCapacity(){
-		int maxCapacity = 0; 
-		for (Vehicle vehicle: this.vehicles) {
-			maxCapacity = (vehicle.capacity() > maxCapacity) ? vehicle.capacity() : maxCapacity; 
+	@Override
+	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
+		long time_start = System.currentTimeMillis();
+		// Compute the plans for each vehicle with the selected algorithm.
+		List<FashionVehicle> fashionVehicles = new ArrayList<FashionVehicle>();
+		for (Vehicle vehicle : vehicles) {
+			fashionVehicles.add(new FashionVehicle(vehicle)); 
 		}
-		return maxCapacity; 
+		SLSAlgo algo = new SLSAlgo(fashionVehicles, new ArrayList<Task>(tasks));
+		List<Plan> plans = algo.computePlans(time_start+timeout_plan, 10000);
+
+        long time_end = System.currentTimeMillis();
+		double duration = (time_end - time_start) / 1000.0;
+		System.out.println(this.bestPlans);
+        System.out.println(plans);
+		System.out.println("The plan was generated in " + duration + " seconds.");
+		//return this.bestPlans;
+        return plans;
 	}
 
 	private void estimateOpponentHomeCity(double opponentBid, Task task) {		
@@ -281,29 +312,11 @@ public class AuctionAgent implements AuctionBehavior {
 		return maxProbaFutureTask; 
 	}
 	
-	@Override
-	public Long askPrice(Task task) {
-		long startTime = System.currentTimeMillis();
-		if (maxCapacity < task.weight) { return null; }
-
-		// TODO: add distribution here as ratio to do something with the bid : we want higher if fits with the tasks we have ?
-
-		TaskSet currentTasks = agent.getTasks();
-		List<Task> possibleTasks = new ArrayList<Task>(currentTasks);
-		ourNewCost = totalCost(possibleTasks, task, true, startTime); 
-		opponentNewCost = totalCost(opponentTasks, task, false, startTime); 
-
-		++round; 
-		double ourDistributionRatio = computeDistributionRatio(task, true); 
-		double opponentDistributionRatio = computeDistributionRatio(task, false); 
-		Long bid = biddingStrategy.computeBid(ourNewCost-ourCost, opponentNewCost-opponentCost, ourDistributionRatio, opponentDistributionRatio); 
-		System.out.println("Agent " + agent.id() + " bid " + bid + " new cost " + ourNewCost + " old cost " + ourCost);
-		return bid;
-	}
 
 	private double totalCost(List<Task> obtainedTasks, Task extraTask, boolean isUs, long startTime) {
 		List<Task> potentialTasks = new ArrayList<Task>(obtainedTasks); 
 		potentialTasks.add(extraTask);
+		
 		double cost;
 		if (isUs) {
 			SLSAlgo algo = new SLSAlgo(vehicles, potentialTasks); // TODO : vehicles is for us
@@ -315,26 +328,6 @@ public class AuctionAgent implements AuctionBehavior {
 			cost = algo.computeCostBestSolution(startTime+timeout_bid);
 		}
 		return cost;
-	}
-
-	@Override
-	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
-		long time_start = System.currentTimeMillis();
-		// Compute the plans for each vehicle with the selected algorithm.
-		List<FashionVehicle> fashionVehicles = new ArrayList<FashionVehicle>();
-		for (Vehicle vehicle : vehicles) {
-			fashionVehicles.add(new FashionVehicle(vehicle)); 
-		}
-		SLSAlgo algo = new SLSAlgo(fashionVehicles, new ArrayList<Task>(tasks));
-
-		List<Plan> plans = algo.computePlans(time_start+timeout_plan);
-
-        long time_end = System.currentTimeMillis();
-        double duration = (time_end - time_start) / 1000.0;
-        System.out.println(plans);
-        System.out.println("The plan was generated in " + duration + " seconds.");
-        
-        return plans;
 	}
 
 	private Long naiveBid(Task task){

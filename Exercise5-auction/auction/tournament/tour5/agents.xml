@@ -3,8 +3,7 @@
 <agents>
 	<!-- An auto-generated list of agents and their behavior classes -->
 	<!--  - jar directory : agents/ -->
-	<!--  - generated on  : Sat Nov 21 15:14:31 CET 2020 -->
-
+	<!--  - generated on  : Sat Nov 21 20:44:30 CET 2020 -->
 	<agent name="auction-var-smart">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
@@ -12,20 +11,18 @@
 		<set strategy="VARIABLE_SMART"/>
 		<set distribution="TRUE"/>
 	</agent>
-	<agent name="auction-var-smart2">
-		<set class-path="bin/"/>
-		<set class-name="bestagent.AuctionAgent"/>
-		<set algorithm="AUCTION"/>
-		<set strategy="VARIABLE_SMART_2"/>
-		<set distribution="FALSE"/>
-	</agent>
-
 	<agent name="auction-var-dis">
 		<set class-path="bin/"/>
 		<set class-name="bestagent.AuctionAgent"/>
 		<set algorithm="AUCTION"/>
 		<set strategy="VARIABLE_SMART"/>
-		<set distribution="TRUE"/>
+		<set distribution="FALSE"/>
 	</agent>
-
+	<agent name="auction-naive">
+		<set class-path="bin/"/>
+		<set class-name="bestagent.AuctionAgent"/>
+		<set algorithm="AUCTION"/>
+		<set strategy="NAIVE"/>
+		<set distribution="FALSE"/>
+	</agent>
 </agents>

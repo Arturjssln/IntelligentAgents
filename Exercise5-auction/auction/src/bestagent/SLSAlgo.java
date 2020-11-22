@@ -21,7 +21,7 @@ public class SLSAlgo {
     private List<Task> tasks;
     private Solution bestSolutionEver; 
 
-    final int MAX_ITERATION = 1000;
+    final int DEFAULT_ITERATION = 1000;
     final double PROBABILITY_UPDATE_SOLUTION = 0.4; 
     final long timeToComputePlan = 1;
 
@@ -33,8 +33,8 @@ public class SLSAlgo {
         this.bestSolutionEver = currentSolution;
 	}
 
-
-    public List<Plan> computePlans(long end_time) {        
+    public List<Plan> computePlans(long end_time, Integer nbIterations) {    
+        int max_iteration = (nbIterations==null) ? DEFAULT_ITERATION : nbIterations;
         long currentTime = System.currentTimeMillis();
         if (tasks.size()==0) {
             List<Plan> plans =  new ArrayList<Plan>();
@@ -57,14 +57,14 @@ public class SLSAlgo {
             ++iteration; 
             currentTime = System.currentTimeMillis(); 
             timeForOneIteration = (currentTime - startTime)/((long)iteration) + 1;
-        } while((iteration<MAX_ITERATION)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
+        } while((iteration<max_iteration)&& (currentTime + timeForOneIteration + timeToComputePlan + 10 < end_time));
 
         bestSolutionEver.computePlans(this.vehicles); 
         return bestSolutionEver.plans;
     }
 
     public double computeCostBestSolution(long end_time) {
-        return computeCost(computePlans(end_time));
+        return computeCost(computePlans(end_time, null));
     }
 
     public List<Plan> getBestPlansEver() {
@@ -107,7 +107,7 @@ public class SLSAlgo {
         initialSolution.deliveryTimes = deliveryTimes; 
         initialSolution.pickupTimes = pickupTimes;         
         initialSolution.nextTaskForTask = nextTaskForTask; 
-
+        initialSolution.computePlans(this.vehicles);
         return initialSolution;
     }
 
